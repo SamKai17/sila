@@ -49,4 +49,20 @@ class AuthRemoteRepository {
       return Left(AppFailure(message: e.toString()));
     }
   }
+
+  Future<Either<AppFailure, UserModel>> getUserData(final String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ServerConstant.serverURL}/auth/'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode != 200) {
+        return Left(AppFailure(message: response.body));
+      }
+      final user = UserModel.fromJson(response.body);
+      return Right(user);
+    } catch (e) {
+      return Left(AppFailure(message: e.toString()));
+    }
+  }
 }

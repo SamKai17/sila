@@ -14,6 +14,7 @@ class AuthLocalRepository {
 
   void setToken(String? token) {
     if (token != null) {
+      print("new token: $token");
       _sharedPreferences.setString('access', token);
     }
   }

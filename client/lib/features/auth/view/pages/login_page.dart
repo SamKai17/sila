@@ -37,7 +37,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         data: (data) {
           print("login page");
           showSnackBar(context, "Successfully logged in!");
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) {
