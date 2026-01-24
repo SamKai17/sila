@@ -34,12 +34,17 @@ class AuthRemoteRepository {
   Future<Either<AppFailure, UserModel>> register({
     required String username,
     required String password,
+    required String confirmPassword,
   }) async {
     try {
       final response = await http.post(
         Uri.parse('${ServerConstant.serverURL}/auth/register/'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': username, 'password': password}),
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+          'confirm_password': confirmPassword,
+        }),
       );
       if (response.statusCode != 201) {
         return Left(AppFailure(message: response.body));

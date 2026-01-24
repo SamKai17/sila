@@ -8,14 +8,18 @@ class UserModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'username']
 
 class RegistrationModelSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField()
     class Meta:
         model = User
-        fields = ['id', 'username', 'password']
+        fields = ['id', 'username', 'confirm_password', 'password']
         extra_kwargs = {'password': {'write_only': True}}
     
     def create(self, validated_data):
         username = validated_data.get('username')
         password = validated_data.get('password')
+        confirm_password = validated_data.get('confirm_password')
+        if password != confirm_password:
+            raise serializers.ValidationError('Unable to login with passwords not matching')
         user = User.objects.create_user(username=username, password=password)
         return user
 

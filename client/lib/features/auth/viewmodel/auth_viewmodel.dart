@@ -1,15 +1,15 @@
 import 'package:client/core/providers/current_user_notifier.dart';
 import 'package:client/features/auth/model/user_model.dart';
-import 'package:client/features/auth/repositories/auth_local_repository.dart';
+import 'package:client/core/providers/auth_local_repository.dart';
 import 'package:client/features/auth/repositories/auth_remote_repository.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 import 'package:riverpod/riverpod.dart';
 
-final authNotifierProvider = AsyncNotifierProvider<AuthViewmodel, UserModel?>(
-  AuthViewmodel.new,
+final authProvider = AsyncNotifierProvider<AuthNotifier, UserModel?>(
+  AuthNotifier.new,
 );
 
-class AuthViewmodel extends AsyncNotifier<UserModel?> {
+class AuthNotifier extends AsyncNotifier<UserModel?> {
   late AuthRemoteRepository _authRemoteRepository;
   late AuthLocalRepository _authLocalRepository;
   late CurrentUserNotifier _currentUserNotifier;
@@ -18,7 +18,7 @@ class AuthViewmodel extends AsyncNotifier<UserModel?> {
   UserModel? build() {
     _authRemoteRepository = ref.watch(authRemoteRepositoryProvider);
     _authLocalRepository = ref.watch(authLocalRepositoryProvider);
-    _currentUserNotifier = ref.watch(currentUserNotifierProvider.notifier);
+    _currentUserNotifier = ref.watch(currentUserProvider.notifier);
     return null;
   }
 
@@ -35,7 +35,7 @@ class AuthViewmodel extends AsyncNotifier<UserModel?> {
       username: username,
       password: password,
     );
-    final val = switch (res) {
+    final _ = switch (res) {
       fp.Right(value: final r) => state = _authSuccess(r),
       fp.Left(value: final l) => state = AsyncValue.error(
         l,
@@ -47,13 +47,15 @@ class AuthViewmodel extends AsyncNotifier<UserModel?> {
   Future<void> register({
     required String username,
     required String password,
+    required String confirmPassword,
   }) async {
     state = AsyncValue.loading();
     final res = await _authRemoteRepository.register(
       username: username,
       password: password,
+      confirmPassword: confirmPassword,
     );
-    final val = switch (res) {
+    final _ = switch (res) {
       fp.Right(value: final r) => _authSuccess(r),
       fp.Left(value: final l) => state = AsyncValue.error(
         l,
@@ -63,23 +65,23 @@ class AuthViewmodel extends AsyncNotifier<UserModel?> {
   }
 
   AsyncValue<UserModel?> _authSuccess(UserModel user) {
-    _authLocalRepository.setToken(user.access);
-    _currentUserNotifier.setUser(user);
-    return state = AsyncValue.data(user);
-  }
-
-  AsyncValue<UserModel?> _getUserDataSuccess(UserModel user) {
+    _authLocalRepository.setAccessToken(user.access);
+    _authLocalRepository.setRefreshToken(user.refresh);
     _currentUserNotifier.setUser(user);
     return state = AsyncValue.data(user);
   }
 
   Future<UserModel?> getUserData() async {
-    state = AsyncValue.loading();
-    final accessToken = _authLocalRepository.getToken();
+    final accessToken = _authLocalRepository.getAccessToken();
+    final refreshToken = _authLocalRepository.getRefreshToken();
+    // print("token: $accessToken");
     if (accessToken != null) {
+      state = AsyncValue.loading();
       final res = await _authRemoteRepository.getUserData(accessToken);
       final val = switch (res) {
-        fp.Right(value: final r) => _getUserDataSuccess(r),
+        fp.Right(value: final r) => _getUserDataSuccess(
+          r.copyWith(access: accessToken, refresh: refreshToken),
+        ),
         fp.Left(value: final l) => state = AsyncValue.error(
           l,
           StackTrace.current,
@@ -88,5 +90,10 @@ class AuthViewmodel extends AsyncNotifier<UserModel?> {
       return val.value;
     }
     return null;
+  }
+
+  AsyncValue<UserModel?> _getUserDataSuccess(UserModel user) {
+    _currentUserNotifier.setUser(user);
+    return state = AsyncValue.data(user);
   }
 }

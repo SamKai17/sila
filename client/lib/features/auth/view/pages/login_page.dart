@@ -4,7 +4,7 @@ import 'package:client/features/auth/view/pages/register_page.dart';
 import 'package:client/features/auth/view/widgets/auth_button_widget.dart';
 import 'package:client/features/auth/view/widgets/custom_field_widget.dart';
 import 'package:client/features/auth/viewmodel/auth_viewmodel.dart';
-import 'package:client/features/home/view/pages/home_page.dart';
+import 'package:client/features/client/view/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,9 +30,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(
-      authNotifierProvider.select((value) => value.isLoading),
+      authProvider.select((value) => value.isLoading),
     );
-    ref.listen(authNotifierProvider, (_, next) {
+    ref.listen(authProvider, (_, next) {
       next.when(
         data: (data) {
           print("login page");
@@ -47,7 +47,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           );
         },
         error: (error, stackTrace) {
-          showSnackBar(context, error.toString());
+          showSnackBar(context, "error login, wrong username or password!");
         },
         loading: () {},
       );
@@ -84,7 +84,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           ref
-                              .read(authNotifierProvider.notifier)
+                              .read(authProvider.notifier)
                               .login(
                                 username: usernameController.text,
                                 password: passwordController.text,

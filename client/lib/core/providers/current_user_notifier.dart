@@ -1,7 +1,7 @@
 import 'package:client/features/auth/model/user_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final currentUserNotifierProvider = NotifierProvider<CurrentUserNotifier, UserModel?>(
+final currentUserProvider = NotifierProvider<CurrentUserNotifier, UserModel?>(
   CurrentUserNotifier.new,
 );
 
@@ -11,7 +11,7 @@ class CurrentUserNotifier extends Notifier<UserModel?> {
     return null;
   }
 
-  void setUser(UserModel user) {
+  void setUser(UserModel? user) {
     state = user;
   }
 }
