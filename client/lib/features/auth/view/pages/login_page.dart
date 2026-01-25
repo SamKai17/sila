@@ -1,8 +1,8 @@
 import 'package:client/core/utils.dart';
 import 'package:client/core/widgets/loader_widget.dart';
 import 'package:client/features/auth/view/pages/register_page.dart';
-import 'package:client/features/auth/view/widgets/auth_button_widget.dart';
-import 'package:client/features/auth/view/widgets/custom_field_widget.dart';
+import 'package:client/core/widgets/custom_button_widget.dart';
+import 'package:client/core/widgets/custom_field_widget.dart';
 import 'package:client/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:client/features/client/view/pages/home_page.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +79,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       isObscureText: true,
                     ),
                     SizedBox(height: 32.0),
-                    AuthButtonWidget(
+                    CustomButtonWidget(
                       buttonText: "Login",
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
@@ -95,7 +95,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     SizedBox(height: 32.0),
                     RichText(text: TextSpan(text: "Don’t have an account?")),
                     SizedBox(height: 12.0),
-                    AuthButtonWidget(
+                    CustomButtonWidget(
                       buttonText: "Register",
                       onPressed: () {
                         Navigator.push(

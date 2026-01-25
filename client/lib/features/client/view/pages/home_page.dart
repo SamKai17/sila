@@ -2,6 +2,7 @@ import 'package:client/core/providers/auth_local_repository.dart';
 import 'package:client/core/providers/current_user_notifier.dart';
 import 'package:client/core/widgets/loader_widget.dart';
 import 'package:client/features/auth/view/pages/login_page.dart';
+import 'package:client/features/client/view/pages/client_create_page.dart';
 import 'package:client/features/client/view/widgets/client_card_widget.dart';
 import 'package:client/features/client/viewmodel/client_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -12,18 +13,19 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clients = ref.watch(clientProvider);
-    print("here");
-    // ref.read(clientProvider.notifier).getAllClients();
+    final clients = ref.watch(clientListProvider);
+    final user = ref.watch(currentUserProvider);
+    // print("clients: $clients");
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home"),
+        title: Text("Welcome ${user?.username}"),
         actions: [
           IconButton(
             onPressed: () {
               print("clear user");
               ref.read(currentUserProvider.notifier).setUser(null);
               ref.read(authLocalRepositoryProvider).clearTokens();
+              ref.invalidate(clientListProvider);
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -43,33 +45,51 @@ class HomePage extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(
-                child: clients.when(
-                  data: (data) {
-                    print(data.length);
-                    return ListView.builder(
+              Text("hello world"),
+              clients.when(
+                data: (data) {
+                  return Expanded(
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: 12.0);
+                      },
                       itemCount: data.length,
                       itemBuilder: (context, index) {
-                        // final client = data[index];
-                        return ClientCardWidget();
+                        final client = data[index];
+                        // print(client);
+                        return ClientCardWidget(
+                          key: ValueKey(client.id),
+                          client: client,
+                        );
                       },
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return Text("no clients found");
-                  },
-                  loading: () {
-                    return LoaderWidget();
-                  },
-                ),
+                    ),
+                  );
+                },
+                error: (error, stackTrace) {
+                  return Text("no clients found");
+                },
+                loading: () {
+                  return LoaderWidget();
+                },
               ),
-              Spacer(),
-              FloatingActionButton(onPressed: () {}, child: Icon(Icons.add)),
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return ClientCreatePage();
+              },
+            ),
+          );
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
