@@ -8,16 +8,25 @@ import 'package:client/features/client/viewmodel/client_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  String searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
     final selectedClients = ref.watch(selectedClientsProvider);
     bool selectedMode = selectedClients.isEmpty ? false : true;
-    final clients = ref.watch(clientListProvider);
+    // final clients = ref.watch(clientListProvider);
+    final clients = ref.watch(searchClientList(searchQuery));
     final user = ref.watch(currentUserProvider);
-    // print("clients: $clients");
+    print("search: $searchQuery");
     return Scaffold(
       appBar: AppBar(
         title: Text("Welcome ${user?.username}"),
@@ -58,7 +67,29 @@ class HomePage extends ConsumerWidget {
           child: Column(
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text("hello world"),
+              TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  suffixIcon: searchQuery != ''
+                      ? IconButton(
+                          onPressed: () {
+                            setState(() {
+                              searchQuery = '';
+                              _searchController.clear();
+                            });
+                          },
+                          icon: Icon(Icons.close),
+                        )
+                      : null,
+                ),
+              ),
+              SizedBox(height: 32.0),
               clients.when(
                 data: (data) {
                   return Expanded(

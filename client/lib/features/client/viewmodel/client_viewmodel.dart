@@ -26,6 +26,16 @@ class SelectedClientsNotifier extends Notifier<List<int>> {
   }
 }
 
+final searchClientList = Provider.autoDispose
+    .family<AsyncValue<List<ClientModel>>, String>((ref, query) {
+      final asyncClientList = ref.watch(clientListProvider);
+      return asyncClientList.whenData((clientList) {
+        return clientList
+            .where((client) => client.name.contains(query))
+            .toList();
+      });
+    });
+
 final clientProvider = Provider.autoDispose
     .family<AsyncValue<ClientModel?>, int>((ref, id) {
       final asyncClientList = ref.watch(clientListProvider);
