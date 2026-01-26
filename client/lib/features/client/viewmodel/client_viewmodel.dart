@@ -5,6 +5,27 @@ import 'package:client/features/client/repositories/client_repository.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 
+final selectedClientsProvider = NotifierProvider(SelectedClientsNotifier.new);
+
+class SelectedClientsNotifier extends Notifier<List<int>> {
+  @override
+  List<int> build() {
+    return [];
+  }
+
+  void addClient(int id) {
+    state = [...state, id];
+  }
+
+  void removeClient(int id) {
+    state = state.where((clientId) => clientId != id).toList();
+  }
+
+  void clear() {
+    state = [];
+  }
+}
+
 final clientProvider = Provider.autoDispose
     .family<AsyncValue<ClientModel?>, int>((ref, id) {
       final asyncClientList = ref.watch(clientListProvider);
@@ -103,6 +124,33 @@ class ClientNotifier extends AsyncNotifier<List<ClientModel>> {
       }
       return client;
     }).toList();
+    state = AsyncValue.data(newList);
+  }
+
+  Future<void> removeClients() async {
+    final selectedClients = ref.read(selectedClientsProvider);
+    String? token = _authLocalRepository.getAccessToken();
+    if (token != null) {
+      state = AsyncValue.loading();
+      final res = await _clientRepository.removeClient(
+        token: token,
+        ids: selectedClients,
+      );
+      final _ = switch (res) {
+        fp.Right(value: final r) => removeClientSuccess(r),
+        fp.Left(value: final l) => state = AsyncValue.error(
+          l,
+          StackTrace.current,
+        ),
+      };
+    }
+  }
+
+  void removeClientSuccess(List<int> clientIdsList) {
+    final oldList = state.value ?? [];
+    final newList = oldList
+        .where((client) => !clientIdsList.contains(client.id))
+        .toList();
     state = AsyncValue.data(newList);
   }
 }

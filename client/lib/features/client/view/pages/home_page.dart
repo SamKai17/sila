@@ -13,6 +13,8 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedClients = ref.watch(selectedClientsProvider);
+    bool selectedMode = selectedClients.isEmpty ? false : true;
     final clients = ref.watch(clientListProvider);
     final user = ref.watch(currentUserProvider);
     // print("clients: $clients");
@@ -20,6 +22,15 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: Text("Welcome ${user?.username}"),
         actions: [
+          if (selectedMode)
+            IconButton(
+              onPressed: () async {
+                await ref.read(clientListProvider.notifier).removeClients();
+                ref.read(selectedClientsProvider.notifier).clear();
+                // remove all the items
+              },
+              icon: Icon(Icons.delete),
+            ),
           IconButton(
             onPressed: () {
               print("clear user");
@@ -62,6 +73,7 @@ class HomePage extends ConsumerWidget {
                         return ClientCardWidget(
                           key: ValueKey(client.id),
                           client: client,
+                          selectedMode: selectedMode,
                         );
                       },
                     ),

@@ -85,4 +85,28 @@ class ClientRepository {
       return Left(AppFailure());
     }
   }
+
+  Future<Either<AppFailure, List<int>>> removeClient({
+    required String token,
+    required List<int> ids,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${ServerConstant.serverURL}/api/clients/delete/"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'ids': ids}),
+      );
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final deletedClients = List<int>.from(data['ids']);
+      if (response.statusCode == 200) {
+        return Right(deletedClients);
+      }
+      return Left(AppFailure());
+    } catch (e) {
+      return Left(AppFailure());
+    }
+  }
 }
