@@ -7,36 +7,84 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ClientCardWidget extends ConsumerStatefulWidget {
   final ClientModel client;
-  bool selectedMode;
-  ClientCardWidget({
-    super.key,
-    required this.client,
-    required this.selectedMode,
-  });
+  const ClientCardWidget({super.key, required this.client});
 
   @override
   ConsumerState<ClientCardWidget> createState() => _ClientCardWidgetState();
 }
 
 class _ClientCardWidgetState extends ConsumerState<ClientCardWidget> {
-  bool isSelected = false;
   @override
   Widget build(BuildContext context) {
+    final selectedClients = ref.watch(selectedClientsProvider);
+    final isSelected = selectedClients.contains(widget.client.id);
+    bool selectedMode = selectedClients.isEmpty ? false : true;
+    // print("clients: $selectedClients");
+    // print("selectedItem: $isSelected");
+    // print("mode: $selectedMode");
     return SizedBox(
       width: double.infinity,
+      // height: 90.0,
       child: GestureDetector(
         child: Card(
-          color: isSelected == false ? AppPallete.surface : Colors.amber,
+          color: isSelected
+              ? AppPallete.selectedBackground
+              : AppPallete.surface,
           child: Padding(
-            padding: const EdgeInsets.all(18.0),
+            padding: const EdgeInsets.all(14.0),
             child: Row(
               children: [
-                CircleAvatar(),
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 32.0,
+                      backgroundColor: AppPallete.avatarBackground,
+                      foregroundColor: AppPallete.primary,
+                      child: Text(widget.client.name[0]),
+                    ),
+                    if (isSelected)
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        // alignment: Alignment.bottomRight,
+                        child: Container(
+                          height: 20,
+                          width: 20,
+                          decoration: BoxDecoration(
+                            color: AppPallete.primary,
+                            shape: BoxShape.circle,
+                            // borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.black,
+                            size: 15.0,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+
                 SizedBox(width: 18.0),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.client.name),
-                    Text(widget.client.phone),
+                    Text(
+                      widget.client.name,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: AppPallete.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      widget.client.phone,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w500,
+                        color: AppPallete.greyText,
+                      ),
+                    ),
                   ],
                 ),
                 Spacer(),
@@ -46,22 +94,18 @@ class _ClientCardWidgetState extends ConsumerState<ClientCardWidget> {
           ),
         ),
         onLongPress: () {
-          setState(() {
-            isSelected = !isSelected;
-            if (isSelected == true) {
-              ref
-                  .read(selectedClientsProvider.notifier)
-                  .addClient(widget.client.id);
-            } else {
-              ref
-                  .read(selectedClientsProvider.notifier)
-                  .removeClient(widget.client.id);
-            }
-          });
-          print("long pressed ${isSelected}");
+          if (isSelected == false) {
+            ref
+                .read(selectedClientsProvider.notifier)
+                .addClient(widget.client.id);
+          } else {
+            ref
+                .read(selectedClientsProvider.notifier)
+                .removeClient(widget.client.id);
+          }
         },
         onTap: () {
-          if (!widget.selectedMode) {
+          if (selectedMode == false) {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -71,18 +115,15 @@ class _ClientCardWidgetState extends ConsumerState<ClientCardWidget> {
               ),
             );
           } else {
-            setState(() {
-              isSelected = !isSelected;
-              if (isSelected == true) {
-                ref
-                    .read(selectedClientsProvider.notifier)
-                    .addClient(widget.client.id);
-              } else {
-                ref
-                    .read(selectedClientsProvider.notifier)
-                    .removeClient(widget.client.id);
-              }
-            });
+            if (isSelected == false) {
+              ref
+                  .read(selectedClientsProvider.notifier)
+                  .addClient(widget.client.id);
+            } else {
+              ref
+                  .read(selectedClientsProvider.notifier)
+                  .removeClient(widget.client.id);
+            }
           }
         },
       ),

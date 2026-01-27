@@ -5,8 +5,11 @@ class AppPallete {
   // Main branding colors
   static const primary = Color(0xFFE6E5E8);
   static const background = Color(0xFF252529); // App background
+  static const avatarBackground = Color(0xFF313037); // App background
+  static const selectedBackground = Color(0xFF60636B); // App background
   static const surface = Color(0xFF3D3E43); // Cards, containers
   static const onPrimary = Color(0xFF19181A);
+  static const greyText = Color(0xFF95979F); // App background
   // static const secondary = Color(0xFF6BA48F);
 
   // Backgrounds

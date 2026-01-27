@@ -1,11 +1,10 @@
 import 'package:client/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static TextTheme _buildTextTheme() {
     final base = ThemeData.dark().textTheme;
-    final poppinsBase = GoogleFonts.poppinsTextTheme(base);
+    final poppinsBase = base.apply(fontFamily: 'Poppins');
     return poppinsBase.copyWith(
       headlineLarge: poppinsBase.headlineLarge?.copyWith(
         fontSize: 48,

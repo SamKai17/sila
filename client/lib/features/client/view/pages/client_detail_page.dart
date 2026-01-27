@@ -1,4 +1,5 @@
-import 'package:client/core/widgets/custom_button_widget.dart';
+import 'package:client/core/theme/app_pallete.dart';
+// import 'package:client/core/widgets/custom_button_widget.dart';
 import 'package:client/core/widgets/loader_widget.dart';
 import 'package:client/features/client/view/pages/client_update_page.dart';
 import 'package:client/features/client/viewmodel/client_viewmodel.dart';
@@ -27,7 +28,7 @@ class ClientDetailPage extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return ClientUpdatePage(client: client!);
+                        return ClientUpdatePage(client: client);
                       },
                     ),
                   );
@@ -38,23 +39,68 @@ class ClientDetailPage extends ConsumerWidget {
           ),
           body: Padding(
             padding: const EdgeInsets.all(18.0),
-            child: Column(
-              children: [
-                CircleAvatar(radius: 50.0),
-                Text(client.name),
-                Text(client.city),
-                Text(client.phone),
-                SizedBox(height: 32),
-                SizedBox(
-                  height: 70.0,
-                  width: 70.0,
-                  child: Card(child: Icon(Icons.swap_horiz)),
-                ),
-                SizedBox(height: 32),
-                CustomButtonWidget(buttonText: 'Buy', onPressed: () {}),
-                SizedBox(height: 32),
-                CustomButtonWidget(buttonText: 'Sell', onPressed: () {}),
-              ],
+            child: SizedBox(
+              // color: Colors.amber,
+              width: double.infinity,
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 50.0,
+                    backgroundColor: AppPallete.avatarBackground,
+                    foregroundColor: AppPallete.primary,
+                    child: Text(client.name[0]),
+                  ),
+                  Text(
+                    client.name,
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  Text(
+                    client.city,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w500,
+                      color: AppPallete.greyText,
+                    ),
+                  ),
+                  Text(
+                    client.phone,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w500,
+                      color: AppPallete.greyText,
+                    ),
+                  ),
+                  SizedBox(height: 32),
+                  SizedBox(
+                    height: 70.0,
+                    width: 70.0,
+                    child: Card(child: Icon(Icons.swap_horiz)),
+                  ),
+                  Spacer(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () {},
+                          child: Text('Buy'),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () {},
+                          child: Text('Sell'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // CustomButtonWidget(buttonText: 'Buy', onPressed: () {}),
+                  // CustomButtonWidget(buttonText: 'Sell', onPressed: () {}),
+                ],
+              ),
             ),
           ),
         );

@@ -1,5 +1,6 @@
 import 'package:client/core/providers/auth_local_repository.dart';
 import 'package:client/core/providers/current_user_notifier.dart';
+import 'package:client/core/theme/app_pallete.dart';
 import 'package:client/core/widgets/loader_widget.dart';
 import 'package:client/features/auth/view/pages/login_page.dart';
 import 'package:client/features/client/view/pages/client_create_page.dart';
@@ -23,49 +24,127 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final selectedClients = ref.watch(selectedClientsProvider);
     bool selectedMode = selectedClients.isEmpty ? false : true;
-    // final clients = ref.watch(clientListProvider);
     final clients = ref.watch(searchClientList(searchQuery));
-    final user = ref.watch(currentUserProvider);
-    print("search: $searchQuery");
+    // final clients = ref.watch(clientListProvider);
+    // final user = ref.watch(currentUserProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome ${user?.username}"),
-        actions: [
-          if (selectedMode)
-            IconButton(
-              onPressed: () async {
-                await ref.read(clientListProvider.notifier).removeClients();
-                ref.read(selectedClientsProvider.notifier).clear();
-                // remove all the items
-              },
-              icon: Icon(Icons.delete),
-            ),
-          IconButton(
-            onPressed: () {
-              print("clear user");
-              ref.read(currentUserProvider.notifier).setUser(null);
-              ref.read(authLocalRepositoryProvider).clearTokens();
-              ref.invalidate(clientListProvider);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return LoginPage();
-                  },
+        // backgroundColor: Colors.amber,
+        leadingWidth: 68,
+        leading: selectedMode
+            ? Padding(
+                padding: const EdgeInsets.only(left: 18.0),
+                child: Center(
+                  child: Container(
+                    height: 50.0,
+                    width: 50.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppPallete.surface,
+                    ),
+                    child: IconButton(
+                      onPressed: () async {
+                        ref.read(selectedClientsProvider.notifier).clear();
+                      },
+                      icon: Icon(Icons.close),
+                    ),
+                  ),
                 ),
-              );
-            },
-            icon: Icon(Icons.logout),
-          ),
+              )
+            : null,
+        title: !selectedMode ? Text("Sila") : null,
+        titleSpacing: 18.0,
+        actions: [
+          selectedMode
+              ? Container(
+                  height: 50.0,
+                  width: 50.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppPallete.surface,
+                  ),
+                  child: IconButton(
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Center(child: Text("Delete this client?")),
+
+                            // content: Text("this action can't be reversed"),
+                            // actionsAlignment: MainAxisAlignment.spaceBetween,
+                            actions: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: FilledButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text("Cancel"),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.0),
+                                  Expanded(
+                                    child: FilledButton(
+                                      onPressed: () async {
+                                        await ref
+                                            .read(clientListProvider.notifier)
+                                            .removeClients();
+                                        ref
+                                            .read(
+                                              selectedClientsProvider.notifier,
+                                            )
+                                            .clear();
+                                        if (context.mounted) {
+                                          Navigator.of(context).pop();
+                                        }
+                                      },
+                                      child: Text("Confirm"),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    icon: Icon(Icons.delete),
+                  ),
+                )
+              : Container(
+                  height: 50.0,
+                  width: 50.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppPallete.surface,
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      ref.read(currentUserProvider.notifier).setUser(null);
+                      ref.read(authLocalRepositoryProvider).clearTokens();
+                      ref.invalidate(clientListProvider);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return LoginPage();
+                          },
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.logout),
+                  ),
+                ),
+          SizedBox(width: 18),
         ],
       ),
-      body: Container(
-        // color: Colors.amber,
+      body: SizedBox(
         width: double.infinity,
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Column(
-            // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               TextField(
                 controller: _searchController,
@@ -75,6 +154,22 @@ class _HomePageState extends ConsumerState<HomePage> {
                   });
                 },
                 decoration: InputDecoration(
+                  hintText: "Search",
+                  contentPadding: EdgeInsets.all(10.0),
+                  filled: true,
+                  fillColor: AppPallete.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
                   prefixIcon: Icon(Icons.search),
                   suffixIcon: searchQuery != ''
                       ? IconButton(
@@ -104,7 +199,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                         return ClientCardWidget(
                           key: ValueKey(client.id),
                           client: client,
-                          selectedMode: selectedMode,
                         );
                       },
                     ),
