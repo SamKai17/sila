@@ -1,11 +1,12 @@
+import 'package:client/core/failure/failure.dart';
 import 'package:client/core/providers/auth_local_repository.dart';
 import 'package:client/core/providers/current_user_notifier.dart';
 import 'package:client/core/theme/app_pallete.dart';
 import 'package:client/core/widgets/loader_widget.dart';
-import 'package:client/features/auth/view/pages/login_page.dart';
-import 'package:client/features/client/view/pages/client_create_page.dart';
-import 'package:client/features/client/view/widgets/client_card_widget.dart';
-import 'package:client/features/client/viewmodel/client_viewmodel.dart';
+import 'package:client/ui/auth/widgets/login_page.dart';
+import 'package:client/ui/client/view_model/client_viewmodel.dart';
+import 'package:client/ui/client/widgets/client_create_page.dart';
+import 'package:client/ui/client/widgets/client_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,7 +45,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                     child: IconButton(
                       onPressed: () async {
-                        ref.read(selectedClientsProvider.notifier).clear();
+                        ref.read(currentUserProvider.notifier).setUser(null);
+                        // ref.read(selectedClientsProvider.notifier).clear();
                       },
                       icon: Icon(Icons.close),
                     ),
@@ -205,7 +207,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   );
                 },
                 error: (error, stackTrace) {
-                  return Text("no clients found");
+                  final err = error as AppFailure;
+                  return Text(err.toString());
                 },
                 loading: () {
                   return LoaderWidget();

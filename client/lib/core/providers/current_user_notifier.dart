@@ -1,4 +1,4 @@
-import 'package:client/features/auth/model/user_model.dart';
+import 'package:client/domain/models/auth/user_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final currentUserProvider = NotifierProvider<CurrentUserNotifier, UserModel?>(

@@ -1,29 +1,31 @@
 import 'package:client/core/utils.dart';
 import 'package:client/core/widgets/loader_widget.dart';
-import 'package:client/features/auth/view/pages/register_page.dart';
 import 'package:client/core/widgets/custom_button_widget.dart';
 import 'package:client/core/widgets/custom_field_widget.dart';
-import 'package:client/features/auth/viewmodel/auth_viewmodel.dart';
-import 'package:client/features/client/view/pages/home_page.dart';
+import 'package:client/ui/auth/view_models/auth_viewmodel.dart';
+import 'package:client/ui/client/widgets/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends ConsumerStatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     usernameController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -35,25 +37,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.listen(authProvider, (_, next) {
       next.when(
         data: (data) {
-          print("login page");
-          showSnackBar(context, "Successfully logged in!");
-          Navigator.pushReplacement(
+          showSnackBar(context, "Account created Successfully!");
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) {
                 return HomePage();
               },
             ),
+            (route) => false,
           );
         },
         error: (error, stackTrace) {
-          showSnackBar(context, "error login, wrong username or password!");
+          showSnackBar(context, error.toString());
         },
         loading: () {},
       );
     });
+
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text("Registration")),
       body: isLoading
           ? LoaderWidget()
           : Padding(
@@ -64,7 +67,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Sila",
+                      "Create a free account",
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
                     SizedBox(height: 32.0),
@@ -78,34 +81,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       controller: passwordController,
                       isObscureText: true,
                     ),
-                    SizedBox(height: 32.0),
-                    CustomButtonWidget(
-                      buttonText: "Login",
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          ref
-                              .read(authProvider.notifier)
-                              .login(
-                                username: usernameController.text,
-                                password: passwordController.text,
-                              );
-                        }
-                      },
+                    SizedBox(height: 24.0),
+                    CustomFieldWidget(
+                      hintText: "Confirm Password",
+                      controller: confirmPasswordController,
+                      isObscureText: true,
                     ),
                     SizedBox(height: 32.0),
-                    RichText(text: TextSpan(text: "Don’t have an account?")),
-                    SizedBox(height: 12.0),
                     CustomButtonWidget(
                       buttonText: "Register",
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return RegisterPage();
-                            },
-                          ),
-                        );
+                        if (formKey.currentState!.validate()) {
+                          ref
+                              .read(authProvider.notifier)
+                              .register(
+                                username: usernameController.text,
+                                password: passwordController.text,
+                                confirmPassword: confirmPasswordController.text,
+                              );
+                        }
                       },
                     ),
                   ],

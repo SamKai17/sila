@@ -1,7 +1,7 @@
 import 'package:client/core/theme/app_pallete.dart';
-import 'package:client/features/client/model/client_model.dart';
-import 'package:client/features/client/view/pages/client_detail_page.dart';
-import 'package:client/features/client/viewmodel/client_viewmodel.dart';
+import 'package:client/domain/models/client/client_model.dart';
+import 'package:client/ui/client/view_model/client_viewmodel.dart';
+import 'package:client/ui/client/widgets/client_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

@@ -1,8 +1,8 @@
 import 'package:client/core/theme/app_pallete.dart';
 // import 'package:client/core/widgets/custom_button_widget.dart';
 import 'package:client/core/widgets/loader_widget.dart';
-import 'package:client/features/client/view/pages/client_update_page.dart';
-import 'package:client/features/client/viewmodel/client_viewmodel.dart';
+import 'package:client/ui/client/view_model/client_viewmodel.dart';
+import 'package:client/ui/client/widgets/client_update_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

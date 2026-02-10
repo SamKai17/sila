@@ -1,7 +1,7 @@
 import 'package:client/core/providers/current_user_notifier.dart';
-import 'package:client/features/auth/model/user_model.dart';
+import 'package:client/data/repositories/auth/auth_remote_repository.dart';
+import 'package:client/domain/models/auth/user_model.dart';
 import 'package:client/core/providers/auth_local_repository.dart';
-import 'package:client/features/auth/repositories/auth_remote_repository.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 import 'package:riverpod/riverpod.dart';
 
@@ -71,14 +71,14 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     return state = AsyncValue.data(user);
   }
 
-  Future<UserModel?> getUserData() async {
+  Future<void> getUserData() async {
     final accessToken = _authLocalRepository.getAccessToken();
     final refreshToken = _authLocalRepository.getRefreshToken();
     // print("token: $accessToken");
     if (accessToken != null) {
       state = AsyncValue.loading();
       final res = await _authRemoteRepository.getUserData(accessToken);
-      final val = switch (res) {
+      final _ = switch (res) {
         fp.Right(value: final r) => _getUserDataSuccess(
           r.copyWith(access: accessToken, refresh: refreshToken),
         ),
@@ -87,9 +87,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
           StackTrace.current,
         ),
       };
-      return val.value;
     }
-    return null;
   }
 
   AsyncValue<UserModel?> _getUserDataSuccess(UserModel user) {

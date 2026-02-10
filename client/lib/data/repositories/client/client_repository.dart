@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:client/core/constants/server_constant.dart';
 import 'package:client/core/failure/failure.dart';
-import 'package:client/features/client/model/client_model.dart';
+import 'package:client/domain/models/client/client_model.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod/riverpod.dart';
@@ -9,6 +9,32 @@ import 'package:riverpod/riverpod.dart';
 final clientRepositoryProvider = Provider<ClientRepository>((ref) {
   return ClientRepository();
 });
+
+Future<void> refreshToken(String refresh) async {
+  final response = await http.post(
+    Uri.parse('${ServerConstant.serverURL}/api/token/refresh/'),
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode({'refresh': refresh}),
+  );
+  if (response.statusCode == 200) {
+    
+  }
+}
+
+Future<http.Response> authenticateResponse(
+  Future<http.Response> Function() requestMethod,
+  String refresh,
+) async {
+  final response = await requestMethod();
+  if (response.statusCode == 401) {
+    refreshToken(refresh);
+    // if success
+    return await requestMethod();
+    // if failed to refresh
+    // refresh the token
+  }
+  return response;
+}
 
 class ClientRepository {
   Future<Either<AppFailure, List<ClientModel>>> getAllClients(
@@ -19,20 +45,15 @@ class ClientRepository {
         Uri.parse('${ServerConstant.serverURL}/api/clients/'),
         headers: {'Authorization': 'Bearer $token'},
       );
-      // print(response.body);
-      print("status|: ${response.statusCode}");
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as List;
-        // print(data);
         final clientList = data.map((e) {
           return ClientModel.fromMap(e);
         }).toList();
-        // print(clientList);
         return Right(clientList);
       }
       return Left(AppFailure());
     } catch (e) {
-      // print(e);
       return Left(AppFailure());
     }
   }

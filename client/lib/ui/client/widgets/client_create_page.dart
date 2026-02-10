@@ -1,6 +1,6 @@
 import 'package:client/core/widgets/custom_button_widget.dart';
 import 'package:client/core/widgets/custom_field_widget.dart';
-import 'package:client/features/client/viewmodel/client_viewmodel.dart';
+import 'package:client/ui/client/view_model/client_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

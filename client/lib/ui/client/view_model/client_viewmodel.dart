@@ -1,7 +1,7 @@
 import 'package:client/core/failure/failure.dart';
 import 'package:client/core/providers/auth_local_repository.dart';
-import 'package:client/features/client/model/client_model.dart';
-import 'package:client/features/client/repositories/client_repository.dart';
+import 'package:client/domain/models/client/client_model.dart';
+import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 
@@ -72,7 +72,7 @@ class ClientNotifier extends AsyncNotifier<List<ClientModel>> {
       // print(result);
       return result;
     }
-    throw AppFailure();
+    throw AppFailure(message: "Access token has expired");
   }
 
   Future<void> addClient({String? name, String? phone, String? city}) async {
