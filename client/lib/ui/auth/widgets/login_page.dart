@@ -1,21 +1,15 @@
-import 'package:client/core/utils.dart';
-import 'package:client/core/widgets/loader_widget.dart';
-import 'package:client/ui/auth/widgets/register_page.dart';
-import 'package:client/core/widgets/custom_button_widget.dart';
-import 'package:client/core/widgets/custom_field_widget.dart';
-import 'package:client/ui/auth/view_models/auth_viewmodel.dart';
-import 'package:client/ui/client/widgets/home_page.dart';
+import 'package:client/ui/core/ui/custom_button_widget.dart';
+import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -29,89 +23,47 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(
-      authProvider.select((value) => value.isLoading),
-    );
-    ref.listen(authProvider, (_, next) {
-      next.when(
-        data: (data) {
-          print("login page");
-          showSnackBar(context, "Successfully logged in!");
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return HomePage();
-              },
-            ),
-          );
-        },
-        error: (error, stackTrace) {
-          showSnackBar(context, "error login, wrong username or password!");
-        },
-        loading: () {},
-      );
-    });
     return Scaffold(
       appBar: AppBar(),
-      body: isLoading
-          ? LoaderWidget()
-          : Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Sila",
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                    SizedBox(height: 32.0),
-                    CustomFieldWidget(
-                      hintText: "Username",
-                      controller: usernameController,
-                    ),
-                    SizedBox(height: 24.0),
-                    CustomFieldWidget(
-                      hintText: "Password",
-                      controller: passwordController,
-                      isObscureText: true,
-                    ),
-                    SizedBox(height: 32.0),
-                    CustomButtonWidget(
-                      buttonText: "Login",
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          ref
-                              .read(authProvider.notifier)
-                              .login(
-                                username: usernameController.text,
-                                password: passwordController.text,
-                              );
-                        }
-                      },
-                    ),
-                    SizedBox(height: 32.0),
-                    RichText(text: TextSpan(text: "Don’t have an account?")),
-                    SizedBox(height: 12.0),
-                    CustomButtonWidget(
-                      buttonText: "Register",
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return RegisterPage();
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Sila", style: Theme.of(context).textTheme.headlineLarge),
+              SizedBox(height: 32.0),
+              CustomFieldWidget(
+                hintText: "Username",
+                controller: usernameController,
               ),
-            ),
+              SizedBox(height: 24.0),
+              CustomFieldWidget(
+                hintText: "Password",
+                controller: passwordController,
+                isObscureText: true,
+              ),
+              SizedBox(height: 32.0),
+              CustomButtonWidget(
+                buttonText: "Login",
+                onPressed: () async {
+
+                },
+              ),
+              SizedBox(height: 32.0),
+              RichText(text: TextSpan(text: "Don’t have an account?")),
+              SizedBox(height: 12.0),
+              CustomButtonWidget(
+                buttonText: "Register",
+                onPressed: () {
+
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

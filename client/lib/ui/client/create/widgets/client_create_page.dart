@@ -1,17 +1,15 @@
-import 'package:client/core/widgets/custom_button_widget.dart';
-import 'package:client/core/widgets/custom_field_widget.dart';
-import 'package:client/ui/client/view_model/client_viewmodel.dart';
+import 'package:client/ui/core/ui/custom_button_widget.dart';
+import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ClientCreatePage extends ConsumerStatefulWidget {
+class ClientCreatePage extends StatefulWidget {
   const ClientCreatePage({super.key});
 
   @override
-  ConsumerState<ClientCreatePage> createState() => _ClientCreatePageState();
+  State<ClientCreatePage> createState() => _ClientCreatePageState();
 }
 
-class _ClientCreatePageState extends ConsumerState<ClientCreatePage> {
+class _ClientCreatePageState extends State<ClientCreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -42,21 +40,7 @@ class _ClientCreatePageState extends ConsumerState<ClientCreatePage> {
               SizedBox(height: 32.0),
               CustomFieldWidget(hintText: 'city', controller: _cityController),
               Spacer(),
-              CustomButtonWidget(
-                buttonText: 'save',
-                onPressed: () async {
-                  await ref
-                      .read(clientListProvider.notifier)
-                      .addClient(
-                        name: _nameController.text,
-                        phone: _phoneController.text,
-                        city: _cityController.text,
-                      );
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                },
-              ),
+              CustomButtonWidget(buttonText: 'save', onPressed: () async {}),
             ],
           ),
         ),

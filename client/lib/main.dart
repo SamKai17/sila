@@ -1,28 +1,22 @@
-import 'package:client/core/theme/app_theme.dart';
-import 'package:client/ui/auth/view_models/auth_viewmodel.dart';
-import 'package:client/ui/client/widgets/home_page.dart';
+import 'package:client/ui/core/theme/app_theme.dart';
+import 'package:client/ui/client/home/widgets/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final container = ProviderContainer();
-  await container.read(authProvider.notifier).initSharedPreferences();
-  await container.read(authProvider.notifier).getUserData();
-  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+  runApp(const MyApp());
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // final user = ref.watch(currentUserProvider);
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sila',
       theme: AppTheme.darkThemeMode,
       themeMode: ThemeMode.dark,
-      home: HomePage(),
+      home: HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

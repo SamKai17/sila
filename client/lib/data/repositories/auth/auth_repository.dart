@@ -1,16 +1,21 @@
-import 'package:flutter/material.dart';
 
-class AuthViewmodel extends ChangeNotifier {
+class AuthRepository {
   Future<void> login({
     required String username,
     required String password,
-  }) async {}
+  }) async {
+
+  }
 
   Future<void> register({
     required String username,
     required String password,
     required String confirmPassword,
-  }) async {}
+  }) async {
+  
+  }
 
-  Future<void> getUserData() async {}
+  Future<void> getUserData(final String token) async {
+ 
+  }
 }

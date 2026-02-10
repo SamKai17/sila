@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 
 class CustomButtonWidget extends StatelessWidget {
   final String buttonText;
@@ -17,10 +17,10 @@ class CustomButtonWidget extends StatelessWidget {
       style: FilledButton.styleFrom(
         minimumSize: Size(double.infinity, 56.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        textStyle: GoogleFonts.poppins(
-          fontSize: 20.0,
-          fontWeight: FontWeight.w600,
-        ),
+        // textStyle: GoogleFonts.poppins(
+        //   fontSize: 20.0,
+        //   fontWeight: FontWeight.w600,
+        // ),
       ),
       child: Text(buttonText),
     );

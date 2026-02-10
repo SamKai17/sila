@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 
 class CustomFieldWidget extends StatelessWidget {
   final String hintText;
@@ -16,7 +16,7 @@ class CustomFieldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
+      // style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
       decoration: InputDecoration(hintText: hintText),
       obscureText: isObscureText,
       validator: (value) {
