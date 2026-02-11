@@ -1,14 +1,16 @@
 import 'dart:collection';
-
+import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/command.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter/material.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  HomeViewModel() {
+  HomeViewModel({required ClientRepository clientRepository})
+      : _clientRepository = clientRepository {
     load = Command0(_load)..execute();
   }
+  final ClientRepository _clientRepository;
 
   late Command0 load;
 
@@ -17,10 +19,17 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<Result<void>> _load() async {
     await Future.delayed(const Duration(seconds: 2));
-    _clients.add(Client(
-        id: "0", name: "oussamaaall", phone: "0697878", city: "casablanca"));
-    _clients.add(
-        Client(id: "0", name: "aya", phone: "0697878", city: "casablanca"));
-    return Result.ok(null);
+    try {
+      final result = await _clientRepository.getClientsList();
+      switch (result) {
+        case Ok():
+          _clients = result.value;
+          return Result.ok(null);
+        case Error():
+          return Result.error(result.error);
+      }
+    } finally {
+      notifyListeners();
+    }
   }
 }
