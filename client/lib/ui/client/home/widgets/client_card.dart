@@ -1,19 +1,20 @@
+import 'package:client/domain/models/client/client.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
-class ClientCardWidget extends StatefulWidget {
-  const ClientCardWidget({super.key});
+class ClientCard extends StatefulWidget {
+  const ClientCard({super.key, required this.client});
+  final Client client;
 
   @override
-  State<ClientCardWidget> createState() => _ClientCardWidgetState();
+  State<ClientCard> createState() => _ClientCardState();
 }
 
-class _ClientCardWidgetState extends State<ClientCardWidget> {
+class _ClientCardState extends State<ClientCard> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      // height: 90.0,
       child: GestureDetector(
         child: Card(
           color: AppPallete.surface,
@@ -32,14 +33,12 @@ class _ClientCardWidgetState extends State<ClientCardWidget> {
                     Positioned(
                       bottom: 0,
                       right: 0,
-                      // alignment: Alignment.bottomRight,
                       child: Container(
                         height: 20,
                         width: 20,
                         decoration: BoxDecoration(
                           color: AppPallete.primary,
                           shape: BoxShape.circle,
-                          // borderRadius: BorderRadius.circular(30.0),
                         ),
                         child: Icon(
                           Icons.check,
@@ -50,13 +49,12 @@ class _ClientCardWidgetState extends State<ClientCardWidget> {
                     ),
                   ],
                 ),
-
                 SizedBox(width: 18.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'oussama',
+                      widget.client.name,
                       style: TextStyle(
                         fontSize: 18.0,
                         color: AppPallete.primary,
@@ -64,7 +62,7 @@ class _ClientCardWidgetState extends State<ClientCardWidget> {
                       ),
                     ),
                     Text(
-                      '0769797',
+                      widget.client.phone,
                       style: TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w500,
