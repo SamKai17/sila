@@ -9,7 +9,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String searchQuery = '';
+  // String searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
   @override

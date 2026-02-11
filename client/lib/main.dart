@@ -1,5 +1,5 @@
+import 'package:client/routing/router.dart';
 import 'package:client/ui/core/theme/app_theme.dart';
-import 'package:client/ui/client/home/widgets/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,12 +12,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Sila',
       theme: AppTheme.darkThemeMode,
       themeMode: ThemeMode.dark,
-      home: HomeScreen(),
       debugShowCheckedModeBanner: false,
+      routerConfig: router,
     );
   }
 }
