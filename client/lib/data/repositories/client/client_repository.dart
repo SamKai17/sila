@@ -1,4 +1,5 @@
 class ClientRepository {
+
   Future<void> getAllClients(
     String token,
   ) async {
