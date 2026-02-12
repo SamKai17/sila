@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({required ClientRepository clientRepository})
       : _clientRepository = clientRepository {
-    print("constructing again...");
+    // print("constructing again...");
     load = Command0(_load)..execute();
   }
   final ClientRepository _clientRepository;

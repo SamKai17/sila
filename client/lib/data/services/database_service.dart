@@ -60,4 +60,43 @@ class DatabaseService {
       return Result.error(e);
     }
   }
+
+  Future<Result<Client>> getClient(String id) async {
+    try {
+      final List<Map<String, Object?>> clientMaps = await _database!.query(
+        _tableName,
+        where: '$_idFieldName = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      if (clientMaps.isNotEmpty) {
+        return Result.ok(Client.fromJson(clientMaps.first));
+      }
+      return Result.error(Exception("no clients found"));
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> updateClient(
+      {required String id,
+      required String name,
+      required String phone,
+      required String city}) async {
+    try {
+      await _database!.update(
+        _tableName,
+        {
+          _nameFieldName: name,
+          _phoneFieldName: phone,
+          _cityFieldName: city,
+        },
+        where: '$_idFieldName = ?',
+        whereArgs: [id],
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
 }

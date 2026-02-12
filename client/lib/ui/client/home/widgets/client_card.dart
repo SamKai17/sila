@@ -1,5 +1,6 @@
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/routing/routes.dart';
+import 'package:client/ui/client/detail/widgets/client_detail_screen.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -81,7 +82,15 @@ class _ClientCardState extends State<ClientCard> {
         ),
         onLongPress: () {},
         onTap: () {
-          context.push('/${Routes.clientDetail}', extra: widget.client);
+          context.push(
+            '/client/${widget.client.id}',
+            extra: widget.client,
+          );
+          // Navigator.push(context, MaterialPageRoute(
+          //   builder: (context) {
+          //     return ClientDetailScreen();
+          //   },
+          // ));
         },
       ),
     );

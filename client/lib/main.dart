@@ -14,8 +14,6 @@ void main() {
     Provider(
       create: (context) => ClientRepository(databaseService: context.read()),
     ),
-    // Provider(
-    // create: (context) => ClientRepository(databaseService: context.read())),
   ], child: const MyApp()));
 }
 

@@ -1,24 +1,39 @@
+import 'package:client/ui/client/update/view_model/client_update_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class ClientUpdatePage extends StatefulWidget {
-  const ClientUpdatePage({super.key});
+class ClientUpdateScreen extends StatefulWidget {
+  const ClientUpdateScreen({
+    super.key,
+    required ClientUpdateViewModel this.viewModel,
+    required String this.clientId,
+    required String this.name,
+    required String this.phone,
+    required String this.city,
+  });
+
+  final ClientUpdateViewModel viewModel;
+  final String clientId;
+  final String name;
+  final String phone;
+  final String city;
 
   @override
-  State<ClientUpdatePage> createState() => _ClientUpdatePageState();
+  State<ClientUpdateScreen> createState() => _ClientUpdateScreenState();
 }
 
-class _ClientUpdatePageState extends State<ClientUpdatePage> {
+class _ClientUpdateScreenState extends State<ClientUpdateScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
   late final TextEditingController _cityController;
 
   @override
   void initState() {
-    _nameController = TextEditingController();
-    _phoneController = TextEditingController();
-    _cityController = TextEditingController();
+    _nameController = TextEditingController(text: widget.name);
+    _phoneController = TextEditingController(text: widget.phone);
+    _cityController = TextEditingController(text: widget.city);
     super.initState();
   }
 
@@ -33,7 +48,7 @@ class _ClientUpdatePageState extends State<ClientUpdatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Client Create")),
+      appBar: AppBar(title: Text("Client update")),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Form(
@@ -48,7 +63,19 @@ class _ClientUpdatePageState extends State<ClientUpdatePage> {
               SizedBox(height: 32.0),
               CustomFieldWidget(hintText: 'city', controller: _cityController),
               Spacer(),
-              CustomButtonWidget(buttonText: 'save', onPressed: () async {}),
+              CustomButtonWidget(
+                  buttonText: 'save',
+                  onPressed: () async {
+                    await widget.viewModel.updateClient.execute({
+                      'id': widget.clientId,
+                      'name': _nameController.text,
+                      'phone': _phoneController.text,
+                      'city': _cityController.text,
+                    });
+                    if (widget.viewModel.updateClient.completed) {
+                      context.pop();
+                    }
+                  }),
             ],
           ),
         ),
