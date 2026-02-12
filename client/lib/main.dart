@@ -8,9 +8,14 @@ import 'package:provider/provider.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MultiProvider(providers: [
-    Provider(create: (context) => DatabaseService()),
     Provider(
-        create: (context) => ClientRepository(databaseService: context.read()))
+      create: (context) => DatabaseService(),
+    ),
+    Provider(
+      create: (context) => ClientRepository(databaseService: context.read()),
+    ),
+    // Provider(
+    // create: (context) => ClientRepository(databaseService: context.read())),
   ], child: const MyApp()));
 }
 

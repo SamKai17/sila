@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({required ClientRepository clientRepository})
       : _clientRepository = clientRepository {
+    print("constructing again...");
     load = Command0(_load)..execute();
   }
   final ClientRepository _clientRepository;
@@ -18,7 +19,8 @@ class HomeViewModel extends ChangeNotifier {
   UnmodifiableListView<Client> get clients => UnmodifiableListView(_clients);
 
   Future<Result<void>> _load() async {
-    await Future.delayed(const Duration(seconds: 2));
+    print("loaddingg....");
+    // await Future.delayed(const Duration(seconds: 2));
     try {
       final result = await _clientRepository.getClientsList();
       switch (result) {

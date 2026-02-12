@@ -1,15 +1,20 @@
+import 'package:client/domain/models/client/client.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class ClientDetailPage extends StatelessWidget {
-  const ClientDetailPage({super.key});
+class ClientDetailScreen extends StatelessWidget {
+  const ClientDetailScreen({super.key, required this.client});
+  final Client client;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("client"),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.edit))],
+        actions: [IconButton(onPressed: () {
+          context.go('');
+        }, icon: Icon(Icons.edit))],
       ),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
@@ -25,11 +30,13 @@ class ClientDetailPage extends StatelessWidget {
                 child: Text('o'),
               ),
               Text(
-                'oussama',
+                client.name,
+                // '',
                 style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w900),
               ),
               Text(
-                'casa',
+                client.city,
+                // '',
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.w500,
@@ -37,7 +44,8 @@ class ClientDetailPage extends StatelessWidget {
                 ),
               ),
               Text(
-                '06',
+                client.phone,
+                // '',
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.w500,

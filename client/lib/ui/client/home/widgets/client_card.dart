@@ -1,6 +1,8 @@
 import 'package:client/domain/models/client/client.dart';
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ClientCard extends StatefulWidget {
   const ClientCard({super.key, required this.client});
@@ -78,7 +80,9 @@ class _ClientCardState extends State<ClientCard> {
           ),
         ),
         onLongPress: () {},
-        onTap: () {},
+        onTap: () {
+          context.push('/${Routes.clientDetail}', extra: widget.client);
+        },
       ),
     );
   }

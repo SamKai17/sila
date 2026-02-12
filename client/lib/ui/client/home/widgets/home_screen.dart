@@ -1,7 +1,9 @@
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/client/home/widgets/client_card.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, required this.viewModel});
@@ -40,7 +42,9 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          context.push(Routes.clientCreate);
+        },
         child: Icon(Icons.add),
       ),
     );

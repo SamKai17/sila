@@ -13,4 +13,14 @@ class ClientRepository {
     }
     return _databaseService.getClientsList();
   }
+
+  Future<Result<void>> addClient(
+      {required String name,
+      required String phone,
+      required String city}) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    return _databaseService.addClient(name: name, phone: phone, city: city);
+  }
 }

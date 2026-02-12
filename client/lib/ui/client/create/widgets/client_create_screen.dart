@@ -1,15 +1,18 @@
+import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class ClientCreatePage extends StatefulWidget {
-  const ClientCreatePage({super.key});
+class ClientCreateScreen extends StatefulWidget {
+  const ClientCreateScreen({super.key, required this.viewModel});
+  final ClientCreateViewModel viewModel;
 
   @override
-  State<ClientCreatePage> createState() => _ClientCreatePageState();
+  State<ClientCreateScreen> createState() => _ClientCreateScreenState();
 }
 
-class _ClientCreatePageState extends State<ClientCreatePage> {
+class _ClientCreateScreenState extends State<ClientCreateScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -40,7 +43,18 @@ class _ClientCreatePageState extends State<ClientCreatePage> {
               SizedBox(height: 32.0),
               CustomFieldWidget(hintText: 'city', controller: _cityController),
               Spacer(),
-              CustomButtonWidget(buttonText: 'save', onPressed: () async {}),
+              CustomButtonWidget(
+                  buttonText: 'save',
+                  onPressed: () async {
+                    await widget.viewModel.addClient.execute({
+                      'name': _nameController.text,
+                      'phone': _phoneController.text,
+                      'city': _cityController.text
+                    });
+                    if (widget.viewModel.addClient.completed) {
+                      context.pop();
+                    }
+                  }),
             ],
           ),
         ),

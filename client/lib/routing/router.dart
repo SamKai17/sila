@@ -1,14 +1,39 @@
+import 'package:client/domain/models/client/client.dart';
 import 'package:client/routing/routes.dart';
+import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
+import 'package:client/ui/client/create/widgets/client_create_screen.dart';
+import 'package:client/ui/client/detail/widgets/client_detail_screen.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/client/home/widgets/home_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-final router = GoRouter(routes: [
-  GoRoute(
-    path: Routes.home,
-    builder: (context, state) => HomeScreen(
-      viewModel: HomeViewModel(clientRepository: context.read()),
+final router = GoRouter(
+  debugLogDiagnostics: true,
+  routes: [
+    GoRoute(
+      path: Routes.home,
+      builder: (context, state) {
+        print("building...");
+        final viewModel = HomeViewModel(clientRepository: context.read());
+        return HomeScreen(
+          viewModel: viewModel,
+        );
+      },
+      routes: [
+        GoRoute(
+          path: Routes.clientDetail,
+          builder: (context, state) => ClientDetailScreen(
+            client: state.extra as Client,
+          ),
+        ),
+        GoRoute(
+          path: Routes.clientCreate,
+          builder: (context, state) => ClientCreateScreen(
+            viewModel: ClientCreateViewModel(clientRepository: context.read()),
+          ),
+        ),
+      ],
     ),
-  ),
-]);
+  ],
+);
