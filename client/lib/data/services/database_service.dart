@@ -99,4 +99,21 @@ class DatabaseService {
       return Result.error(e);
     }
   }
+
+  Future<Result<void>> deleteClients(List<String> ids) async {
+    try {
+      final batch = _database!.batch();
+      for (var id in ids) {
+        batch.delete(
+          _tableName,
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      }
+      await batch.commit(noResult: true);
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
 }

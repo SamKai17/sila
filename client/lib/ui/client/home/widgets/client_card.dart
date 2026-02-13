@@ -1,26 +1,44 @@
 import 'package:client/domain/models/client/client.dart';
-import 'package:client/routing/routes.dart';
-import 'package:client/ui/client/detail/widgets/client_detail_screen.dart';
+import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ClientCard extends StatefulWidget {
-  const ClientCard({super.key, required this.client});
+  const ClientCard({
+    super.key,
+    required this.client,
+    required this.viewModel,
+  });
+
   final Client client;
+  final HomeViewModel viewModel;
 
   @override
   State<ClientCard> createState() => _ClientCardState();
 }
 
 class _ClientCardState extends State<ClientCard> {
+  // late bool isSelected;
+  @override
+  void initState() {
+    print("rebuilding");
+    // isSelected = widget.viewModel.isSelected(widget.client);
+    // isSelected = widget.viewModel.isSelected(widget.client);
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print("rebuilding inside");
     return SizedBox(
       width: double.infinity,
       child: GestureDetector(
         child: Card(
-          color: AppPallete.surface,
+          color: widget.viewModel.isSelected(widget.client)
+              ? AppPallete.selectedBackground
+              : AppPallete.surface,
           child: Padding(
             padding: const EdgeInsets.all(14.0),
             child: Row(
@@ -31,25 +49,26 @@ class _ClientCardState extends State<ClientCard> {
                       radius: 32.0,
                       backgroundColor: AppPallete.avatarBackground,
                       foregroundColor: AppPallete.primary,
-                      child: Text('O'),
+                      child: Text(widget.client.name[0].toUpperCase()),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        height: 20,
-                        width: 20,
-                        decoration: BoxDecoration(
-                          color: AppPallete.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.black,
-                          size: 15.0,
+                    if (widget.viewModel.isSelected(widget.client))
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          height: 20,
+                          width: 20,
+                          decoration: BoxDecoration(
+                            color: AppPallete.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.black,
+                            size: 15.0,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 SizedBox(width: 18.0),
@@ -80,12 +99,28 @@ class _ClientCardState extends State<ClientCard> {
             ),
           ),
         ),
-        onLongPress: () {},
+        onLongPress: () {
+          print("on long pressed");
+          if (!widget.viewModel.isSelected(widget.client)) {
+            widget.viewModel.addSelectedClient(widget.client);
+          } else {
+            widget.viewModel.removeSelectedClient(widget.client);
+          }
+        },
         onTap: () {
-          context.push(
-            '/client/${widget.client.id}',
-            extra: widget.client,
-          );
+          if (!widget.viewModel.selectedMode) {
+            context.push(
+              '/client/${widget.client.id}',
+              extra: widget.client,
+            );
+          } else {
+            if (!widget.viewModel.isSelected(widget.client)) {
+              widget.viewModel.addSelectedClient(widget.client);
+            } else {
+              widget.viewModel.removeSelectedClient(widget.client);
+            }
+          }
+          // change the selected mode
           // Navigator.push(context, MaterialPageRoute(
           //   builder: (context) {
           //     return ClientDetailScreen();

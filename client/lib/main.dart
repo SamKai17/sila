@@ -1,6 +1,7 @@
 import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:client/data/services/database_service.dart';
 import 'package:client/routing/router.dart';
+import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,9 @@ void main() {
     Provider(
       create: (context) => ClientRepository(databaseService: context.read()),
     ),
+    ChangeNotifierProvider(
+      create: (context) => HomeViewModel(clientRepository: context.read()),
+    )
   ], child: const MyApp()));
 }
 

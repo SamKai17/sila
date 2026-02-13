@@ -1,8 +1,11 @@
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class DeleteButton extends StatelessWidget {
-  const DeleteButton({super.key});
+class DeleteClientsButton extends StatelessWidget {
+  const DeleteClientsButton({super.key, required this.deleteClients});
+
+  final Future<void> Function() deleteClients;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,7 @@ class DeleteButton extends StatelessWidget {
                       Expanded(
                         child: FilledButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            context.pop();
                           },
                           child: Text("Cancel"),
                         ),
@@ -34,7 +37,10 @@ class DeleteButton extends StatelessWidget {
                       SizedBox(width: 10.0),
                       Expanded(
                         child: FilledButton(
-                          onPressed: () async {},
+                          onPressed: () async {
+                            await deleteClients();
+                            context.pop();
+                          },
                           child: Text("Confirm"),
                         ),
                       ),

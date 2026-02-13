@@ -18,6 +18,7 @@ final router = GoRouter(
       builder: (context, state) {
         // print("building...");
         final viewModel = HomeViewModel(clientRepository: context.read());
+        // final viewModel = context.read<HomeViewModel>();
         return HomeScreen(
           viewModel: viewModel,
         );

@@ -19,6 +19,8 @@ class ClientCreateViewModel extends ChangeNotifier {
           city: values['city'] ?? '',
           phone: values['phone'] ?? '');
       return Result.ok(null);
-    } finally {}
+    } finally {
+      notifyListeners();
+    }
   }
 }
