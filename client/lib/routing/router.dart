@@ -28,7 +28,7 @@ final router = GoRouter(
             path: Routes.clientDetail,
             builder: (context, state) {
               // print("reconstruct...");
-              print("detail params: ${state.pathParameters['id']}");
+              // print("detail params: ${state.pathParameters['id']}");
               return ClientDetailScreen(
                 viewModel: ClientDetailViewModel(
                   clientId: state.pathParameters['id']!,
@@ -41,7 +41,7 @@ final router = GoRouter(
                 path: Routes.clientUpdate,
                 builder: (context, state) {
                   // state.
-                  print("update params: ${state.pathParameters['id']}");
+                  // print("update params: ${state.pathParameters['id']}");
                   final clientId = state.pathParameters['id']!;
                   final values = state.extra as Map<String, String>;
                   return ClientUpdateScreen(

@@ -22,16 +22,13 @@ class _ClientCardState extends State<ClientCard> {
   // late bool isSelected;
   @override
   void initState() {
-    print("rebuilding");
-    // isSelected = widget.viewModel.isSelected(widget.client);
-    // isSelected = widget.viewModel.isSelected(widget.client);
-    // TODO: implement initState
+    // print("rebuilding");
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("rebuilding inside");
+    // print("rebuilding inside");
     return SizedBox(
       width: double.infinity,
       child: GestureDetector(

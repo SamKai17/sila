@@ -51,7 +51,7 @@ class HomeViewModel extends ChangeNotifier {
           print("success");
         // return Result.ok(null);
         case Error():
-          print("error");
+          // print("error");
           return Result.error(result.error);
       }
       final clientResult = await _clientRepository.getClientsList();
