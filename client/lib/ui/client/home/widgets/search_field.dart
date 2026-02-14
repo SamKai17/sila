@@ -2,7 +2,9 @@ import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 class SearchField extends StatefulWidget {
-  const SearchField({super.key});
+  const SearchField({super.key, required this.filter});
+
+  final void Function(String query) filter;
 
   @override
   State<SearchField> createState() => _SearchFieldState();
@@ -14,7 +16,12 @@ class _SearchFieldState extends State<SearchField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: _searchController,
-      onChanged: (value) {},
+      onChanged: (value) {
+        // print(value);
+        setState(() {
+          widget.filter(value);
+        });
+      },
       decoration: InputDecoration(
         hintText: "Search",
         contentPadding: EdgeInsets.all(10.0),
@@ -33,10 +40,17 @@ class _SearchFieldState extends State<SearchField> {
           borderSide: BorderSide.none,
         ),
         prefixIcon: Icon(Icons.search),
-        suffixIcon: IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.close),
-        ),
+        suffixIcon: _searchController.text.length > 0
+            ? IconButton(
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {
+                    widget.filter('');
+                  });
+                },
+                icon: Icon(Icons.close),
+              )
+            : null,
       ),
     );
   }

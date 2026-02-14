@@ -10,7 +10,7 @@ class ClearSelectedClientsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 18.0),
+      padding: const EdgeInsets.only(left: 32.0),
       child: UnconstrainedBox(
         child: Container(
           height: 50.0,

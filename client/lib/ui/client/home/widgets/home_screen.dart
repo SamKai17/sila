@@ -23,21 +23,21 @@ class HomeScreen extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        leadingWidth: 68,
+        leadingWidth: 82,
         leading: ClearSelectedClientsButton(
           clearSelectedClients: viewModel.clearSelectedClients,
         ),
         actions: [
           // if (viewModel.selectedMode)
           DeleteClientsButton(deleteClients: viewModel.deleteClients.execute),
-          SizedBox(width: 18)
+          SizedBox(width: 32)
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(18.0),
+        padding: const EdgeInsets.only(left: 32.0, right: 32, top: 24.0),
         child: Column(children: [
-          SearchField(),
-          SizedBox(height: 32),
+          SearchField(filter: viewModel.filter),
+          SizedBox(height: 32.0),
           Expanded(
             child: SizedBox(
               width: double.infinity,
@@ -55,10 +55,12 @@ class HomeScreen extends StatelessWidget {
                 child: ListenableBuilder(
                   listenable: viewModel,
                   builder: (context, child) {
-                    return ListView.builder(
-                      itemCount: viewModel.clients.length,
+                    return ListView.separated(
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 24.0),
+                      itemCount: viewModel.filteredClients.length,
                       itemBuilder: (context, index) {
-                        final client = viewModel.clients[index];
+                        final client = viewModel.filteredClients[index];
                         return ClientCard(
                           client: client,
                           viewModel: viewModel,

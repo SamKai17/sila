@@ -17,6 +17,7 @@ class HomeViewModel extends ChangeNotifier {
   late Command0 deleteClients;
 
   List<Client> _clients = [];
+  List<Client> _filteredClients = [];
 
   bool get selectedMode => _clientRepository.selectedMode;
 
@@ -25,6 +26,8 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   UnmodifiableListView<Client> get clients => UnmodifiableListView(_clients);
+  UnmodifiableListView<Client> get filteredClients =>
+      UnmodifiableListView(_filteredClients);
 
   Future<Result<void>> _load() async {
     // await Future.delayed(const Duration(seconds: 2));
@@ -34,6 +37,7 @@ class HomeViewModel extends ChangeNotifier {
       switch (result) {
         case Ok():
           _clients = result.value;
+          _filteredClients = _clients;
           return Result.ok(null);
         case Error():
           return Result.error(result.error);
@@ -58,6 +62,7 @@ class HomeViewModel extends ChangeNotifier {
       switch (clientResult) {
         case Ok():
           _clients = clientResult.value;
+          _filteredClients = _clients;
         case Error():
         // return Result.error(clientResult.error);
       }
@@ -67,6 +72,12 @@ class HomeViewModel extends ChangeNotifier {
       _clientRepository.clearSelectedClients();
       notifyListeners();
     }
+  }
+
+  void filter(String query) {
+    _filteredClients =
+        _clients.where((client) => client.name.contains(query)).toList();
+    notifyListeners();
   }
 
   void addSelectedClient(Client client) {
