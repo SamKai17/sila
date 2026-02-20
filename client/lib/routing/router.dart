@@ -16,52 +16,50 @@ final router = GoRouter(
     GoRoute(
       path: Routes.home,
       builder: (context, state) {
-        // print("building...");
-        final viewModel = HomeViewModel(clientRepository: context.read());
-        // final viewModel = context.read<HomeViewModel>();
+        // print("building home...");
+        final viewModel = context.read<HomeViewModel>();
         return HomeScreen(
           viewModel: viewModel,
         );
       },
       routes: [
         GoRoute(
-            path: Routes.clientDetail,
-            builder: (context, state) {
-              // print("reconstruct...");
-              // print("detail params: ${state.pathParameters['id']}");
-              return ClientDetailScreen(
-                viewModel: ClientDetailViewModel(
-                  clientId: state.pathParameters['id']!,
-                  clientRepository: context.read(),
-                ),
-              );
-            },
-            routes: [
-              GoRoute(
-                path: Routes.clientUpdate,
-                builder: (context, state) {
-                  // state.
-                  // print("update params: ${state.pathParameters['id']}");
-                  final clientId = state.pathParameters['id']!;
-                  final values = state.extra as Map<String, String>;
-                  return ClientUpdateScreen(
-                    viewModel: ClientUpdateViewModel(
-                      clientId: clientId,
-                      clientRepository: context.read(),
-                    ),
-                    clientId: state.pathParameters['id']!,
-                    name: values['name']!,
-                    phone: values['phone']!,
-                    city: values['city']!,
-                  );
-                },
-              ),
-            ]),
+          path: Routes.clientDetail,
+          builder: (context, state) {
+            // print("building detail...");
+            final clientId = state.pathParameters['id']!;
+            final viewModel = context.read<ClientDetailViewModel>();
+            return ClientDetailScreen(
+              viewModel: viewModel,
+              clientId: clientId,
+            );
+          },
+        ),
+        GoRoute(
+          path: Routes.clientUpdate,
+          builder: (context, state) {
+            // print("building update...");
+            final clientId = state.pathParameters['id']!;
+            final values = state.extra as Map<String, String>;
+            final viewModel = context.read<ClientUpdateViewModel>();
+            return ClientUpdateScreen(
+              viewModel: viewModel,
+              clientId: clientId,
+              name: values['name']!,
+              phone: values['phone']!,
+              city: values['city']!,
+            );
+          },
+        ),
         GoRoute(
           path: Routes.clientCreate,
-          builder: (context, state) => ClientCreateScreen(
-            viewModel: ClientCreateViewModel(clientRepository: context.read()),
-          ),
+          builder: (context, state) {
+            // print("building create...");
+            final viewModel = context.read<ClientCreateViewModel>();
+            return ClientCreateScreen(
+              viewModel: viewModel,
+            );
+          },
         ),
       ],
     ),

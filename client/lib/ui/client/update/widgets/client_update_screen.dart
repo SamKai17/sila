@@ -34,6 +34,10 @@ class _ClientUpdateScreenState extends State<ClientUpdateScreen> {
     _nameController = TextEditingController(text: widget.name);
     _phoneController = TextEditingController(text: widget.phone);
     _cityController = TextEditingController(text: widget.city);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // print("init update...");
+      widget.viewModel.load.execute(widget.clientId);
+    });
     super.initState();
   }
 

@@ -5,9 +5,9 @@ import 'package:client/utils/result.dart';
 import 'package:flutter/material.dart';
 
 class ClientUpdateViewModel extends ChangeNotifier {
-  ClientUpdateViewModel({required ClientRepository clientRepository, required String clientId})
+  ClientUpdateViewModel({required ClientRepository clientRepository})
       : _clientRepository = clientRepository {
-    load = Command1<void, String>(_load)..execute(clientId);
+    load = Command1<void, String>(_load);
     updateClient = Command1<void, Map<String, String>>(_updateClient);
   }
   final ClientRepository _clientRepository;

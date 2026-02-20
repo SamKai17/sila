@@ -1,15 +1,38 @@
-import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class ClientDetailScreen extends StatelessWidget {
-  const ClientDetailScreen(
-      {super.key, required ClientDetailViewModel this.viewModel});
+class ClientDetailScreen extends StatefulWidget {
+  const ClientDetailScreen({
+    super.key,
+    required ClientDetailViewModel this.viewModel,
+    required String this.clientId,
+  });
 
+  final String clientId;
   final ClientDetailViewModel viewModel;
+  @override
+  State<ClientDetailScreen> createState() => _ClientDetailScreenState();
+}
+
+class _ClientDetailScreenState extends State<ClientDetailScreen> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // print("init detail...");
+      widget.viewModel.load.execute(widget.clientId);
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    // print("detail: we disposing");
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,12 +42,13 @@ class ClientDetailScreen extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                context.go(
-                  '/client/${viewModel.client!.id}/update',
+                context.push(
+                  '/update/${widget.viewModel.client!.id}',
+                  // '/client/update',
                   extra: {
-                    'name': viewModel.client!.name,
-                    'phone': viewModel.client!.phone,
-                    'city': viewModel.client!.city
+                    'name': widget.viewModel.client!.name,
+                    'phone': widget.viewModel.client!.phone,
+                    'city': widget.viewModel.client!.city
                   },
                 );
               },
@@ -36,12 +60,12 @@ class ClientDetailScreen extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: ListenableBuilder(
-            listenable: viewModel.load,
+            listenable: widget.viewModel.load,
             builder: (context, child) {
-              if (viewModel.load.running) {
+              if (widget.viewModel.load.running) {
                 return LoaderWidget();
               }
-              if (viewModel.load.error) {
+              if (widget.viewModel.load.error) {
                 return Center(
                   child: Text("an error happened!"),
                 );
@@ -55,12 +79,12 @@ class ClientDetailScreen extends StatelessWidget {
                     child: Text('o'),
                   ),
                   Text(
-                    viewModel.client?.name ?? 'name',
+                    widget.viewModel.client?.name ?? 'name',
                     style:
                         TextStyle(fontSize: 24.0, fontWeight: FontWeight.w900),
                   ),
                   Text(
-                    viewModel.client?.city ?? 'city',
+                    widget.viewModel.client?.city ?? 'city',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w500,
@@ -68,7 +92,7 @@ class ClientDetailScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    viewModel.client?.phone ?? 'phone',
+                    widget.viewModel.client?.phone ?? 'phone',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w500,

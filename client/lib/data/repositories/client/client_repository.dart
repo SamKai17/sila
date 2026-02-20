@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:client/data/services/database_service.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';
@@ -6,6 +8,8 @@ class ClientRepository {
   ClientRepository({required DatabaseService databaseService})
       : _databaseService = databaseService;
   DatabaseService _databaseService;
+  StreamController _controller = StreamController<void>.broadcast();
+  Stream get stream => _controller.stream;
 
   List<Client> _selectedClients = [];
 
@@ -23,6 +27,7 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
+    _controller.sink.add(null);
     return _databaseService.addClient(name: name, phone: phone, city: city);
   }
 
@@ -41,8 +46,10 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    return _databaseService.updateClient(
+    final result = await _databaseService.updateClient(
         id: id, name: name, phone: phone, city: city);
+    _controller.sink.add(null);
+    return result;
   }
 
   Future<Result<void>> deleteClients() async {

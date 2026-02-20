@@ -5,12 +5,19 @@ import 'package:client/utils/result.dart';
 import 'package:flutter/material.dart';
 
 class ClientDetailViewModel extends ChangeNotifier {
-  ClientDetailViewModel(
-      {required String clientId, required ClientRepository clientRepository})
-      : _clientRepository = clientRepository {
-    load = Command1<void, String>(_load)..execute(clientId);
+  ClientDetailViewModel({
+    // required String clientId,
+    required ClientRepository clientRepository,
+  }) : _clientRepository = clientRepository {
+    // print("loading detail...");
+    load = Command1<void, String>(_load);
+    clientRepository.stream.listen(
+      (event) {
+        load.execute(id);
+      },
+    );
   }
-
+  late String id;
   late Command1 load;
   ClientRepository _clientRepository;
   Client? _client;
@@ -18,6 +25,9 @@ class ClientDetailViewModel extends ChangeNotifier {
 
   Future<Result<void>> _load(String id) async {
     try {
+      this.id = id;
+      // print("detail load function...");
+      // await Future.delayed(const Duration(seconds: 2));
       final result = await _clientRepository.getClient(id);
       switch (result) {
         case Ok():

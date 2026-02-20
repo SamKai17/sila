@@ -47,6 +47,7 @@ class _ClientCardState extends State<ClientCard> {
                       backgroundColor: AppPallete.avatarBackground,
                       foregroundColor: AppPallete.primary,
                       child: Text(widget.client.name[0].toUpperCase()),
+                      // child: Text('o'),
                     ),
                     if (widget.viewModel.isSelected(widget.client))
                       Positioned(
@@ -97,7 +98,7 @@ class _ClientCardState extends State<ClientCard> {
           ),
         ),
         onLongPress: () {
-          print("on long pressed");
+          // print("on long pressed");
           if (!widget.viewModel.isSelected(widget.client)) {
             widget.viewModel.addSelectedClient(widget.client);
           } else {
@@ -107,8 +108,8 @@ class _ClientCardState extends State<ClientCard> {
         onTap: () {
           if (!widget.viewModel.selectedMode) {
             context.push(
-              '/client/${widget.client.id}',
-              extra: widget.client,
+              '/detail/${widget.client.id}',
+              // '/client',
             );
           } else {
             if (!widget.viewModel.isSelected(widget.client)) {
@@ -117,12 +118,6 @@ class _ClientCardState extends State<ClientCard> {
               widget.viewModel.removeSelectedClient(widget.client);
             }
           }
-          // change the selected mode
-          // Navigator.push(context, MaterialPageRoute(
-          //   builder: (context) {
-          //     return ClientDetailScreen();
-          //   },
-          // ));
         },
       ),
     );

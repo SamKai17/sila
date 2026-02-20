@@ -9,14 +9,35 @@ import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.viewModel});
   final HomeViewModel viewModel;
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // print("init home...");
+      widget.viewModel.load.execute();
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // print("home: we disposing");
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: viewModel,
+      listenable: widget.viewModel,
       builder: (context, child) {
         return Scaffold(
           appBar: AppBar(
@@ -24,7 +45,7 @@ class HomeScreen extends StatelessWidget {
             surfaceTintColor: AppPallete.background,
             // backgroundColor: AppPallete.avatarBackground,
             titleSpacing: 32.0,
-            title: !viewModel.selectedMode
+            title: !widget.viewModel.selectedMode
                 ? Text(
                     "Sila",
                     style: TextStyle(
@@ -34,71 +55,60 @@ class HomeScreen extends StatelessWidget {
                   )
                 : null,
             leadingWidth: 82,
-            leading: viewModel.selectedMode
+            leading: widget.viewModel.selectedMode
                 ? ClearSelectedClientsButton(
-                    clearSelectedClients: viewModel.clearSelectedClients,
+                    clearSelectedClients: widget.viewModel.clearSelectedClients,
                   )
                 : null,
-            actions: [
-              if (viewModel.selectedMode)
-                DeleteClientsButton(
-                    deleteClients: viewModel.deleteClients.execute),
-              SizedBox(width: 32)
-            ],
+            actions: widget.viewModel.selectedMode
+                ? [
+                    DeleteClientsButton(
+                        deleteClients: widget.viewModel.deleteClients.execute),
+                    SizedBox(width: 32)
+                  ]
+                : null,
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(72.0),
+              child: SearchField(filter: widget.viewModel.filter),
+            ),
           ),
           body: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.only(left: 32.0, right: 32, top: 24.0),
+              padding: const EdgeInsets.only(
+                left: 32.0,
+                right: 32,
+                // top: 24.0,
+                bottom: 24.0,
+              ),
               child: Column(children: [
-                SearchField(filter: viewModel.filter),
-                SizedBox(height: 32.0),
-                // Expanded(
-                SizedBox(
-                  width: double.infinity,
+                // SizedBox(height: 32.0),
+                ListenableBuilder(
+                  listenable: widget.viewModel.load,
+                  builder: (context, child) {
+                    if (widget.viewModel.load.running) {
+                      return LoaderWidget();
+                    }
+                    if (widget.viewModel.load.error) {
+                      return Center(child: Text("no clients found"));
+                    }
+                    return child!;
+                  },
                   child: ListenableBuilder(
-                    listenable: viewModel.load,
+                    listenable: widget.viewModel,
                     builder: (context, child) {
-                      if (viewModel.load.running) {
-                        return LoaderWidget();
-                      }
-                      if (viewModel.load.error) {
-                        return Center(child: Text("no clients found"));
-                      }
-                      return child!;
+                      final clients = widget.viewModel.filteredClients;
+                      return Column(
+                        spacing: 16.0,
+                        children: clients.map(
+                          (client) {
+                            return ClientCard(
+                              client: client,
+                              viewModel: widget.viewModel,
+                            );
+                          },
+                        ).toList(),
+                      );
                     },
-                    // child: Column(
-                    //   children: [
-                    //     Text("hello"),
-                    //   ],
-                    // ),
-                    child: ListenableBuilder(
-                      listenable: viewModel,
-                      builder: (context, child) {
-                        final clients = viewModel.filteredClients;
-                        return Column(
-                          children: clients.map(
-                            (client) {
-                              return ClientCard(
-                                client: client,
-                                viewModel: viewModel,
-                              );
-                            },
-                          ).toList(),
-                        );
-                        // return ListView.separated(
-                        //   separatorBuilder: (context, index) =>
-                        //       SizedBox(height: 24.0),
-                        //   itemCount: viewModel.filteredClients.length,
-                        //   itemBuilder: (context, index) {
-                        //     final client = viewModel.filteredClients[index];
-                        //     return ClientCard(
-                        //       client: client,
-                        //       viewModel: viewModel,
-                        //     );
-                        //   },
-                        // );
-                      },
-                    ),
                   ),
                 ),
                 // ),
@@ -107,7 +117,7 @@ class HomeScreen extends StatelessWidget {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              context.push(Routes.clientCreate);
+              context.go("/${Routes.clientCreate}");
             },
             child: Icon(Icons.add),
           ),

@@ -8,8 +8,14 @@ import 'package:flutter/material.dart';
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({required ClientRepository clientRepository})
       : _clientRepository = clientRepository {
-    load = Command0(_load)..execute();
+    // print("loading home...");
+    load = Command0(_load);
     deleteClients = Command0(_deleteClients);
+    clientRepository.stream.listen(
+      (event) {
+        load.execute();
+      },
+    );
   }
   final ClientRepository _clientRepository;
 
@@ -31,7 +37,7 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<Result<void>> _load() async {
     // await Future.delayed(const Duration(seconds: 2));
-    print("loaddingg....");
+    // print("home load function....");
     try {
       final result = await _clientRepository.getClientsList();
       switch (result) {
