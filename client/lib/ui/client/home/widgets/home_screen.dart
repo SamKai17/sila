@@ -1,8 +1,8 @@
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
-import 'package:client/ui/client/home/widgets/clear_selected_clients_button.dart';
+import 'package:client/ui/core/ui/clear_button.dart';
 import 'package:client/ui/client/home/widgets/client_card.dart';
-import 'package:client/ui/client/home/widgets/delete_clients_button.dart';
+import 'package:client/ui/core/ui/delete_button.dart';
 import 'package:client/ui/client/home/widgets/search_field.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
@@ -56,14 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 : null,
             leadingWidth: 82,
             leading: widget.viewModel.selectedMode
-                ? ClearSelectedClientsButton(
-                    clearSelectedClients: widget.viewModel.clearSelectedClients,
+                ? ClearButton(
+                    clear: widget.viewModel.clearSelectedClients,
                   )
                 : null,
             actions: widget.viewModel.selectedMode
                 ? [
-                    DeleteClientsButton(
-                        deleteClients: widget.viewModel.deleteClients.execute),
+                    DeleteButton(
+                        delete: widget.viewModel.deleteClients.execute),
                     SizedBox(width: 32)
                   ]
                 : null,

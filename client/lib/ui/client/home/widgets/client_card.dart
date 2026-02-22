@@ -108,7 +108,7 @@ class _ClientCardState extends State<ClientCard> {
         onTap: () {
           if (!widget.viewModel.selectedMode) {
             context.push(
-              '/detail/${widget.client.id}',
+              '/client/detail/${widget.client.id}',
               // '/client',
             );
           } else {

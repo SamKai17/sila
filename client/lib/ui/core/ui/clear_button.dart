@@ -1,11 +1,11 @@
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
-class ClearSelectedClientsButton extends StatelessWidget {
-  const ClearSelectedClientsButton(
-      {super.key, required this.clearSelectedClients});
+class ClearButton extends StatelessWidget {
+  const ClearButton(
+      {super.key, required this.clear});
 
-  final Function clearSelectedClients;
+  final Function clear;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class ClearSelectedClientsButton extends StatelessWidget {
           ),
           child: IconButton(
             onPressed: () async {
-              clearSelectedClients();
+              clear();
             },
             icon: Icon(Icons.close),
           ),

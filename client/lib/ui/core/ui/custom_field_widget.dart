@@ -14,17 +14,22 @@ class CustomFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      // style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
-      decoration: InputDecoration(hintText: hintText),
-      obscureText: isObscureText,
-      validator: (value) {
-        if (value!.trim().isEmpty) {
-          return "$hintText is missing";
-        }
-        return null;
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('${hintText[0].toUpperCase()}${hintText.substring(1)}'),
+        TextFormField(
+          controller: controller,
+          decoration: InputDecoration(hintText: hintText),
+          obscureText: isObscureText,
+          validator: (value) {
+            if (value!.trim().isEmpty) {
+              return "$hintText is missing";
+            }
+            return null;
+          },
+        ),
+      ],
     );
   }
 }

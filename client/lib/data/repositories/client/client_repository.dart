@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:client/data/services/database_service.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';

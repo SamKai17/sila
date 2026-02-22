@@ -1,3 +1,4 @@
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
@@ -43,7 +44,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
           IconButton(
               onPressed: () {
                 context.push(
-                  '/update/${widget.viewModel.client!.id}',
+                  '/client/update/${widget.viewModel.client!.id}',
                   // '/client/update',
                   extra: {
                     'name': widget.viewModel.client!.name,
@@ -109,13 +110,19 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child:
-                            FilledButton(onPressed: () {}, child: Text('Buy')),
+                        child: FilledButton(
+                            onPressed: () {
+                              context.push('/${Routes.transactionCreate}');
+                            },
+                            child: Text('Buy')),
                       ),
                       SizedBox(width: 16),
                       Expanded(
-                        child:
-                            FilledButton(onPressed: () {}, child: Text('Sell')),
+                        child: FilledButton(
+                            onPressed: () {
+                              context.push('/${Routes.transactionCreate}');
+                            },
+                            child: Text('Sell')),
                       ),
                     ],
                   ),

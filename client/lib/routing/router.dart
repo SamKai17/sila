@@ -1,3 +1,4 @@
+import 'package:client/domain/models/item/item.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
 import 'package:client/ui/client/create/widgets/client_create_screen.dart';
@@ -7,6 +8,11 @@ import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/client/home/widgets/home_screen.dart';
 import 'package:client/ui/client/update/view_model/client_update_viewmodel.dart';
 import 'package:client/ui/client/update/widgets/client_update_screen.dart';
+import 'package:client/ui/item/create/widgets/item_create_screen.dart';
+import 'package:client/ui/item/update/widgets/item_update_screen.dart';
+import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
+import 'package:client/ui/transaction/create/widgets/transaction_create_screen.dart';
+import 'package:client/ui/transaction/payment/widgets/transaction_payment_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -61,6 +67,38 @@ final router = GoRouter(
             );
           },
         ),
+        GoRoute(
+          path: Routes.transactionCreate,
+          builder: (context, state) {
+            return TransactionCreateScreen(
+              viewModel: context.read(),
+            );
+          },
+        ),
+        GoRoute(
+          path: Routes.itemCreate,
+          builder: (context, state) {
+            return ItemCreateScreen(
+              viewModel: context.read(),
+            );
+          },
+        ),
+        GoRoute(
+          path: Routes.itemUpdate,
+          builder: (context, state) {
+            final Item item = state.extra as Item;
+            return ItemUpdateScreen(
+              viewModel: context.read(),
+              item: item,
+            );
+          },
+        ),
+        GoRoute(
+          path: Routes.transactionPayment,
+          builder: (context, state) {
+            return TransactionPaymentScreen();
+          },
+        )
       ],
     ),
   ],

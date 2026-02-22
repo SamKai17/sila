@@ -6,6 +6,7 @@ import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart'
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/client/update/view_model/client_update_viewmodel.dart';
 import 'package:client/ui/core/theme/app_theme.dart';
+import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,7 +33,10 @@ void main() {
     ChangeNotifierProvider(
       create: (context) =>
           ClientCreateViewModel(clientRepository: context.read()),
-    )
+    ),
+    ChangeNotifierProvider(
+      create: (context) => TransactionCreateViewModel(),
+    ),
   ], child: const MyApp()));
 }
 
