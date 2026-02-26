@@ -1,9 +1,14 @@
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
+import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TransactionPaymentScreen extends StatefulWidget {
-  const TransactionPaymentScreen({super.key});
+  const TransactionPaymentScreen(
+      {super.key, required TransactionCreateViewModel this.viewModel});
+  final TransactionCreateViewModel viewModel;
 
   @override
   State<TransactionPaymentScreen> createState() =>
@@ -42,7 +47,7 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
                 crossAxisCount: 3,
                 mainAxisSpacing: 35.0,
                 crossAxisSpacing: 35.0,
-                // childAspectRatio: 1 / 1,
+                childAspectRatio: 0.25 / 0.25,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
                   PaymentButton(
@@ -98,7 +103,10 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
             ),
             CustomButtonWidget(
               buttonText: 'Pay',
-              onPressed: () {},
+              onPressed: () {
+                widget.viewModel.paid = 1230.0;
+                context.push('/${Routes.transactionPreview}');
+              },
             )
           ],
         ),

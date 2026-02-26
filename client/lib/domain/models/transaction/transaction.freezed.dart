@@ -15,12 +15,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Transaction {
   String get id;
-  String get client;
-  double get total;
+  double get totalPrice;
   double get remainder;
-  double get paid;
-  String get type;
-  String get date;
+  double get totalPaid; // required String type,
+  int get timeOfTransaction;
+  String get clientId;
 
   /// Create a copy of Transaction
   /// with the given fields replaced by the non-null parameter values.
@@ -38,23 +37,26 @@ mixin _$Transaction {
         (other.runtimeType == runtimeType &&
             other is Transaction &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.client, client) || other.client == client) &&
-            (identical(other.total, total) || other.total == total) &&
+            (identical(other.totalPrice, totalPrice) ||
+                other.totalPrice == totalPrice) &&
             (identical(other.remainder, remainder) ||
                 other.remainder == remainder) &&
-            (identical(other.paid, paid) || other.paid == paid) &&
-            (identical(other.type, type) || other.type == type) &&
-            (identical(other.date, date) || other.date == date));
+            (identical(other.totalPaid, totalPaid) ||
+                other.totalPaid == totalPaid) &&
+            (identical(other.timeOfTransaction, timeOfTransaction) ||
+                other.timeOfTransaction == timeOfTransaction) &&
+            (identical(other.clientId, clientId) ||
+                other.clientId == clientId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, client, total, remainder, paid, type, date);
+  int get hashCode => Object.hash(runtimeType, id, totalPrice, remainder,
+      totalPaid, timeOfTransaction, clientId);
 
   @override
   String toString() {
-    return 'Transaction(id: $id, client: $client, total: $total, remainder: $remainder, paid: $paid, type: $type, date: $date)';
+    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, timeOfTransaction: $timeOfTransaction, clientId: $clientId)';
   }
 }
 
@@ -66,12 +68,11 @@ abstract mixin class $TransactionCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String client,
-      double total,
+      double totalPrice,
       double remainder,
-      double paid,
-      String type,
-      String date});
+      double totalPaid,
+      int timeOfTransaction,
+      String clientId});
 }
 
 /// @nodoc
@@ -87,41 +88,36 @@ class _$TransactionCopyWithImpl<$Res> implements $TransactionCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? client = null,
-    Object? total = null,
+    Object? totalPrice = null,
     Object? remainder = null,
-    Object? paid = null,
-    Object? type = null,
-    Object? date = null,
+    Object? totalPaid = null,
+    Object? timeOfTransaction = null,
+    Object? clientId = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      client: null == client
-          ? _self.client
-          : client // ignore: cast_nullable_to_non_nullable
-              as String,
-      total: null == total
-          ? _self.total
-          : total // ignore: cast_nullable_to_non_nullable
+      totalPrice: null == totalPrice
+          ? _self.totalPrice
+          : totalPrice // ignore: cast_nullable_to_non_nullable
               as double,
       remainder: null == remainder
           ? _self.remainder
           : remainder // ignore: cast_nullable_to_non_nullable
               as double,
-      paid: null == paid
-          ? _self.paid
-          : paid // ignore: cast_nullable_to_non_nullable
+      totalPaid: null == totalPaid
+          ? _self.totalPaid
+          : totalPaid // ignore: cast_nullable_to_non_nullable
               as double,
-      type: null == type
-          ? _self.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
+      timeOfTransaction: null == timeOfTransaction
+          ? _self.timeOfTransaction
+          : timeOfTransaction // ignore: cast_nullable_to_non_nullable
+              as int,
+      clientId: null == clientId
+          ? _self.clientId
+          : clientId // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -220,16 +216,16 @@ extension TransactionPatterns on Transaction {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String client, double total, double remainder,
-            double paid, String type, String date)?
+    TResult Function(String id, double totalPrice, double remainder,
+            double totalPaid, int timeOfTransaction, String clientId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _Transaction() when $default != null:
-        return $default(_that.id, _that.client, _that.total, _that.remainder,
-            _that.paid, _that.type, _that.date);
+        return $default(_that.id, _that.totalPrice, _that.remainder,
+            _that.totalPaid, _that.timeOfTransaction, _that.clientId);
       case _:
         return orElse();
     }
@@ -250,15 +246,15 @@ extension TransactionPatterns on Transaction {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String client, double total, double remainder,
-            double paid, String type, String date)
+    TResult Function(String id, double totalPrice, double remainder,
+            double totalPaid, int timeOfTransaction, String clientId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Transaction():
-        return $default(_that.id, _that.client, _that.total, _that.remainder,
-            _that.paid, _that.type, _that.date);
+        return $default(_that.id, _that.totalPrice, _that.remainder,
+            _that.totalPaid, _that.timeOfTransaction, _that.clientId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -278,15 +274,15 @@ extension TransactionPatterns on Transaction {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String client, double total, double remainder,
-            double paid, String type, String date)?
+    TResult? Function(String id, double totalPrice, double remainder,
+            double totalPaid, int timeOfTransaction, String clientId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Transaction() when $default != null:
-        return $default(_that.id, _that.client, _that.total, _that.remainder,
-            _that.paid, _that.type, _that.date);
+        return $default(_that.id, _that.totalPrice, _that.remainder,
+            _that.totalPaid, _that.timeOfTransaction, _that.clientId);
       case _:
         return null;
     }
@@ -298,29 +294,27 @@ extension TransactionPatterns on Transaction {
 class _Transaction implements Transaction {
   const _Transaction(
       {required this.id,
-      required this.client,
-      required this.total,
+      required this.totalPrice,
       required this.remainder,
-      required this.paid,
-      required this.type,
-      required this.date});
+      required this.totalPaid,
+      required this.timeOfTransaction,
+      required this.clientId});
   factory _Transaction.fromJson(Map<String, dynamic> json) =>
       _$TransactionFromJson(json);
 
   @override
   final String id;
   @override
-  final String client;
-  @override
-  final double total;
+  final double totalPrice;
   @override
   final double remainder;
   @override
-  final double paid;
+  final double totalPaid;
+// required String type,
   @override
-  final String type;
+  final int timeOfTransaction;
   @override
-  final String date;
+  final String clientId;
 
   /// Create a copy of Transaction
   /// with the given fields replaced by the non-null parameter values.
@@ -343,23 +337,26 @@ class _Transaction implements Transaction {
         (other.runtimeType == runtimeType &&
             other is _Transaction &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.client, client) || other.client == client) &&
-            (identical(other.total, total) || other.total == total) &&
+            (identical(other.totalPrice, totalPrice) ||
+                other.totalPrice == totalPrice) &&
             (identical(other.remainder, remainder) ||
                 other.remainder == remainder) &&
-            (identical(other.paid, paid) || other.paid == paid) &&
-            (identical(other.type, type) || other.type == type) &&
-            (identical(other.date, date) || other.date == date));
+            (identical(other.totalPaid, totalPaid) ||
+                other.totalPaid == totalPaid) &&
+            (identical(other.timeOfTransaction, timeOfTransaction) ||
+                other.timeOfTransaction == timeOfTransaction) &&
+            (identical(other.clientId, clientId) ||
+                other.clientId == clientId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, client, total, remainder, paid, type, date);
+  int get hashCode => Object.hash(runtimeType, id, totalPrice, remainder,
+      totalPaid, timeOfTransaction, clientId);
 
   @override
   String toString() {
-    return 'Transaction(id: $id, client: $client, total: $total, remainder: $remainder, paid: $paid, type: $type, date: $date)';
+    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, timeOfTransaction: $timeOfTransaction, clientId: $clientId)';
   }
 }
 
@@ -373,12 +370,11 @@ abstract mixin class _$TransactionCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      String client,
-      double total,
+      double totalPrice,
       double remainder,
-      double paid,
-      String type,
-      String date});
+      double totalPaid,
+      int timeOfTransaction,
+      String clientId});
 }
 
 /// @nodoc
@@ -394,41 +390,36 @@ class __$TransactionCopyWithImpl<$Res> implements _$TransactionCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? client = null,
-    Object? total = null,
+    Object? totalPrice = null,
     Object? remainder = null,
-    Object? paid = null,
-    Object? type = null,
-    Object? date = null,
+    Object? totalPaid = null,
+    Object? timeOfTransaction = null,
+    Object? clientId = null,
   }) {
     return _then(_Transaction(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      client: null == client
-          ? _self.client
-          : client // ignore: cast_nullable_to_non_nullable
-              as String,
-      total: null == total
-          ? _self.total
-          : total // ignore: cast_nullable_to_non_nullable
+      totalPrice: null == totalPrice
+          ? _self.totalPrice
+          : totalPrice // ignore: cast_nullable_to_non_nullable
               as double,
       remainder: null == remainder
           ? _self.remainder
           : remainder // ignore: cast_nullable_to_non_nullable
               as double,
-      paid: null == paid
-          ? _self.paid
-          : paid // ignore: cast_nullable_to_non_nullable
+      totalPaid: null == totalPaid
+          ? _self.totalPaid
+          : totalPaid // ignore: cast_nullable_to_non_nullable
               as double,
-      type: null == type
-          ? _self.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
+      timeOfTransaction: null == timeOfTransaction
+          ? _self.timeOfTransaction
+          : timeOfTransaction // ignore: cast_nullable_to_non_nullable
+              as int,
+      clientId: null == clientId
+          ? _self.clientId
+          : clientId // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }

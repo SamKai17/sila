@@ -71,6 +71,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   child: Text("an error happened!"),
                 );
               }
+              print(widget.viewModel.client?.id);
               return Column(
                 children: [
                   CircleAvatar(
@@ -101,10 +102,15 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     ),
                   ),
                   SizedBox(height: 32),
-                  SizedBox(
-                    height: 70.0,
-                    width: 70.0,
-                    child: Card(child: Icon(Icons.swap_horiz)),
+                  GestureDetector(
+                    onTap: () {
+                      context.push('/${Routes.transactionList}');
+                    },
+                    child: SizedBox(
+                      height: 70.0,
+                      width: 70.0,
+                      child: Card(child: Icon(Icons.swap_horiz)),
+                    ),
                   ),
                   Spacer(),
                   Row(

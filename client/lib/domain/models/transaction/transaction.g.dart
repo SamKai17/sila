@@ -8,21 +8,19 @@ part of 'transaction.dart';
 
 _Transaction _$TransactionFromJson(Map<String, dynamic> json) => _Transaction(
       id: json['id'] as String,
-      client: json['client'] as String,
-      total: (json['total'] as num).toDouble(),
+      totalPrice: (json['total_price'] as num).toDouble(),
       remainder: (json['remainder'] as num).toDouble(),
-      paid: (json['paid'] as num).toDouble(),
-      type: json['type'] as String,
-      date: json['date'] as String,
+      totalPaid: (json['total_paid'] as num).toDouble(),
+      timeOfTransaction: (json['time_of_transaction'] as num).toInt(),
+      clientId: json['client_id'] as String,
     );
 
 Map<String, dynamic> _$TransactionToJson(_Transaction instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'client': instance.client,
-      'total': instance.total,
+      'totalPrice': instance.totalPrice,
       'remainder': instance.remainder,
-      'paid': instance.paid,
-      'type': instance.type,
-      'date': instance.date,
+      'totalPaid': instance.totalPaid,
+      'timeOfTransaction': instance.timeOfTransaction,
+      'clientId': instance.clientId,
     };

@@ -1,11 +1,35 @@
 import 'dart:collection';
+import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/domain/models/transaction/transaction.dart';
+import 'package:client/utils/command.dart';
+import 'package:client/utils/result.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class TransactionCreateViewModel extends ChangeNotifier {
-  List<Item> _items = [];
+  TransactionCreateViewModel(
+      {required TransactionRepository transactionRepository})
+      : _transactionRepository = transactionRepository {
+    addTransaction = Command0<void>(_addTransaction);
+    load = Command0<void>(_load);
+  }
+
+  late Command0 addTransaction;
+  late Command0 load;
+
+  final TransactionRepository _transactionRepository;
+
   List<Item> _selectedItems = [];
+
+  set paid(double paid) {
+    _paid = paid;
+  }
+
+  double _paid = 0.0;
+  double get paid => _paid;
+
+  bool get selectedMode => !_selectedItems.isEmpty;
 
   int get totalItems {
     int total = 0;
@@ -23,7 +47,12 @@ class TransactionCreateViewModel extends ChangeNotifier {
     return total;
   }
 
+  List<Item> _items = [];
   UnmodifiableListView<Item> get items => UnmodifiableListView(_items);
+
+  List<Transaction> _transactions = [];
+  UnmodifiableListView<Transaction> get transactions =>
+      UnmodifiableListView(_transactions);
 
   void addItem({
     required String name,
@@ -47,6 +76,28 @@ class TransactionCreateViewModel extends ChangeNotifier {
           Item(id: id, name: name, price: price, quantity: quantity);
       notifyListeners();
     }
+  }
+
+  Future<Result<void>> _load() async {
+    try {
+      final result = await _transactionRepository.getTransactionsList();
+      switch (result) {
+        case Ok():
+          // print(result.value);
+          _transactions = result.value;
+          return Result.ok(null);
+        case Error():
+          return Result.error(result.error);
+      }
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<Result<void>> _addTransaction() async {
+    final result = await _transactionRepository.addTransaction();
+    notifyListeners();
+    return result;
   }
 
   void addSelectedItem({required Item item}) {
@@ -74,6 +125,4 @@ class TransactionCreateViewModel extends ChangeNotifier {
   bool isSelected({required Item item}) {
     return _selectedItems.contains(item);
   }
-
-  bool get selectedMode => !_selectedItems.isEmpty;
 }

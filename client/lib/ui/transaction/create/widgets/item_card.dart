@@ -43,8 +43,6 @@ class ItemCard extends StatelessWidget {
             children: [
               if (viewModel.selectedMode)
                 Icon(
-                  // alignment: Alignment(0, 10),
-                  // icon: Icon(Icons.check_box_outline_blank_outlined),
                   viewModel.isSelected(item: item)
                       ? Icons.check_box
                       : Icons.check_box_outline_blank_outlined,

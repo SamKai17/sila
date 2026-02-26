@@ -10,9 +10,12 @@ import 'package:client/ui/client/update/view_model/client_update_viewmodel.dart'
 import 'package:client/ui/client/update/widgets/client_update_screen.dart';
 import 'package:client/ui/item/create/widgets/item_create_screen.dart';
 import 'package:client/ui/item/update/widgets/item_update_screen.dart';
-import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/create/widgets/transaction_create_screen.dart';
+import 'package:client/ui/transaction/detail/widgets/transaction_detail_screen.dart';
+import 'package:client/ui/transaction/list/widgets/transaction_list_screen.dart';
 import 'package:client/ui/transaction/payment/widgets/transaction_payment_screen.dart';
+import 'package:client/ui/transaction/preview/widgets/transaction_preview_screen.dart';
+import 'package:client/ui/transaction/receipt/widgets/transaction_receipt_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -96,9 +99,39 @@ final router = GoRouter(
         GoRoute(
           path: Routes.transactionPayment,
           builder: (context, state) {
-            return TransactionPaymentScreen();
+            return TransactionPaymentScreen(
+              viewModel: context.read(),
+            );
           },
-        )
+        ),
+        GoRoute(
+          path: Routes.transactionPreview,
+          builder: (context, state) {
+            return TransactionPreviewScreen(
+              viewModel: context.read(),
+            );
+          },
+        ),
+        GoRoute(
+          path: Routes.transactionReceipt,
+          builder: (context, state) {
+            return TransactionReceiptScreen();
+          },
+        ),
+        GoRoute(
+          path: Routes.transactionList,
+          builder: (context, state) {
+            return TransactionListScreen(
+              viewModel: context.read(),
+            );
+          },
+        ),
+        GoRoute(
+          path: Routes.transactionDetail,
+          builder: (context, state) {
+            return TransactionDetailScreen();
+          },
+        ),
       ],
     ),
   ],

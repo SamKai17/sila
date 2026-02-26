@@ -1,4 +1,5 @@
 import 'package:client/data/repositories/client/client_repository.dart';
+import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/data/services/database_service.dart';
 import 'package:client/routing/router.dart';
 import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
@@ -19,6 +20,10 @@ void main() {
     Provider(
       create: (context) => ClientRepository(databaseService: context.read()),
     ),
+    Provider(
+      create: (context) =>
+          TransactionRepository(databaseService: context.read()),
+    ),
     ChangeNotifierProvider(
       create: (context) => HomeViewModel(clientRepository: context.read()),
     ),
@@ -35,7 +40,7 @@ void main() {
           ClientCreateViewModel(clientRepository: context.read()),
     ),
     ChangeNotifierProvider(
-      create: (context) => TransactionCreateViewModel(),
+      create: (context) => TransactionCreateViewModel(transactionRepository: context.read()),
     ),
   ], child: const MyApp()));
 }
