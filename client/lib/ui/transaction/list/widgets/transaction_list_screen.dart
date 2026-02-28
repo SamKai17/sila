@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class TransactionListScreen extends StatefulWidget {
-  const TransactionListScreen(
-      {super.key, required TransactionCreateViewModel this.viewModel});
+  const TransactionListScreen({
+    super.key,
+    required TransactionCreateViewModel this.viewModel,
+    required String this.clientId,
+  });
   final TransactionCreateViewModel viewModel;
+  final String clientId;
 
   @override
   State<TransactionListScreen> createState() => _TransactionListScreenState();
@@ -18,7 +22,7 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
     // TODO: implement initState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // print("init home...");
-      widget.viewModel.load.execute();
+      widget.viewModel.load.execute(widget.clientId);
     });
     super.initState();
   }
@@ -31,32 +35,47 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
         listenable: widget.viewModel,
         builder: (context, child) {
           final transactions = widget.viewModel.transactions;
-          return Container(
-            // color: Colors.amber,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 16.0,
-                children: transactions.map(
-                  (transaction) {
-                    return GestureDetector(
-                      onTap: () {
-                        context.push('/${Routes.transactionDetail}');
-                      },
-                      child: Container(
-                        height: 100.0,
-                        width: 300.0,
-                        child: Card(
-                          child: Text(
-                            transaction.totalPrice.toString(),
+          return SingleChildScrollView(
+            child: Container(
+              // color: Colors.amber,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  spacing: 16.0,
+                  children: transactions.map(
+                    (transaction) {
+                      return GestureDetector(
+                        onTap: () {
+                          context.push('/transaction/${transaction.id}');
+                        },
+                        child: Container(
+                          height: 100.0,
+                          width: 300.0,
+                          child: Card(
+                            child: Column(
+                              children: [
+                                Text(
+                                  'total price: ${transaction.totalPrice.toString()}',
+                                ),
+                                Text(
+                                  'total paid: ${transaction.totalPaid.toString()}',
+                                ),
+                                Text(
+                                  'remainder: ${transaction.remainder.toString()}',
+                                ),
+                                Text(
+                                  'type: ${transaction.type}',
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ).toList(),
+                      );
+                    },
+                  ).toList(),
+                ),
               ),
             ),
           );

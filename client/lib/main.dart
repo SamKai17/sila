@@ -1,6 +1,6 @@
 import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
-import 'package:client/data/services/database_service.dart';
+import 'package:client/data/services/local/database_service.dart';
 import 'package:client/routing/router.dart';
 import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';

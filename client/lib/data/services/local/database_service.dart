@@ -1,8 +1,7 @@
+import 'package:client/data/services/local/models/transaction/transaction_local_model.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
-import 'package:client/domain/models/transaction/transaction.dart'
-    as transaction;
 import 'package:client/utils/result.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -47,9 +46,10 @@ class DatabaseService {
       onOpen: (db) async {
         print("opening db...");
         // print(await db.query('sqlite_master', where: 'name = ?', whereArgs: ['transactions']));
+        // db.rawDelete('DELETE FROM $_transactionTable');
+        // db.execute('DROP TABLE IF EXISTS transactions');
         // db.execute('DROP TABLE IF EXISTS items');
         // db.execute('DROP TABLE IF EXISTS payments');
-        // db.execute('DROP TABLE IF EXISTS transactions');
         // db.execute('DROP TABLE IF EXISTS clients');
       },
       onCreate: (db, version) {
@@ -97,53 +97,80 @@ class DatabaseService {
     );
   }
 
-  // final List<Map<String, Object?>> itemsMap = await _database!.query(
-  //   _itemTable,
-  //   where: '$_itemTransactionIdField = ?',
-  //   whereArgs: [1],
-  // );
-  // final List<Map<String, Object?>> paymentsMap = await _database!.query(
-  //   _paymentTable,
-  //   where: '$_paymentTransactionIdField = ?',
-  //   whereArgs: [1],
-  // );
-
-  Future<Result<void>> getTransaction({required String transactionId}) async {
-    final List<Map<String, Object?>> transactionMap = await _database!.query(
-      _transactionTable,
-      where: '$_transactionIdField = ?',
-      whereArgs: [transactionId],
-      limit: 1,
-    );
-    final List<Map<String, Object?>> itemsMap = await _database!.query(
-      _itemTable,
-      where: '$_itemTransactionIdField = ?',
-      whereArgs: [transactionId],
-    );
-    final List<Map<String, Object?>> paymentsMap = await _database!.query(
-      _paymentTable,
-      where: '$_paymentTransactionIdField = ?',
-      whereArgs: [transactionId],
-    );
-    if (transactionMap.isNotEmpty) {
-      print(transactionMap);
-      print(itemsMap);
-      print(paymentsMap);
-    } else {
-      print('no transaction found...');
+  Future<Result<List<Item>>> getItems({
+    required String transactionId,
+  }) async {
+    try {
+      final List<Map<String, Object?>> itemsMap = await _database!.query(
+        _itemTable,
+        where: '$_itemTransactionIdField = ?',
+        whereArgs: [transactionId],
+      );
+      final items = itemsMap.map((e) => Item.fromJson(e)).toList();
+      return Result.ok(items);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
-    return Result.ok(null);
   }
 
-  Future<Result<List<transaction.Transaction>>> getTransactionsList() async {
-    // i need to filter by client
-    final List<Map<String, Object?>> transactionsMap =
-        await _database!.query(_transactionTable);
-    final transactions = transactionsMap.map((t) {
-      return transaction.Transaction.fromJson(t);
-    }).toList();
-    // print("transactions: $transactions");
-    return Result.ok(transactions);
+  Future<Result<List<Payment>>> getPayments({
+    required String transactionId,
+  }) async {
+    try {
+      final List<Map<String, Object?>> paymentsMap = await _database!.query(
+        _paymentTable,
+        where: '$_paymentTransactionIdField = ?',
+        whereArgs: [transactionId],
+      );
+      final payments = paymentsMap.map((e) => Payment.fromJson(e)).toList();
+      return Result.ok(payments);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<TransactionLocalModel>> getTransaction({
+    required String transactionId,
+  }) async {
+    try {
+      final List<Map<String, Object?>> transactionMap = await _database!.query(
+        _transactionTable,
+        where: '$_transactionIdField = ?',
+        whereArgs: [transactionId],
+        limit: 1,
+      );
+      if (transactionMap.isNotEmpty) {
+        final TransactionLocalModel transaction =
+            TransactionLocalModel.fromJson(transactionMap.first);
+        return Result.ok(transaction);
+      } else {
+        throw Exception('transaction not found');
+      }
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<List<TransactionLocalModel>>> getTransactionsList({
+    required String clientId,
+  }) async {
+    try {
+      // i need to filter by client
+      print('clientId 2: $clientId');
+      final List<Map<String, Object?>> transactionsMap = await _database!.query(
+        _transactionTable,
+        where: '$_transactionClientIdField = ?',
+        whereArgs: [clientId],
+      );
+      print(transactionsMap);
+      final transactions = transactionsMap.map((t) {
+        return TransactionLocalModel.fromJson(t);
+      }).toList();
+      // print("transactions: $transactions");
+      return Result.ok(transactions);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
   }
 
   Future<Result<void>> addTransaction({
@@ -153,28 +180,32 @@ class DatabaseService {
     required int timeOfTransaction,
     required String clientId,
     required double paid,
+    required String type,
     required List<Item> items,
   }) async {
     try {
       final transactionId = Uuid().v4();
       final paymentId = Uuid().v4();
+      print('clientId 1: $clientId');
+      print(items);
       await _database!.transaction(
         (txn) async {
-          await _database!.insert(
+          await txn.insert(
             _transactionTable,
             {
               _transactionIdField: transactionId,
               _transactionTotalPriceField: totalPrice,
               _transactionTotalPaidField: totalPaid,
+              _transactionTypeField: type,
               _transactionRemainderField: remainder,
               _transactionTimeOfTransactionField: timeOfTransaction,
               _transactionClientIdField: clientId,
             },
             conflictAlgorithm: ConflictAlgorithm.replace,
           );
-          items.map(
+          items.forEach(
             (item) async {
-              await _database!.insert(_itemTable, {
+              await txn.insert(_itemTable, {
                 _itemIdField: item.id,
                 _itemNameField: item.name,
                 _itemQuantityField: item.quantity,
@@ -183,7 +214,7 @@ class DatabaseService {
               });
             },
           );
-          await _database!.insert(_paymentTable, {
+          await txn.insert(_paymentTable, {
             _paymentIdField: paymentId,
             _paymentAmountField: paid,
             _paymentTimeOfPaymentField: timeOfTransaction,
@@ -191,7 +222,6 @@ class DatabaseService {
           });
         },
       );
-      print('good');
       return Result.ok(null);
     } on Exception catch (e) {
       print(e);

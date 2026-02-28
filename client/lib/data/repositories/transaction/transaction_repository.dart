@@ -1,7 +1,9 @@
-import 'package:client/data/services/database_service.dart';
+import 'package:client/data/services/local/database_service.dart';
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/utils/result.dart';
+import 'package:uuid/uuid.dart';
 
 class TransactionRepository {
   TransactionRepository({required DatabaseService databaseService})
@@ -10,25 +12,99 @@ class TransactionRepository {
   final DatabaseService _databaseService;
   List<Transaction> _transactions = [];
 
-  Future<Result<void>> addTransaction() async {
+  Future<Result<void>> addTransaction({
+    required double totalPrice,
+    required double totalPaid,
+    required double remainder,
+    required double paid,
+    required List<Item> items,
+    required String type,
+    required String clientId,
+  }) async {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    List<Item> items = [
-      Item(id: '1', name: 'serwal', price: 100.0, quantity: 25),
-    ];
     return _databaseService.addTransaction(
-      clientId: '0aea6958-beff-4902-a1cf-303b18d144de',
-      paid: 100.0,
-      remainder: 500.0,
+      clientId: clientId,
+      paid: paid,
+      remainder: remainder,
+      type: 'sell',
       timeOfTransaction: DateTime.now().millisecondsSinceEpoch,
-      totalPaid: 1000.0,
-      totalPrice: 1500.0,
+      totalPaid: totalPaid,
+      totalPrice: totalPrice,
       items: items,
     );
   }
 
-  Future<Result<List<Transaction>>> getTransactionsList() async {
-    return _databaseService.getTransactionsList();
+  Future<Result<List<Transaction>>> getTransactionsList({required String clientId}) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    final transactions = await _databaseService.getTransactionsList(clientId: clientId);
+    switch (transactions) {
+      case Ok():
+        _transactions = transactions.value
+            .map(
+              (transaction) => Transaction(
+                id: transaction.id,
+                totalPrice: transaction.totalPrice,
+                remainder: transaction.remainder,
+                totalPaid: transaction.totalPaid,
+                type: transaction.type,
+                timeOfTransaction: transaction.timeOfTransaction,
+                clientId: transaction.clientId,
+              ),
+            )
+            .toList();
+      case Error():
+        return Result.error(transactions.error);
+    }
+    return Result.ok(_transactions);
+  }
+
+  Future<Result<Transaction>> getTransaction(
+      {required String transactionId}) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    final itemsResult =
+        await _databaseService.getItems(transactionId: transactionId);
+    List<Item> items;
+    switch (itemsResult) {
+      case Ok():
+        items = itemsResult.value;
+      case Error():
+        return Result.error(itemsResult.error);
+    }
+    final paymentsResult = await _databaseService.getPayments(
+        transactionId: transactionId);
+    List<Payment> payments;
+    switch (paymentsResult) {
+      case Ok():
+        payments = paymentsResult.value;
+      case Error():
+        return Result.error(paymentsResult.error);
+    }
+    final transactionResult = await _databaseService.getTransaction(
+        transactionId: transactionId);
+    switch (transactionResult) {
+      case Ok():
+        final transactionLocal = transactionResult.value;
+        final transaction = Transaction(
+          id: transactionLocal.id,
+          clientId: transactionLocal.clientId,
+          remainder: transactionLocal.remainder,
+          timeOfTransaction: transactionLocal.timeOfTransaction,
+          totalPaid: transactionLocal.totalPaid,
+          totalPrice: transactionLocal.totalPrice,
+          type: transactionLocal.type,
+          items: items,
+          payments: payments,
+        );
+        print('tran: $transaction');
+        return Result.ok(transaction);
+      case Error():
+        return Result.error(transactionResult.error);
+    }
   }
 }

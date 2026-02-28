@@ -6,9 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class TransactionPreviewScreen extends StatelessWidget {
-  const TransactionPreviewScreen(
-      {super.key, required TransactionCreateViewModel this.viewModel});
+  const TransactionPreviewScreen({
+    super.key,
+    required TransactionCreateViewModel this.viewModel,
+    required Map<String, String> this.extra,
+  });
   final TransactionCreateViewModel viewModel;
+  final Map<String, String> extra;
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +126,7 @@ class TransactionPreviewScreen extends StatelessWidget {
             CustomButtonWidget(
               buttonText: 'Confirm',
               onPressed: () async {
-                await viewModel.addTransaction.execute();
+                await viewModel.addTransaction.execute(extra['clientId']);
                 // save the transaction
                 context.push('/${Routes.transactionReceipt}');
               },

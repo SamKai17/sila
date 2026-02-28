@@ -104,7 +104,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   SizedBox(height: 32),
                   GestureDetector(
                     onTap: () {
-                      context.push('/${Routes.transactionList}');
+                      context.push('/${Routes.transactionList}', extra: widget.clientId);
                     },
                     child: SizedBox(
                       height: 70.0,
@@ -118,7 +118,11 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                       Expanded(
                         child: FilledButton(
                             onPressed: () {
-                              context.push('/${Routes.transactionCreate}');
+                              context.push('/${Routes.transactionCreate}',
+                                  extra: {
+                                    'type': 'buy',
+                                    'clientId': widget.clientId
+                                  });
                             },
                             child: Text('Buy')),
                       ),
@@ -126,7 +130,11 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                       Expanded(
                         child: FilledButton(
                             onPressed: () {
-                              context.push('/${Routes.transactionCreate}');
+                              context.push('/${Routes.transactionCreate}',
+                                  extra: {
+                                    'type': 'sell',
+                                    'clientId': widget.clientId
+                                  });
                             },
                             child: Text('Sell')),
                       ),

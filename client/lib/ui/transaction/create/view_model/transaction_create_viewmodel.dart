@@ -11,16 +11,21 @@ class TransactionCreateViewModel extends ChangeNotifier {
   TransactionCreateViewModel(
       {required TransactionRepository transactionRepository})
       : _transactionRepository = transactionRepository {
-    addTransaction = Command0<void>(_addTransaction);
-    load = Command0<void>(_load);
+    addTransaction = Command1<void, String>(_addTransaction);
+    load = Command1<void, String>(_load);
+    loadTransaction = Command1<void, String>(_loadTransaction);
   }
 
-  late Command0 addTransaction;
-  late Command0 load;
+  late Command1 addTransaction;
+  late Command1 load;
+  late Command1 loadTransaction;
 
   final TransactionRepository _transactionRepository;
 
   List<Item> _selectedItems = [];
+
+  Transaction? transaction;
+  String? transactionType;
 
   set paid(double paid) {
     _paid = paid;
@@ -45,6 +50,23 @@ class TransactionCreateViewModel extends ChangeNotifier {
       total += item.price * item.quantity;
     }
     return total;
+  }
+
+  double get remainder {
+    return totalPrice - _paid;
+  }
+
+  double get totalPaid {
+    final payments = transaction?.payments;
+    double result = 0;
+    if (payments != null) {
+      payments.forEach(
+        (payment) {
+          result += payment.amount;
+        },
+      );
+    }
+    return result;
   }
 
   List<Item> _items = [];
@@ -78,12 +100,12 @@ class TransactionCreateViewModel extends ChangeNotifier {
     }
   }
 
-  Future<Result<void>> _load() async {
+  Future<Result<void>> _load(String clientId) async {
     try {
-      final result = await _transactionRepository.getTransactionsList();
+      final result =
+          await _transactionRepository.getTransactionsList(clientId: clientId);
       switch (result) {
         case Ok():
-          // print(result.value);
           _transactions = result.value;
           return Result.ok(null);
         case Error():
@@ -94,10 +116,45 @@ class TransactionCreateViewModel extends ChangeNotifier {
     }
   }
 
-  Future<Result<void>> _addTransaction() async {
-    final result = await _transactionRepository.addTransaction();
-    notifyListeners();
-    return result;
+  Future<Result<void>> _loadTransaction(String transactionId) async {
+    try {
+      final result = await _transactionRepository.getTransaction(
+          transactionId: transactionId);
+      switch (result) {
+        case Ok():
+          transaction = result.value;
+          return Result.ok(null);
+        case Error():
+          return Result.error(result.error);
+      }
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<Result<void>> _addTransaction(String clientId) async {
+    try {
+      final result = await _transactionRepository.addTransaction(
+        clientId: clientId,
+        totalPrice: totalPrice,
+        totalPaid: _paid,
+        remainder: remainder,
+        paid: _paid,
+        type: transactionType!,
+        items: _items,
+      );
+      switch (result) {
+        case Ok():
+          // reset values
+          _paid = 0;
+          _items.clear();
+          return Result.ok(null);
+        case Error():
+          return Result.error(result.error);
+      }
+    } finally {
+      notifyListeners();
+    }
   }
 
   void addSelectedItem({required Item item}) {

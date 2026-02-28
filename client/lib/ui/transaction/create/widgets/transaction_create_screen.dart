@@ -7,34 +7,53 @@ import 'package:client/ui/transaction/create/widgets/item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class TransactionCreateScreen extends StatelessWidget {
-  const TransactionCreateScreen(
-      {super.key, required TransactionCreateViewModel this.viewModel});
+class TransactionCreateScreen extends StatefulWidget {
+  const TransactionCreateScreen({
+    super.key,
+    required TransactionCreateViewModel this.viewModel,
+    required Map<String, String> this.extra,
+  });
   final TransactionCreateViewModel viewModel;
+  final Map<String, String> extra;
+
+  @override
+  State<TransactionCreateScreen> createState() =>
+      _TransactionCreateScreenState();
+}
+
+class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    widget.viewModel.transactionType = widget.extra['type'];
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: viewModel,
+      listenable: widget.viewModel,
       builder: (context, child) {
         return Scaffold(
           appBar: AppBar(
-            automaticallyImplyLeading: viewModel.selectedMode ? false : true,
+            automaticallyImplyLeading:
+                widget.viewModel.selectedMode ? false : true,
             toolbarHeight: 72,
             surfaceTintColor: AppPallete.background,
             // backgroundColor: AppPallete.avatarBackground,
             // titleSpacing: 32.0,
-            title: !viewModel.selectedMode ? Text("Transaction") : null,
+            title: !widget.viewModel.selectedMode ? Text("Transaction") : null,
             // : Text('${viewModel.items.length} items selected'),
             leadingWidth: 82,
-            leading: viewModel.selectedMode
+            leading: widget.viewModel.selectedMode
                 ? ClearButton(
-                    clear: viewModel.clearSelectedItems,
+                    clear: widget.viewModel.clearSelectedItems,
                   )
                 : null,
-            actions: viewModel.selectedMode
+            actions: widget.viewModel.selectedMode
                 ? [
-                    DeleteButton(delete: viewModel.deleteSelectedItems),
+                    DeleteButton(delete: widget.viewModel.deleteSelectedItems),
                     SizedBox(width: 32)
                   ]
                 : null,
@@ -51,11 +70,11 @@ class TransactionCreateScreen extends StatelessWidget {
                 //         name: 'ddsfklsjflksdjflskdjflksdjflksjfdlkj',
                 //         price: 12.0,
                 //         quantity: 10)),
-                ...viewModel.items.map(
+                ...widget.viewModel.items.map(
                   (item) {
                     return ItemCard(
                       item: item,
-                      viewModel: viewModel,
+                      viewModel: widget.viewModel,
                     );
                   },
                 ).toList(),
@@ -73,14 +92,14 @@ class TransactionCreateScreen extends StatelessWidget {
                           children: [
                             Text("Total Items"),
                             Spacer(),
-                            Text(viewModel.totalItems.toString()),
+                            Text(widget.viewModel.totalItems.toString()),
                           ],
                         ),
                         Row(
                           children: [
                             Text("Total Price"),
                             Spacer(),
-                            Text('${viewModel.totalPrice}\$'),
+                            Text('${widget.viewModel.totalPrice}\$'),
                           ],
                         )
                       ],
@@ -106,7 +125,8 @@ class TransactionCreateScreen extends StatelessWidget {
                     Expanded(
                       child: FilledButton(
                         onPressed: () {
-                          context.push('/${Routes.transactionPayment}');
+                          context.push('/${Routes.transactionPayment}',
+                              extra: widget.extra);
                         },
                         child: Text("pay"),
                       ),

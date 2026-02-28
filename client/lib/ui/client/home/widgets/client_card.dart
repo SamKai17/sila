@@ -109,7 +109,6 @@ class _ClientCardState extends State<ClientCard> {
           if (!widget.viewModel.selectedMode) {
             context.push(
               '/client/detail/${widget.client.id}',
-              // '/client',
             );
           } else {
             if (!widget.viewModel.isSelected(widget.client)) {

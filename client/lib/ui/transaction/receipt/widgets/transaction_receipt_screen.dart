@@ -1,5 +1,6 @@
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TransactionReceiptScreen extends StatelessWidget {
   const TransactionReceiptScreen({super.key});
@@ -15,7 +16,9 @@ class TransactionReceiptScreen extends StatelessWidget {
             Spacer(),
             CustomButtonWidget(
               buttonText: 'View Transaction',
-              onPressed: () {},
+              onPressed: () {
+                context.pop();
+              },
             ),
             SizedBox(height: 12.0),
             CustomButtonWidget(

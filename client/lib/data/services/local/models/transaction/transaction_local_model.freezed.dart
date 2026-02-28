@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'transaction.dart';
+part of 'transaction_local_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,7 +13,7 @@ part of 'transaction.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$Transaction {
+mixin _$TransactionLocalModel {
   String get id;
   double get totalPrice;
   double get remainder;
@@ -21,24 +21,23 @@ mixin _$Transaction {
   String get type;
   int get timeOfTransaction;
   String get clientId;
-  List<Item>? get items;
-  List<Payment>? get payments;
 
-  /// Create a copy of Transaction
+  /// Create a copy of TransactionLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $TransactionCopyWith<Transaction> get copyWith =>
-      _$TransactionCopyWithImpl<Transaction>(this as Transaction, _$identity);
+  $TransactionLocalModelCopyWith<TransactionLocalModel> get copyWith =>
+      _$TransactionLocalModelCopyWithImpl<TransactionLocalModel>(
+          this as TransactionLocalModel, _$identity);
 
-  /// Serializes this Transaction to a JSON map.
+  /// Serializes this TransactionLocalModel to a JSON map.
   Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is Transaction &&
+            other is TransactionLocalModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.totalPrice, totalPrice) ||
                 other.totalPrice == totalPrice) &&
@@ -50,36 +49,25 @@ mixin _$Transaction {
             (identical(other.timeOfTransaction, timeOfTransaction) ||
                 other.timeOfTransaction == timeOfTransaction) &&
             (identical(other.clientId, clientId) ||
-                other.clientId == clientId) &&
-            const DeepCollectionEquality().equals(other.items, items) &&
-            const DeepCollectionEquality().equals(other.payments, payments));
+                other.clientId == clientId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      totalPrice,
-      remainder,
-      totalPaid,
-      type,
-      timeOfTransaction,
-      clientId,
-      const DeepCollectionEquality().hash(items),
-      const DeepCollectionEquality().hash(payments));
+  int get hashCode => Object.hash(runtimeType, id, totalPrice, remainder,
+      totalPaid, type, timeOfTransaction, clientId);
 
   @override
   String toString() {
-    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, items: $items, payments: $payments)';
+    return 'TransactionLocalModel(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId)';
   }
 }
 
 /// @nodoc
-abstract mixin class $TransactionCopyWith<$Res> {
-  factory $TransactionCopyWith(
-          Transaction value, $Res Function(Transaction) _then) =
-      _$TransactionCopyWithImpl;
+abstract mixin class $TransactionLocalModelCopyWith<$Res> {
+  factory $TransactionLocalModelCopyWith(TransactionLocalModel value,
+          $Res Function(TransactionLocalModel) _then) =
+      _$TransactionLocalModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -88,19 +76,18 @@ abstract mixin class $TransactionCopyWith<$Res> {
       double totalPaid,
       String type,
       int timeOfTransaction,
-      String clientId,
-      List<Item>? items,
-      List<Payment>? payments});
+      String clientId});
 }
 
 /// @nodoc
-class _$TransactionCopyWithImpl<$Res> implements $TransactionCopyWith<$Res> {
-  _$TransactionCopyWithImpl(this._self, this._then);
+class _$TransactionLocalModelCopyWithImpl<$Res>
+    implements $TransactionLocalModelCopyWith<$Res> {
+  _$TransactionLocalModelCopyWithImpl(this._self, this._then);
 
-  final Transaction _self;
-  final $Res Function(Transaction) _then;
+  final TransactionLocalModel _self;
+  final $Res Function(TransactionLocalModel) _then;
 
-  /// Create a copy of Transaction
+  /// Create a copy of TransactionLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -112,8 +99,6 @@ class _$TransactionCopyWithImpl<$Res> implements $TransactionCopyWith<$Res> {
     Object? type = null,
     Object? timeOfTransaction = null,
     Object? clientId = null,
-    Object? items = freezed,
-    Object? payments = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -144,20 +129,12 @@ class _$TransactionCopyWithImpl<$Res> implements $TransactionCopyWith<$Res> {
           ? _self.clientId
           : clientId // ignore: cast_nullable_to_non_nullable
               as String,
-      items: freezed == items
-          ? _self.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<Item>?,
-      payments: freezed == payments
-          ? _self.payments
-          : payments // ignore: cast_nullable_to_non_nullable
-              as List<Payment>?,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [Transaction].
-extension TransactionPatterns on Transaction {
+/// Adds pattern-matching-related methods to [TransactionLocalModel].
+extension TransactionLocalModelPatterns on TransactionLocalModel {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -172,12 +149,12 @@ extension TransactionPatterns on Transaction {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_Transaction value)? $default, {
+    TResult Function(_TransactionLocalModel value)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Transaction() when $default != null:
+      case _TransactionLocalModel() when $default != null:
         return $default(_that);
       case _:
         return orElse();
@@ -199,11 +176,11 @@ extension TransactionPatterns on Transaction {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_Transaction value) $default,
+    TResult Function(_TransactionLocalModel value) $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Transaction():
+      case _TransactionLocalModel():
         return $default(_that);
       case _:
         throw StateError('Unexpected subclass');
@@ -224,11 +201,11 @@ extension TransactionPatterns on Transaction {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_Transaction value)? $default,
+    TResult? Function(_TransactionLocalModel value)? $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Transaction() when $default != null:
+      case _TransactionLocalModel() when $default != null:
         return $default(_that);
       case _:
         return null;
@@ -256,15 +233,13 @@ extension TransactionPatterns on Transaction {
             double totalPaid,
             String type,
             int timeOfTransaction,
-            String clientId,
-            List<Item>? items,
-            List<Payment>? payments)?
+            String clientId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Transaction() when $default != null:
+      case _TransactionLocalModel() when $default != null:
         return $default(
             _that.id,
             _that.totalPrice,
@@ -272,9 +247,7 @@ extension TransactionPatterns on Transaction {
             _that.totalPaid,
             _that.type,
             _that.timeOfTransaction,
-            _that.clientId,
-            _that.items,
-            _that.payments);
+            _that.clientId);
       case _:
         return orElse();
     }
@@ -302,14 +275,12 @@ extension TransactionPatterns on Transaction {
             double totalPaid,
             String type,
             int timeOfTransaction,
-            String clientId,
-            List<Item>? items,
-            List<Payment>? payments)
+            String clientId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Transaction():
+      case _TransactionLocalModel():
         return $default(
             _that.id,
             _that.totalPrice,
@@ -317,9 +288,7 @@ extension TransactionPatterns on Transaction {
             _that.totalPaid,
             _that.type,
             _that.timeOfTransaction,
-            _that.clientId,
-            _that.items,
-            _that.payments);
+            _that.clientId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -346,14 +315,12 @@ extension TransactionPatterns on Transaction {
             double totalPaid,
             String type,
             int timeOfTransaction,
-            String clientId,
-            List<Item>? items,
-            List<Payment>? payments)?
+            String clientId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Transaction() when $default != null:
+      case _TransactionLocalModel() when $default != null:
         return $default(
             _that.id,
             _that.totalPrice,
@@ -361,9 +328,7 @@ extension TransactionPatterns on Transaction {
             _that.totalPaid,
             _that.type,
             _that.timeOfTransaction,
-            _that.clientId,
-            _that.items,
-            _that.payments);
+            _that.clientId);
       case _:
         return null;
     }
@@ -372,21 +337,17 @@ extension TransactionPatterns on Transaction {
 
 /// @nodoc
 @JsonSerializable()
-class _Transaction implements Transaction {
-  const _Transaction(
+class _TransactionLocalModel implements TransactionLocalModel {
+  const _TransactionLocalModel(
       {required this.id,
       required this.totalPrice,
       required this.remainder,
       required this.totalPaid,
       required this.type,
       required this.timeOfTransaction,
-      required this.clientId,
-      final List<Item>? items,
-      final List<Payment>? payments})
-      : _items = items,
-        _payments = payments;
-  factory _Transaction.fromJson(Map<String, dynamic> json) =>
-      _$TransactionFromJson(json);
+      required this.clientId});
+  factory _TransactionLocalModel.fromJson(Map<String, dynamic> json) =>
+      _$TransactionLocalModelFromJson(json);
 
   @override
   final String id;
@@ -402,37 +363,19 @@ class _Transaction implements Transaction {
   final int timeOfTransaction;
   @override
   final String clientId;
-  final List<Item>? _items;
-  @override
-  List<Item>? get items {
-    final value = _items;
-    if (value == null) return null;
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
 
-  final List<Payment>? _payments;
-  @override
-  List<Payment>? get payments {
-    final value = _payments;
-    if (value == null) return null;
-    if (_payments is EqualUnmodifiableListView) return _payments;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
-
-  /// Create a copy of Transaction
+  /// Create a copy of TransactionLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$TransactionCopyWith<_Transaction> get copyWith =>
-      __$TransactionCopyWithImpl<_Transaction>(this, _$identity);
+  _$TransactionLocalModelCopyWith<_TransactionLocalModel> get copyWith =>
+      __$TransactionLocalModelCopyWithImpl<_TransactionLocalModel>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$TransactionToJson(
+    return _$TransactionLocalModelToJson(
       this,
     );
   }
@@ -441,7 +384,7 @@ class _Transaction implements Transaction {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _Transaction &&
+            other is _TransactionLocalModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.totalPrice, totalPrice) ||
                 other.totalPrice == totalPrice) &&
@@ -453,37 +396,26 @@ class _Transaction implements Transaction {
             (identical(other.timeOfTransaction, timeOfTransaction) ||
                 other.timeOfTransaction == timeOfTransaction) &&
             (identical(other.clientId, clientId) ||
-                other.clientId == clientId) &&
-            const DeepCollectionEquality().equals(other._items, _items) &&
-            const DeepCollectionEquality().equals(other._payments, _payments));
+                other.clientId == clientId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      totalPrice,
-      remainder,
-      totalPaid,
-      type,
-      timeOfTransaction,
-      clientId,
-      const DeepCollectionEquality().hash(_items),
-      const DeepCollectionEquality().hash(_payments));
+  int get hashCode => Object.hash(runtimeType, id, totalPrice, remainder,
+      totalPaid, type, timeOfTransaction, clientId);
 
   @override
   String toString() {
-    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, items: $items, payments: $payments)';
+    return 'TransactionLocalModel(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$TransactionCopyWith<$Res>
-    implements $TransactionCopyWith<$Res> {
-  factory _$TransactionCopyWith(
-          _Transaction value, $Res Function(_Transaction) _then) =
-      __$TransactionCopyWithImpl;
+abstract mixin class _$TransactionLocalModelCopyWith<$Res>
+    implements $TransactionLocalModelCopyWith<$Res> {
+  factory _$TransactionLocalModelCopyWith(_TransactionLocalModel value,
+          $Res Function(_TransactionLocalModel) _then) =
+      __$TransactionLocalModelCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -493,19 +425,18 @@ abstract mixin class _$TransactionCopyWith<$Res>
       double totalPaid,
       String type,
       int timeOfTransaction,
-      String clientId,
-      List<Item>? items,
-      List<Payment>? payments});
+      String clientId});
 }
 
 /// @nodoc
-class __$TransactionCopyWithImpl<$Res> implements _$TransactionCopyWith<$Res> {
-  __$TransactionCopyWithImpl(this._self, this._then);
+class __$TransactionLocalModelCopyWithImpl<$Res>
+    implements _$TransactionLocalModelCopyWith<$Res> {
+  __$TransactionLocalModelCopyWithImpl(this._self, this._then);
 
-  final _Transaction _self;
-  final $Res Function(_Transaction) _then;
+  final _TransactionLocalModel _self;
+  final $Res Function(_TransactionLocalModel) _then;
 
-  /// Create a copy of Transaction
+  /// Create a copy of TransactionLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -517,10 +448,8 @@ class __$TransactionCopyWithImpl<$Res> implements _$TransactionCopyWith<$Res> {
     Object? type = null,
     Object? timeOfTransaction = null,
     Object? clientId = null,
-    Object? items = freezed,
-    Object? payments = freezed,
   }) {
-    return _then(_Transaction(
+    return _then(_TransactionLocalModel(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -549,14 +478,6 @@ class __$TransactionCopyWithImpl<$Res> implements _$TransactionCopyWith<$Res> {
           ? _self.clientId
           : clientId // ignore: cast_nullable_to_non_nullable
               as String,
-      items: freezed == items
-          ? _self._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<Item>?,
-      payments: freezed == payments
-          ? _self._payments
-          : payments // ignore: cast_nullable_to_non_nullable
-              as List<Payment>?,
     ));
   }
 }

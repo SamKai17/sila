@@ -15,8 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Payment {
   String get id;
-  double get paid;
-  String get date;
+  double get amount;
+  int get timeOfPayment;
 
   /// Create a copy of Payment
   /// with the given fields replaced by the non-null parameter values.
@@ -34,17 +34,18 @@ mixin _$Payment {
         (other.runtimeType == runtimeType &&
             other is Payment &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.paid, paid) || other.paid == paid) &&
-            (identical(other.date, date) || other.date == date));
+            (identical(other.amount, amount) || other.amount == amount) &&
+            (identical(other.timeOfPayment, timeOfPayment) ||
+                other.timeOfPayment == timeOfPayment));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, paid, date);
+  int get hashCode => Object.hash(runtimeType, id, amount, timeOfPayment);
 
   @override
   String toString() {
-    return 'Payment(id: $id, paid: $paid, date: $date)';
+    return 'Payment(id: $id, amount: $amount, timeOfPayment: $timeOfPayment)';
   }
 }
 
@@ -53,7 +54,7 @@ abstract mixin class $PaymentCopyWith<$Res> {
   factory $PaymentCopyWith(Payment value, $Res Function(Payment) _then) =
       _$PaymentCopyWithImpl;
   @useResult
-  $Res call({String id, double paid, String date});
+  $Res call({String id, double amount, int timeOfPayment});
 }
 
 /// @nodoc
@@ -69,22 +70,22 @@ class _$PaymentCopyWithImpl<$Res> implements $PaymentCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? paid = null,
-    Object? date = null,
+    Object? amount = null,
+    Object? timeOfPayment = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      paid: null == paid
-          ? _self.paid
-          : paid // ignore: cast_nullable_to_non_nullable
+      amount: null == amount
+          ? _self.amount
+          : amount // ignore: cast_nullable_to_non_nullable
               as double,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
+      timeOfPayment: null == timeOfPayment
+          ? _self.timeOfPayment
+          : timeOfPayment // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -182,13 +183,13 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, double paid, String date)? $default, {
+    TResult Function(String id, double amount, int timeOfPayment)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _Payment() when $default != null:
-        return $default(_that.id, _that.paid, _that.date);
+        return $default(_that.id, _that.amount, _that.timeOfPayment);
       case _:
         return orElse();
     }
@@ -209,12 +210,12 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, double paid, String date) $default,
+    TResult Function(String id, double amount, int timeOfPayment) $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Payment():
-        return $default(_that.id, _that.paid, _that.date);
+        return $default(_that.id, _that.amount, _that.timeOfPayment);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -234,12 +235,12 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, double paid, String date)? $default,
+    TResult? Function(String id, double amount, int timeOfPayment)? $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Payment() when $default != null:
-        return $default(_that.id, _that.paid, _that.date);
+        return $default(_that.id, _that.amount, _that.timeOfPayment);
       case _:
         return null;
     }
@@ -249,16 +250,17 @@ extension PaymentPatterns on Payment {
 /// @nodoc
 @JsonSerializable()
 class _Payment implements Payment {
-  const _Payment({required this.id, required this.paid, required this.date});
+  const _Payment(
+      {required this.id, required this.amount, required this.timeOfPayment});
   factory _Payment.fromJson(Map<String, dynamic> json) =>
       _$PaymentFromJson(json);
 
   @override
   final String id;
   @override
-  final double paid;
+  final double amount;
   @override
-  final String date;
+  final int timeOfPayment;
 
   /// Create a copy of Payment
   /// with the given fields replaced by the non-null parameter values.
@@ -281,17 +283,18 @@ class _Payment implements Payment {
         (other.runtimeType == runtimeType &&
             other is _Payment &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.paid, paid) || other.paid == paid) &&
-            (identical(other.date, date) || other.date == date));
+            (identical(other.amount, amount) || other.amount == amount) &&
+            (identical(other.timeOfPayment, timeOfPayment) ||
+                other.timeOfPayment == timeOfPayment));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, paid, date);
+  int get hashCode => Object.hash(runtimeType, id, amount, timeOfPayment);
 
   @override
   String toString() {
-    return 'Payment(id: $id, paid: $paid, date: $date)';
+    return 'Payment(id: $id, amount: $amount, timeOfPayment: $timeOfPayment)';
   }
 }
 
@@ -301,7 +304,7 @@ abstract mixin class _$PaymentCopyWith<$Res> implements $PaymentCopyWith<$Res> {
       __$PaymentCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, double paid, String date});
+  $Res call({String id, double amount, int timeOfPayment});
 }
 
 /// @nodoc
@@ -317,22 +320,22 @@ class __$PaymentCopyWithImpl<$Res> implements _$PaymentCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? paid = null,
-    Object? date = null,
+    Object? amount = null,
+    Object? timeOfPayment = null,
   }) {
     return _then(_Payment(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      paid: null == paid
-          ? _self.paid
-          : paid // ignore: cast_nullable_to_non_nullable
+      amount: null == amount
+          ? _self.amount
+          : amount // ignore: cast_nullable_to_non_nullable
               as double,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
+      timeOfPayment: null == timeOfPayment
+          ? _self.timeOfPayment
+          : timeOfPayment // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }

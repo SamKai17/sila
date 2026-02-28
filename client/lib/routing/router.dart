@@ -73,8 +73,11 @@ final router = GoRouter(
         GoRoute(
           path: Routes.transactionCreate,
           builder: (context, state) {
+            final extra = state.extra as Map<String, String>;
             return TransactionCreateScreen(
               viewModel: context.read(),
+              extra: extra,
+              
             );
           },
         ),
@@ -99,16 +102,23 @@ final router = GoRouter(
         GoRoute(
           path: Routes.transactionPayment,
           builder: (context, state) {
+            final extra = state.extra as Map<String, String>;
+
             return TransactionPaymentScreen(
               viewModel: context.read(),
+              extra: extra
             );
           },
         ),
         GoRoute(
           path: Routes.transactionPreview,
           builder: (context, state) {
+            // final clientId = state.extra as String;
+            // final clientId = '0aea6958-beff-4902-a1cf-303b18d144de';
+            final extra = state.extra as Map<String, String>;
             return TransactionPreviewScreen(
               viewModel: context.read(),
+              extra: extra,
             );
           },
         ),
@@ -121,15 +131,21 @@ final router = GoRouter(
         GoRoute(
           path: Routes.transactionList,
           builder: (context, state) {
+            final clientId = state.extra as String;
             return TransactionListScreen(
               viewModel: context.read(),
+              clientId: clientId
             );
           },
         ),
         GoRoute(
           path: Routes.transactionDetail,
           builder: (context, state) {
-            return TransactionDetailScreen();
+            final String transactionId = state.pathParameters['id']!;
+            return TransactionDetailScreen(
+              viewModel: context.read(),
+              transactionId: transactionId,
+            );
           },
         ),
       ],

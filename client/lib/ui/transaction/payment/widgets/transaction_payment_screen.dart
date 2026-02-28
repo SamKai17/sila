@@ -6,9 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class TransactionPaymentScreen extends StatefulWidget {
-  const TransactionPaymentScreen(
-      {super.key, required TransactionCreateViewModel this.viewModel});
+  const TransactionPaymentScreen({
+    super.key,
+    required TransactionCreateViewModel this.viewModel,
+    required Map<String, String> this.extra,
+  });
   final TransactionCreateViewModel viewModel;
+  final Map<String, String> extra;
 
   @override
   State<TransactionPaymentScreen> createState() =>
@@ -19,8 +23,21 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
   String value = '';
 
   void updateValue(String newValue) {
+    // 0 shouldn't be first
+    if (newValue == '0' && value.isEmpty) {
+      return;
+    }
+    if (newValue == '.' && (value.contains('.') || value.isEmpty)) {
+      return;
+    }
     setState(() {
       value += newValue;
+    });
+  }
+
+  void clearValue() {
+    setState(() {
+      value = '';
     });
   }
 
@@ -32,6 +49,13 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
         padding: const EdgeInsets.all(18.0),
         child: Column(
           children: [
+            Text(
+              '${widget.viewModel.totalPrice}\$',
+              style: TextStyle(
+                  fontSize: 36.0,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white38),
+            ),
             Spacer(),
             Text(
               '$value\$',
@@ -52,51 +76,51 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
                 children: [
                   PaymentButton(
                     text: '9',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('9'),
                   ),
                   PaymentButton(
                     text: '8',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('8'),
                   ),
                   PaymentButton(
                     text: '7',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('7'),
                   ),
                   PaymentButton(
                     text: '6',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('6'),
                   ),
                   PaymentButton(
                     text: '5',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('5'),
                   ),
                   PaymentButton(
                     text: '4',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('4'),
                   ),
                   PaymentButton(
                     text: '3',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('3'),
                   ),
                   PaymentButton(
                     text: '2',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('2'),
                   ),
                   PaymentButton(
                     text: '1',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('1'),
                   ),
                   PaymentButton(
                     text: '.',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('.'),
                   ),
                   PaymentButton(
                     text: '0',
-                    updateValue: updateValue,
+                    onClick: () => updateValue('0'),
                   ),
                   PaymentButton(
                     text: 'del',
-                    updateValue: updateValue,
+                    onClick: () => clearValue(),
                   ),
                 ],
               ),
@@ -104,8 +128,10 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
             CustomButtonWidget(
               buttonText: 'Pay',
               onPressed: () {
-                widget.viewModel.paid = 1230.0;
-                context.push('/${Routes.transactionPreview}');
+                widget.viewModel.paid =
+                    double.parse(value.isEmpty ? '0' : value);
+                context.push('/${Routes.transactionPreview}',
+                    extra: widget.extra);
               },
             )
           ],
@@ -117,15 +143,15 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
 
 class PaymentButton extends StatelessWidget {
   const PaymentButton(
-      {super.key, required String this.text, required this.updateValue});
+      {super.key, required String this.text, required this.onClick});
   final String text;
-  final Function(String) updateValue;
+  final Function onClick;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        updateValue(text);
+        onClick();
       },
       child: Container(
         // height: 70.0,
