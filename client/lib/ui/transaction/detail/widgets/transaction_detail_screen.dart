@@ -1,10 +1,14 @@
-import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
+import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
 
 class TransactionDetailScreen extends StatefulWidget {
-  const TransactionDetailScreen(
-      {super.key, required TransactionCreateViewModel this.viewModel, required String this.transactionId});
-  final TransactionCreateViewModel viewModel;
+  const TransactionDetailScreen({
+    super.key,
+    required TransactionDetailViewModel this.viewModel,
+    required String this.transactionId,
+  });
+
+  final TransactionDetailViewModel viewModel;
   final String transactionId;
 
   @override
@@ -16,7 +20,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.viewModel.loadTransaction.execute(widget.transactionId);
+      widget.viewModel.load.execute(widget.transactionId);
     });
     super.initState();
   }

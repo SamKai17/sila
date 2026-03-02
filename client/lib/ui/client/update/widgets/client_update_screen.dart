@@ -1,3 +1,4 @@
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/update/view_model/client_update_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
@@ -77,7 +78,7 @@ class _ClientUpdateScreenState extends State<ClientUpdateScreen> {
                       'city': _cityController.text,
                     });
                     if (widget.viewModel.updateClient.completed) {
-                      context.pop();
+                      context.goNamed(Routes.clientDetailName, pathParameters: {'clientId': widget.clientId});
                     }
                   }),
             ],

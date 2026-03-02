@@ -1,4 +1,5 @@
 import 'package:client/domain/models/client/client.dart';
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
@@ -107,8 +108,9 @@ class _ClientCardState extends State<ClientCard> {
         },
         onTap: () {
           if (!widget.viewModel.selectedMode) {
-            context.push(
-              '/client/detail/${widget.client.id}',
+            context.goNamed(
+              Routes.clientDetailName,
+              pathParameters: {'clientId': widget.client.id},
             );
           } else {
             if (!widget.viewModel.isSelected(widget.client)) {

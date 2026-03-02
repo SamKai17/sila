@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({required ClientRepository clientRepository})
       : _clientRepository = clientRepository {
-    // print("loading home...");
     load = Command0(_load);
     deleteClients = Command0(_deleteClients);
     clientRepository.stream.listen(
@@ -36,8 +35,6 @@ class HomeViewModel extends ChangeNotifier {
       UnmodifiableListView(_filteredClients);
 
   Future<Result<void>> _load() async {
-    // await Future.delayed(const Duration(seconds: 2));
-    // print("home load function....");
     try {
       final result = await _clientRepository.getClientsList();
       switch (result) {
@@ -57,12 +54,9 @@ class HomeViewModel extends ChangeNotifier {
     try {
       final result = await _clientRepository.deleteClients();
       switch (result) {
-        case Ok():
-          print("success");
-        // return Result.ok(null);
         case Error():
-          // print("error");
           return Result.error(result.error);
+        case Ok():
       }
       final clientResult = await _clientRepository.getClientsList();
       switch (clientResult) {
@@ -70,10 +64,9 @@ class HomeViewModel extends ChangeNotifier {
           _clients = clientResult.value;
           _filteredClients = _clients;
         case Error():
-        // return Result.error(clientResult.error);
+          return Result.error(clientResult.error);
       }
       return clientResult;
-      // return Result.ok(null);
     } finally {
       _clientRepository.clearSelectedClients();
       notifyListeners();

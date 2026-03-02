@@ -43,9 +43,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
         actions: [
           IconButton(
               onPressed: () {
-                context.push(
-                  '/client/update/${widget.viewModel.client!.id}',
-                  // '/client/update',
+                context.goNamed(
+                  Routes.clientUpdateName,
+                  pathParameters: {'clientId': widget.viewModel.client!.id},
                   extra: {
                     'name': widget.viewModel.client!.name,
                     'phone': widget.viewModel.client!.phone,
@@ -71,7 +71,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   child: Text("an error happened!"),
                 );
               }
-              print(widget.viewModel.client?.id);
               return Column(
                 children: [
                   CircleAvatar(
@@ -104,7 +103,12 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   SizedBox(height: 32),
                   GestureDetector(
                     onTap: () {
-                      context.push('/${Routes.transactionList}', extra: widget.clientId);
+                      context.goNamed(
+                        Routes.transactionsName,
+                        pathParameters: {
+                          'clientId': widget.viewModel.client!.id
+                        },
+                      );
                     },
                     child: SizedBox(
                       height: 70.0,
@@ -118,11 +122,13 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                       Expanded(
                         child: FilledButton(
                             onPressed: () {
-                              context.push('/${Routes.transactionCreate}',
-                                  extra: {
-                                    'type': 'buy',
-                                    'clientId': widget.clientId
-                                  });
+                              context.goNamed(
+                                Routes.transactionCreateName,
+                                pathParameters: {
+                                  'clientId': widget.viewModel.client!.id
+                                },
+                                queryParameters: {'type': 'buy'},
+                              );
                             },
                             child: Text('Buy')),
                       ),
@@ -130,11 +136,13 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                       Expanded(
                         child: FilledButton(
                             onPressed: () {
-                              context.push('/${Routes.transactionCreate}',
-                                  extra: {
-                                    'type': 'sell',
-                                    'clientId': widget.clientId
-                                  });
+                              context.goNamed(
+                                Routes.transactionCreateName,
+                                pathParameters: {
+                                  'clientId': widget.viewModel.client!.id
+                                },
+                                queryParameters: {'type': 'sell'},
+                              );
                             },
                             child: Text('Sell')),
                       ),

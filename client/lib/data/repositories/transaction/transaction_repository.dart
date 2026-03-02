@@ -12,7 +12,7 @@ class TransactionRepository {
   final DatabaseService _databaseService;
   List<Transaction> _transactions = [];
 
-  Future<Result<void>> addTransaction({
+  Future<Result<String>> addTransaction({
     required double totalPrice,
     required double totalPaid,
     required double remainder,
@@ -28,7 +28,7 @@ class TransactionRepository {
       clientId: clientId,
       paid: paid,
       remainder: remainder,
-      type: 'sell',
+      type: type,
       timeOfTransaction: DateTime.now().millisecondsSinceEpoch,
       totalPaid: totalPaid,
       totalPrice: totalPrice,
@@ -101,7 +101,7 @@ class TransactionRepository {
           items: items,
           payments: payments,
         );
-        print('tran: $transaction');
+        // print('tran: $transaction');
         return Result.ok(transaction);
       case Error():
         return Result.error(transactionResult.error);

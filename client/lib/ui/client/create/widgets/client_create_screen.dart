@@ -1,3 +1,4 @@
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
@@ -52,7 +53,7 @@ class _ClientCreateScreenState extends State<ClientCreateScreen> {
                       'city': _cityController.text
                     });
                     if (widget.viewModel.addClient.completed) {
-                      context.pop();
+                      context.goNamed(Routes.homeName);
                     }
                   }),
             ],

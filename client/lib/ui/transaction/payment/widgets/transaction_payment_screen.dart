@@ -1,18 +1,20 @@
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
-import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
+import 'package:client/ui/transaction/payment/view_model/transaction_payment_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class TransactionPaymentScreen extends StatefulWidget {
   const TransactionPaymentScreen({
     super.key,
-    required TransactionCreateViewModel this.viewModel,
-    required Map<String, String> this.extra,
+    required TransactionPaymentViewModel this.viewModel,
+    required String this.clientId,
+    required String this.type,
   });
-  final TransactionCreateViewModel viewModel;
-  final Map<String, String> extra;
+  final TransactionPaymentViewModel viewModel;
+  final String clientId;
+  final String type;
 
   @override
   State<TransactionPaymentScreen> createState() =>
@@ -128,10 +130,16 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
             CustomButtonWidget(
               buttonText: 'Pay',
               onPressed: () {
-                widget.viewModel.paid =
-                    double.parse(value.isEmpty ? '0' : value);
-                context.push('/${Routes.transactionPreview}',
-                    extra: widget.extra);
+                widget.viewModel.setTransactionDraftPayment(
+                  clientId: widget.clientId,
+                  value: double.parse(value.isEmpty ? '0' : value),
+                );
+                // clearValue();
+                context.goNamed(
+                  Routes.transactionPreviewName,
+                  pathParameters: {'clientId': widget.clientId},
+                  queryParameters: {'type': widget.type},
+                );
               },
             )
           ],

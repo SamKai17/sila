@@ -1,14 +1,26 @@
 abstract final class Routes {
   static const home = '/';
-  static const clientDetail = 'client/detail/:id';
-  static const clientCreate = 'client/create';
-  static const clientUpdate = 'client/update/:id';
-  static const transactionCreate = 'transaction/create';
-  static const transactionPayment = 'transaction/payment';
-  static const transactionPreview = 'transaction/preview';
-  static const transactionReceipt = 'transaction/receipt';
-  static const transactionDetail = 'transaction/:id';
-  static const transactionList = 'transactions';
-  static const itemCreate = 'item/create';
-  static const itemUpdate = 'item/update';
+  static const homeName = 'home';
+  static const clientCreate = 'create';
+  static const clientCreateName = 'create';
+  static const clientDetail = ':clientId';
+  static const clientDetailName = 'clientDetail';
+  static const clientUpdate = 'update';
+  static const clientUpdateName = 'update';
+  static const transactions = 'transactions';
+  static const transactionDetail = ':transactionId';
+  static const transactionDetailName = 'transactionDetail';
+  static const transactionsName = 'transactions';
+  static const transactionCreate = 'transaction';
+  static const transactionCreateName = 'transactionCreate';
+  static const transactionPayment = 'payment';
+  static const transactionPaymentName = 'payment';
+  static const transactionPreview = 'preview';
+  static const transactionPreviewName = 'preview';
+  static const transactionReceipt = 'receipt/:transactionId';
+  static const transactionReceiptName = 'transactionReceipt';
+  static const itemCreate = 'item-create';
+  static const itemCreateName = 'itemCreate';
+  static const itemUpdate = 'item-update';
+  static const itemUpdateName = 'itemUpdate';
 }

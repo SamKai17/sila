@@ -11,10 +11,12 @@ class TransactionCreateScreen extends StatefulWidget {
   const TransactionCreateScreen({
     super.key,
     required TransactionCreateViewModel this.viewModel,
-    required Map<String, String> this.extra,
+    required String this.clientId,
+    required String this.type,
   });
   final TransactionCreateViewModel viewModel;
-  final Map<String, String> extra;
+  final String clientId;
+  final String type;
 
   @override
   State<TransactionCreateScreen> createState() =>
@@ -24,9 +26,12 @@ class TransactionCreateScreen extends StatefulWidget {
 class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
   @override
   void initState() {
-    // TODO: implement initState
-    widget.viewModel.transactionType = widget.extra['type'];
-
+    print('init page');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // print("init home...");
+      widget.viewModel.load.execute(widget.clientId);
+    });
+    // set the type
     super.initState();
   }
 
@@ -53,34 +58,29 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                 : null,
             actions: widget.viewModel.selectedMode
                 ? [
-                    DeleteButton(delete: widget.viewModel.deleteSelectedItems),
+                    DeleteButton(
+                      delete: () =>
+                          widget.viewModel.deleteItems(widget.clientId),
+                    ),
                     SizedBox(width: 32)
                   ]
                 : null,
-
-            // title: Text('transaction create'),
           ),
           body: Padding(
             padding: const EdgeInsets.all(18.0),
             child: Column(
               children: [
-                // ItemCard(
-                //     item: Item(
-                //         id: '',
-                //         name: 'ddsfklsjflksdjflskdjflksdjflksjfdlkj',
-                //         price: 12.0,
-                //         quantity: 10)),
                 ...widget.viewModel.items.map(
                   (item) {
                     return ItemCard(
                       item: item,
                       viewModel: widget.viewModel,
+                      cliendId: widget.clientId,
                     );
                   },
                 ).toList(),
                 Spacer(),
                 Card(
-                  // margin: EdgeInsets.all(0),
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child: Column(
@@ -114,7 +114,11 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                     Expanded(
                       child: FilledButton(
                         onPressed: () {
-                          context.push('/${Routes.itemCreate}');
+                          context.goNamed(
+                            Routes.itemCreateName,
+                            pathParameters: {'clientId': widget.clientId},
+                            queryParameters: {'type': widget.type},
+                          );
                         },
                         child: Text("+ add item"),
                       ),
@@ -125,14 +129,17 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                     Expanded(
                       child: FilledButton(
                         onPressed: () {
-                          context.push('/${Routes.transactionPayment}',
-                              extra: widget.extra);
+                          context.goNamed(
+                            Routes.transactionPaymentName,
+                            pathParameters: {'clientId': widget.clientId},
+                            queryParameters: {'type': widget.type},
+                          );
                         },
                         child: Text("pay"),
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

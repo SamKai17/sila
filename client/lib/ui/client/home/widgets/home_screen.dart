@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, child) {
         return Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: true,
             toolbarHeight: 72,
             surfaceTintColor: AppPallete.background,
             // backgroundColor: AppPallete.avatarBackground,
@@ -117,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              context.go("/${Routes.clientCreate}");
+              context.goNamed(Routes.clientCreateName);
             },
             child: Icon(Icons.add),
           ),

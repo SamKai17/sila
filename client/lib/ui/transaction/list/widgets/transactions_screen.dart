@@ -1,27 +1,25 @@
 import 'package:client/routing/routes.dart';
-import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
+import 'package:client/ui/transaction/list/view_model/transactions_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class TransactionListScreen extends StatefulWidget {
-  const TransactionListScreen({
+class TransactionsScreen extends StatefulWidget {
+  const TransactionsScreen({
     super.key,
-    required TransactionCreateViewModel this.viewModel,
+    required TransactionsViewModel this.viewModel,
     required String this.clientId,
   });
-  final TransactionCreateViewModel viewModel;
+  final TransactionsViewModel viewModel;
   final String clientId;
 
   @override
-  State<TransactionListScreen> createState() => _TransactionListScreenState();
+  State<TransactionsScreen> createState() => _TransactionsScreenState();
 }
 
-class _TransactionListScreenState extends State<TransactionListScreen> {
+class _TransactionsScreenState extends State<TransactionsScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // print("init home...");
       widget.viewModel.load.execute(widget.clientId);
     });
     super.initState();
@@ -37,7 +35,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
           final transactions = widget.viewModel.transactions;
           return SingleChildScrollView(
             child: Container(
-              // color: Colors.amber,
               width: double.infinity,
               child: Padding(
                 padding: const EdgeInsets.all(18.0),
@@ -48,7 +45,11 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
                     (transaction) {
                       return GestureDetector(
                         onTap: () {
-                          context.push('/transaction/${transaction.id}');
+                          context.goNamed(Routes.transactionDetailName,
+                              pathParameters: {
+                                'clientId': widget.clientId,
+                                'transactionId': transaction.id
+                              });
                         },
                         child: Container(
                           height: 100.0,

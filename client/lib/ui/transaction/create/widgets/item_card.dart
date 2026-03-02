@@ -6,16 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ItemCard extends StatelessWidget {
-  const ItemCard({super.key, required Item this.item, required this.viewModel});
+  const ItemCard({super.key, required Item this.item, required this.viewModel, required String this.cliendId});
   final Item item;
   final TransactionCreateViewModel viewModel;
+  final String cliendId;
+
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         if (!viewModel.selectedMode) {
-          context.push('/${Routes.itemUpdate}', extra: item);
+          context.goNamed(Routes.itemUpdateName, pathParameters: {'clientId': cliendId}, extra: item);
         } else {
           if (viewModel.isSelected(item: item)) {
             viewModel.removeSelectedItem(item: item);
