@@ -170,9 +170,11 @@ final router = GoRouter(
                             final clientId = state.pathParameters['clientId']!;
                             final transactionId =
                                 state.pathParameters['transactionId']!;
+                            final type = state.uri.queryParameters['type'];
                             return TransactionReceiptScreen(
                               viewModel: context.read(),
                               clientId: clientId,
+                              type: type!,
                               transactionId: transactionId,
                             );
                           },

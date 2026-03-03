@@ -77,9 +77,9 @@ class TransactionCard extends StatelessWidget {
 
   int getPercentage({
     required double total,
-    required double remainder,
+    required double totalPaid,
   }) {
-    double result = (100 * remainder) / total;
+    double result = (totalPaid * 100) / total;
     return result.toInt();
   }
 
@@ -112,7 +112,7 @@ class TransactionCard extends StatelessWidget {
                 Text('Payment Progress'),
                 Spacer(),
                 Text(
-                    '${getPercentage(total: transaction.totalPrice, remainder: transaction.remainder)}%'),
+                    '${getPercentage(total: transaction.totalPrice, totalPaid: transaction.totalPaid)}%'),
               ],
             ),
             Stack(
@@ -128,7 +128,7 @@ class TransactionCard extends StatelessWidget {
                 FractionallySizedBox(
                   widthFactor: getPercentage(
                           total: transaction.totalPrice,
-                          remainder: transaction.remainder) /
+                          totalPaid: transaction.totalPaid) /
                       100,
                   child: Container(
                     height: 10,

@@ -12,10 +12,12 @@ class TransactionReceiptScreen extends StatefulWidget {
     required TransactionReceiptViewModel this.viewModel,
     required String this.clientId,
     required String this.transactionId,
+    required String this.type,
   });
   final TransactionReceiptViewModel viewModel;
   final String clientId;
   final String transactionId;
+  final String type;
 
   @override
   State<TransactionReceiptScreen> createState() =>
@@ -45,6 +47,7 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
                 context.goNamed(
                   Routes.transactionCreateName,
                   pathParameters: {'clientId': widget.clientId},
+                  queryParameters: {'type': widget.type}
                 );
               },
               icon: Icon(Icons.close),
