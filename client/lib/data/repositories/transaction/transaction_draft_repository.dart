@@ -1,9 +1,7 @@
 import 'package:client/data/services/local/database_service.dart';
 import 'package:client/domain/models/item/item.dart';
-import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/domain/models/transaction_draft/transaction_draft.dart';
 import 'package:client/utils/result.dart';
-import 'package:uuid/uuid.dart';
 
 class TransactionDraftRepository {
   TransactionDraftRepository({required DatabaseService databaseService})
@@ -112,6 +110,28 @@ class TransactionDraftRepository {
         items: [item],
       );
       _transactionDraftList.add(transaction);
+    }
+  }
+
+  void updateItem(
+      {required String clientId,
+      required String itemId,
+      required Item newItem}) {
+    final index = _transactionDraftList.indexWhere(
+      (e) => e.clientId == clientId,
+    );
+    if (index != -1) {
+      print('add to existing draft');
+      final newItems = _transactionDraftList[index].items.map(
+        (item) {
+          if (item.id == itemId) {
+            return newItem;
+          }
+          return item;
+        },
+      ).toList();
+      _transactionDraftList[index] =
+          _transactionDraftList[index].copyWith(items: newItems);
     }
   }
 

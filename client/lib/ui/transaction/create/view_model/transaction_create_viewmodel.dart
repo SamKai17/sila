@@ -21,12 +21,8 @@ class TransactionCreateViewModel extends ChangeNotifier {
     return _transactionDraftRepository.getTotalPrice(clientId: clientId);
   }
 
-  int get totalItems {
-    int total = 0;
-    for (var item in _items) {
-      total += item.quantity;
-    }
-    return total;
+  int getTotalItems({required String clientId}) {
+    return _transactionDraftRepository.getTotalItems(clientId: clientId);
   }
 
   List<Item> _items = [];
@@ -34,6 +30,7 @@ class TransactionCreateViewModel extends ChangeNotifier {
 
   Future<Result<void>> _load(String clientId) async {
     _items = _transactionDraftRepository.getItems(clientId);
+    notifyListeners();
     return Result.ok(null);
   }
 
@@ -55,16 +52,17 @@ class TransactionCreateViewModel extends ChangeNotifier {
 
   void updateItem({
     required String id,
+    required String clientId,
     required String name,
     required double price,
     required int quantity,
   }) {
-    final int index = _items.indexWhere((item) => item.id == id);
-    if (index != -1) {
-      _items[index] =
-          Item(id: id, name: name, price: price, quantity: quantity);
-      notifyListeners();
-    }
+    _transactionDraftRepository.updateItem(
+        clientId: clientId,
+        itemId: id,
+        newItem: Item(id: id, name: name, price: price, quantity: quantity));
+    _items = _transactionDraftRepository.getItems(clientId);
+    notifyListeners();
   }
 
   List<Item> _selectedItems = [];

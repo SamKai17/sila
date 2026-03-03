@@ -128,10 +128,12 @@ final router = GoRouter(
                   name: Routes.itemUpdateName,
                   path: Routes.itemUpdate,
                   builder: (context, state) {
+                    final clientId = state.pathParameters['clientId']!;
                     final Item item = state.extra as Item;
                     return ItemUpdateScreen(
                       viewModel: context.read(),
                       item: item,
+                      clientId: clientId,
                     );
                   },
                 ),

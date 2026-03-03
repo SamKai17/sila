@@ -46,10 +46,7 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                 widget.viewModel.selectedMode ? false : true,
             toolbarHeight: 72,
             surfaceTintColor: AppPallete.background,
-            // backgroundColor: AppPallete.avatarBackground,
-            // titleSpacing: 32.0,
             title: !widget.viewModel.selectedMode ? Text("Transaction") : null,
-            // : Text('${viewModel.items.length} items selected'),
             leadingWidth: 82,
             leading: widget.viewModel.selectedMode
                 ? ClearButton(
@@ -93,7 +90,9 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                           children: [
                             Text("Total Items"),
                             Spacer(),
-                            Text(widget.viewModel.totalItems.toString()),
+                            Text(widget.viewModel
+                                .getTotalItems(clientId: widget.clientId)
+                                .toString()),
                           ],
                         ),
                         Row(

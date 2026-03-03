@@ -1,4 +1,5 @@
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
@@ -6,12 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ItemUpdateScreen extends StatefulWidget {
-  const ItemUpdateScreen(
-      {super.key,
-      required TransactionCreateViewModel this.viewModel,
-      required Item this.item});
+  const ItemUpdateScreen({
+    super.key,
+    required TransactionCreateViewModel this.viewModel,
+    required Item this.item,
+    required String this.clientId,
+  });
   final TransactionCreateViewModel viewModel;
   final Item item;
+  final String clientId;
 
   @override
   State<ItemUpdateScreen> createState() => _ItemUpdateScreenState();
@@ -71,11 +75,17 @@ class _ItemUpdateScreenState extends State<ItemUpdateScreen> {
                 onPressed: () {
                   widget.viewModel.updateItem(
                     id: widget.item.id,
+                    clientId: widget.clientId,
                     name: _nameController.text,
                     price: double.parse(_priceController.text),
                     quantity: int.parse(_quantityController.text),
                   );
-                  context.pop();
+                  context
+                      .goNamed(Routes.transactionCreateName, pathParameters: {
+                    'clientId': widget.clientId,
+                  }, queryParameters: {
+                    'type': 'sell',
+                  });
                 },
               ),
             ],
