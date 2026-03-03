@@ -1,7 +1,10 @@
+import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
+import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/transaction/list/view_model/transactions_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({
@@ -52,23 +55,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       },
                       child: Container(
                         width: double.infinity,
-                        child: Card(
-                          child: Column(
-                            children: [
-                              Text(
-                                'total price: ${transaction.totalPrice.toString()}',
-                              ),
-                              Text(
-                                'total paid: ${transaction.totalPaid.toString()}',
-                              ),
-                              Text(
-                                'remainder: ${transaction.remainder.toString()}',
-                              ),
-                              Text(
-                                'type: ${transaction.type}',
-                              ),
-                            ],
-                          ),
+                        child: TransactionCard(
+                          transaction: transaction,
                         ),
                       ),
                     );
@@ -78,6 +66,113 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class TransactionCard extends StatelessWidget {
+  const TransactionCard({super.key, required Transaction this.transaction});
+  final Transaction transaction;
+
+  int getPercentage({
+    required double total,
+    required double remainder,
+  }) {
+    double result = (100 * remainder) / total;
+    return result.toInt();
+  }
+
+  // double getProgressBarWidth({required int maxWidth, required int percentage}) {
+  //   double result = (percentage * maxWidth) / 100;
+  //   return result;
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          spacing: 10.0,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                '${transaction.type[0].toUpperCase()}${transaction.type.substring(1)} Transaction'),
+            Row(
+              spacing: 10.0,
+              children: [
+                Icon(Icons.access_time_filled),
+                Text(
+                    '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction))}'),
+              ],
+            ),
+            Row(
+              children: [
+                Text('Payment Progress'),
+                Spacer(),
+                Text(
+                    '${getPercentage(total: transaction.totalPrice, remainder: transaction.remainder)}%'),
+              ],
+            ),
+            Stack(
+              children: [
+                Container(
+                  height: 10,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF252428),
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                ),
+                FractionallySizedBox(
+                  widthFactor: getPercentage(
+                          total: transaction.totalPrice,
+                          remainder: transaction.remainder) /
+                      100,
+                  child: Container(
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFD9D9D9),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Due',
+                    ),
+                    Text(
+                      '${transaction.remainder}\$',
+                    ),
+                  ],
+                ),
+                Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total',
+                    ),
+                    Text(
+                      '${transaction.totalPrice}\$',
+                    ),
+                  ],
+                )
+              ],
+            ),
+            CustomButtonWidget(
+              buttonText: 'Pay',
+              onPressed: () {},
+            )
+          ],
+        ),
       ),
     );
   }

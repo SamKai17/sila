@@ -45,6 +45,10 @@ class DatabaseService {
       join(await getDatabasesPath(), 'client_database.db'),
       onOpen: (db) async {
         print("opening db...");
+        // db.delete(_transactionTable,
+        //     where: '$_transactionIdField = ?',
+        //     whereArgs: ["c6e920d8-be61-4c26-b782-2fe51001aa63"]);
+        // print('success');
         // print(await db.query('sqlite_master', where: 'name = ?', whereArgs: ['transactions']));
         // db.rawDelete('DELETE FROM $_transactionTable');
         // db.execute('DROP TABLE IF EXISTS transactions');
