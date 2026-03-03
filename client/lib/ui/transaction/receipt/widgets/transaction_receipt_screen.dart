@@ -1,5 +1,7 @@
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
+import 'package:client/ui/core/ui/information_card.dart';
+import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/transaction/receipt/view_model/transaction_receipt_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -52,11 +54,84 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
             padding: const EdgeInsets.all(18.0),
             child: Column(
               children: [
-                Text(
-                    'total price: ${widget.viewModel.transaction?.totalPrice}'),
-                Text('total paid: ${widget.viewModel.transaction?.totalPaid}'),
-                Text('remainder: ${widget.viewModel.transaction?.remainder}'),
-                Spacer(),
+                Expanded(
+                  child: Container(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Successful Transaction',
+                            style: TextStyle(
+                                fontSize: 28.0, fontWeight: FontWeight.w500),
+                          ),
+                          SizedBox(height: 32.0),
+                          Text(
+                            'Items',
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.w500),
+                          ),
+                          SizedBox(height: 12.0),
+                          Card(
+                              margin: EdgeInsets.all(0.0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: ItemsTable(
+                                    items: widget.viewModel.transaction != null
+                                        ? widget.viewModel.transaction!.items ??
+                                            []
+                                        : []),
+                              )),
+                          SizedBox(height: 32.0),
+                          Text(
+                            'Client',
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.w500),
+                          ),
+                          SizedBox(height: 12.0),
+                          InformationCard(information: {
+                            'Name': 'Oussama',
+                            'Phone': '0689231289',
+                            'City': 'Casablanca',
+                          }),
+                          SizedBox(height: 32.0),
+                          Text(
+                            'Payment detail',
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.w500),
+                          ),
+                          SizedBox(height: 12.0),
+                          InformationCard(information: {
+                            'Payment Date':
+                                '${widget.viewModel.transaction != null ? DateTime.fromMillisecondsSinceEpoch(widget.viewModel.transaction!.payments?.last.timeOfPayment ?? 0) : null}',
+                            'Paid':
+                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.payments?.last.amount : null}\$',
+                          }),
+                          SizedBox(height: 32.0),
+                          Text(
+                            'Transaction detail',
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.w500),
+                          ),
+                          SizedBox(height: 12.0),
+                          InformationCard(information: {
+                            'Transaction Date':
+                                '${widget.viewModel.transaction != null ? DateTime.fromMillisecondsSinceEpoch(widget.viewModel.transaction!.timeOfTransaction) : null}',
+                            'Total Paid':
+                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPaid : null}\$',
+                            'Remainder':
+                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.remainder : null}\$',
+                            'Total':
+                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPrice : null}\$',
+                          }),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
                 CustomButtonWidget(
                   buttonText: 'View Transaction',
                   onPressed: () {

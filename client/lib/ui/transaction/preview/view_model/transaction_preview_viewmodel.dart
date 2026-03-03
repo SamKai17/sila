@@ -27,6 +27,14 @@ class TransactionPreviewViewModel extends ChangeNotifier {
   TransactionDraft? transaction;
   // UnmodifiableListView<Item> get items => UnmodifiableListView(_items);
 
+  double getTotalPrice({required String clientId}) {
+    return _transactionDraftRepository.getTotalPrice(clientId: clientId);
+  }
+
+  int getTotalItems({required String clientId}) {
+    return _transactionDraftRepository.getTotalItems(clientId: clientId);
+  }
+
   Future<Result<void>> _load(String clientId) async {
     try {
       final transactionDraftResult =
@@ -50,6 +58,7 @@ class TransactionPreviewViewModel extends ChangeNotifier {
       switch (result) {
         case Ok():
           transactionId = result.value;
+          _transactionDraftRepository.clear();
           return Result.ok(null);
         case Error():
           return Result.error(result.error);

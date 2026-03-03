@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 
 class TransactionPaymentViewModel extends ChangeNotifier {
   TransactionPaymentViewModel({
-    // required TransactionRepository transactionRepository,
     required TransactionDraftRepository transactionDraftRepository,
-  }) : _transactionDraftRepository = transactionDraftRepository {
-    // load = Command1<void, String>(_load);
-  }
-  // final TransactionRepository _transactionRepository;
+  }) : _transactionDraftRepository = transactionDraftRepository {}
 
   final TransactionDraftRepository _transactionDraftRepository;
 
-  double totalPrice = 0.0;
+  double getTotalPrice({required String clientId}) {
+    return _transactionDraftRepository.getTotalPrice(clientId: clientId);
+  }
 
-  void setTransactionDraftPayment(
-      {required String clientId, required double value}) {
+  void setTransactionDraftPayment({
+    required String clientId,
+    required double value,
+  }) {
     _transactionDraftRepository.setTransactionDraftPayment(
       clientId: clientId,
       value: value,

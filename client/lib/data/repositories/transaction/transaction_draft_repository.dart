@@ -13,12 +13,38 @@ class TransactionDraftRepository {
 
   List<TransactionDraft> _transactionDraftList = [];
 
-  double _totalPrice(List<Item> items) {
-    double total = 0;
-    for (var item in items) {
-      total += item.price * item.quantity;
+  int getTotalItems({required String clientId}) {
+    final index = _transactionDraftList.indexWhere(
+      (e) => e.clientId == clientId,
+    );
+    if (index != -1) {
+      List<Item> items = _transactionDraftList[index].items;
+      int total = 0;
+      for (var item in items) {
+        total += item.quantity;
+      }
+      return total;
     }
-    return total;
+    return 0;
+  }
+
+  void clear() {
+    _transactionDraftList.clear();
+  }
+
+  double getTotalPrice({required String clientId}) {
+    final index = _transactionDraftList.indexWhere(
+      (e) => e.clientId == clientId,
+    );
+    if (index != -1) {
+      List<Item> items = _transactionDraftList[index].items;
+      double total = 0;
+      for (var item in items) {
+        total += item.price * item.quantity;
+      }
+      return total;
+    }
+    return 0.0;
   }
 
   double _remainder(double totalPaid, double totalPrice) {
@@ -36,7 +62,7 @@ class TransactionDraftRepository {
     }
   }
 
-  Result<TransactionDraft> getTransactionDraft(String clientId)  {
+  Result<TransactionDraft> getTransactionDraft(String clientId) {
     final index = _transactionDraftList.indexWhere(
       (e) => e.clientId == clientId,
     );
@@ -53,7 +79,7 @@ class TransactionDraftRepository {
     }
     final transactionDraft = _transactionDraftList
         .firstWhere((element) => element.clientId == clientId);
-    final double totalPrice = _totalPrice(transactionDraft.items);
+    final double totalPrice = getTotalPrice(clientId: clientId);
     return _databaseService.addTransaction(
       clientId: clientId, // needs this +
       paid: transactionDraft.paid, // needs this +
@@ -75,10 +101,9 @@ class TransactionDraftRepository {
     );
     if (index != -1) {
       print('add to existing draft');
-      _transactionDraftList[index].items.add(item);
-      // final currentItems = _transactionDraftList[index].items;
-      // _transactionDraftList[index] =
-      //     _transactionDraftList[index].copyWith(items: [...currentItems, item]);
+      final currentItems = _transactionDraftList[index].items;
+      _transactionDraftList[index] =
+          _transactionDraftList[index].copyWith(items: [...currentItems, item]);
     } else {
       print('create new transaction draft');
       final transaction = TransactionDraft(
@@ -95,7 +120,7 @@ class TransactionDraftRepository {
       (e) => e.clientId == clientId,
     );
     if (index != -1) {
-      final currentItems = _transactionDraftList[index].items ?? [];
+      final currentItems = _transactionDraftList[index].items;
       final newItems =
           currentItems.where((item) => !items.contains(item)).toList();
       if (newItems.isEmpty) {

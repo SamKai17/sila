@@ -94,6 +94,14 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       routerConfig: router,
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: const MaterialScrollBehavior().copyWith(
+            overscroll: false,
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }

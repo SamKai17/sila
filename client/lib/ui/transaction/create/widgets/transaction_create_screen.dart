@@ -76,6 +76,7 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                       item: item,
                       viewModel: widget.viewModel,
                       cliendId: widget.clientId,
+                      type: widget.type,
                     );
                   },
                 ).toList(),
@@ -99,7 +100,8 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                           children: [
                             Text("Total Price"),
                             Spacer(),
-                            Text('${widget.viewModel.totalPrice}\$'),
+                            Text(
+                                '${widget.viewModel.getTotalPrice(clientId: widget.clientId)}\$'),
                           ],
                         )
                       ],

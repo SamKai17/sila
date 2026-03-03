@@ -34,49 +34,46 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         builder: (context, child) {
           final transactions = widget.viewModel.transactions;
           return SingleChildScrollView(
-            child: Container(
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  spacing: 16.0,
-                  children: transactions.map(
-                    (transaction) {
-                      return GestureDetector(
-                        onTap: () {
-                          context.goNamed(Routes.transactionDetailName,
-                              pathParameters: {
-                                'clientId': widget.clientId,
-                                'transactionId': transaction.id
-                              });
-                        },
-                        child: Container(
-                          height: 100.0,
-                          width: 300.0,
-                          child: Card(
-                            child: Column(
-                              children: [
-                                Text(
-                                  'total price: ${transaction.totalPrice.toString()}',
-                                ),
-                                Text(
-                                  'total paid: ${transaction.totalPaid.toString()}',
-                                ),
-                                Text(
-                                  'remainder: ${transaction.remainder.toString()}',
-                                ),
-                                Text(
-                                  'type: ${transaction.type}',
-                                ),
-                              ],
-                            ),
+            physics: const ClampingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 16.0,
+                children: transactions.map(
+                  (transaction) {
+                    return GestureDetector(
+                      onTap: () {
+                        context.goNamed(Routes.transactionDetailName,
+                            pathParameters: {
+                              'clientId': widget.clientId,
+                              'transactionId': transaction.id
+                            });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        child: Card(
+                          child: Column(
+                            children: [
+                              Text(
+                                'total price: ${transaction.totalPrice.toString()}',
+                              ),
+                              Text(
+                                'total paid: ${transaction.totalPaid.toString()}',
+                              ),
+                              Text(
+                                'remainder: ${transaction.remainder.toString()}',
+                              ),
+                              Text(
+                                'type: ${transaction.type}',
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    },
-                  ).toList(),
-                ),
+                      ),
+                    );
+                  },
+                ).toList(),
               ),
             ),
           );

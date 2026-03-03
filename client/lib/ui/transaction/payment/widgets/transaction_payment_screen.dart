@@ -52,7 +52,7 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
         child: Column(
           children: [
             Text(
-              '${widget.viewModel.totalPrice}\$',
+              '${widget.viewModel.getTotalPrice(clientId: widget.clientId)}\$',
               style: TextStyle(
                   fontSize: 36.0,
                   fontWeight: FontWeight.w500,

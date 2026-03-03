@@ -1,6 +1,8 @@
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
+import 'package:client/ui/core/ui/information_card.dart';
+import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/transaction/preview/view_model/transaction_preview_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -47,103 +49,25 @@ class _TransactionPreviewScreenState extends State<TransactionPreviewScreen> {
               children: [
                 Text('Items'),
                 SizedBox(height: 12.0),
-                Card(
-                  color: AppPallete.surface,
-                  child: Table(
-                    defaultColumnWidth: IntrinsicColumnWidth(),
-                    columnWidths: {1: FlexColumnWidth()},
-                    children: [
-                      TableRow(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Quantity'),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Name'),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Price'),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Total'),
-                          ),
-                        ],
-                      ),
-                      if (widget.viewModel.transaction != null)
-                        ...widget.viewModel.transaction!.items
-                            .map(
-                              (item) => TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(item.quantity.toString()),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(item.name),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text('\$${item.price}'),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child:
-                                        Text('\$${item.price * item.quantity}'),
-                                  ),
-                                ],
-                              ),
-                            )
-                            .toList(),
-                    ],
-                  ),
-                ),
+                if (widget.viewModel.transaction != null)
+                  Card(
+                      child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child:
+                        ItemsTable(items: widget.viewModel.transaction!.items),
+                  )),
                 SizedBox(height: 32.0),
                 Text('Details'),
                 SizedBox(height: 12.0),
-                Card(
-                  color: AppPallete.surface,
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      spacing: 12.0,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Client'),
-                            Text('Oussama'),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Paid'),
-                            Text('\$${widget.viewModel.transaction?.paid}'),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Total items'),
-                            Text('12'),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Total'),
-                            Text('\$1000.0'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                InformationCard(information: {
+                  'Client': 'Oussama',
+                  'Paid': '\$${widget.viewModel.transaction?.paid}',
+                  'Total items': widget.viewModel
+                      .getTotalItems(clientId: widget.clientId)
+                      .toString(),
+                  'Total':
+                      '\$${widget.viewModel.getTotalPrice(clientId: widget.clientId)}',
+                }),
                 Spacer(),
                 CustomButtonWidget(
                   buttonText: 'Confirm',

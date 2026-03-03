@@ -17,12 +17,8 @@ class TransactionCreateViewModel extends ChangeNotifier {
 
   final TransactionDraftRepository _transactionDraftRepository;
 
-  double get totalPrice {
-    double total = 0;
-    for (var item in _items) {
-      total += item.price * item.quantity;
-    }
-    return total;
+  double getTotalPrice({required String clientId}) {
+    return _transactionDraftRepository.getTotalPrice(clientId: clientId);
   }
 
   int get totalItems {
