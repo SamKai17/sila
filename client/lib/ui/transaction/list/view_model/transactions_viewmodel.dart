@@ -36,4 +36,40 @@ class TransactionsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  List<Transaction> _selectedTransactions = [];
+
+  Future<void> deleteTransactions(String clientId) async {
+    // you should probably load the items again instead of doing it yourself
+    // _transactions = _selectedTransactions
+    //     .where((transaction) => !_selectedTransactions.contains(transaction))
+    //     .toList();
+    List<String> transactionIds =
+        _selectedTransactions.map((e) => e.id).toList();
+    _transactionRepository.deleteTransactions(transactionsIds: transactionIds);
+    _selectedTransactions.clear();
+    _load(clientId);
+    // notifyListeners();
+  }
+
+  void addSelectedTransaction({required Transaction transaction}) {
+    _selectedTransactions.add(transaction);
+    notifyListeners();
+  }
+
+  void removeSelectedTransaction({required Transaction transaction}) {
+    _selectedTransactions.remove(transaction);
+    notifyListeners();
+  }
+
+  void clearSelectedTransactions() {
+    _selectedTransactions.clear();
+    notifyListeners();
+  }
+
+  bool isSelected({required Transaction transaction}) {
+    return _selectedTransactions.contains(transaction);
+  }
+
+  bool get selectedMode => !_selectedTransactions.isEmpty;
 }

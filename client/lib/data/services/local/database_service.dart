@@ -166,7 +166,7 @@ class DatabaseService {
         where: '$_transactionClientIdField = ?',
         whereArgs: [clientId],
       );
-      print(transactionsMap);
+      // print(transactionsMap);
       final transactions = transactionsMap.map((t) {
         return TransactionLocalModel.fromJson(t);
       }).toList();
@@ -191,7 +191,7 @@ class DatabaseService {
       final transactionId = Uuid().v4();
       final paymentId = Uuid().v4();
       // print('clientId 1: $clientId');
-      print(items);
+      // print(items);
       await _database!.transaction(
         (txn) async {
           await txn.insert(
@@ -229,6 +229,25 @@ class DatabaseService {
       return Result.ok(transactionId);
     } on Exception catch (e) {
       print(e);
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> deleteTransactions({
+    required List<String> transactionsIds,
+  }) async {
+    try {
+      final batch = _database!.batch();
+      for (var id in transactionsIds) {
+        batch.delete(
+          _transactionTable,
+          where: '$_transactionIdField = ?',
+          whereArgs: [id],
+        );
+      }
+      await batch.commit(noResult: true);
+      return Result.ok(null);
+    } on Exception catch (e) {
       return Result.error(e);
     }
   }
@@ -313,7 +332,7 @@ class DatabaseService {
       for (var id in ids) {
         batch.delete(
           _clientTable,
-          where: 'id = ?',
+          where: '$_clientIdField = ?',
           whereArgs: [id],
         );
       }

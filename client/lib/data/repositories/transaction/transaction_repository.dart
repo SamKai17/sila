@@ -36,11 +36,22 @@ class TransactionRepository {
     );
   }
 
-  Future<Result<List<Transaction>>> getTransactionsList({required String clientId}) async {
+  Future<Result<void>> deleteTransactions(
+      {required List<String> transactionsIds}) async {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final transactions = await _databaseService.getTransactionsList(clientId: clientId);
+    return _databaseService.deleteTransactions(
+        transactionsIds: transactionsIds);
+  }
+
+  Future<Result<List<Transaction>>> getTransactionsList(
+      {required String clientId}) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    final transactions =
+        await _databaseService.getTransactionsList(clientId: clientId);
     switch (transactions) {
       case Ok():
         _transactions = transactions.value
@@ -76,8 +87,8 @@ class TransactionRepository {
       case Error():
         return Result.error(itemsResult.error);
     }
-    final paymentsResult = await _databaseService.getPayments(
-        transactionId: transactionId);
+    final paymentsResult =
+        await _databaseService.getPayments(transactionId: transactionId);
     List<Payment> payments;
     switch (paymentsResult) {
       case Ok():
@@ -85,8 +96,8 @@ class TransactionRepository {
       case Error():
         return Result.error(paymentsResult.error);
     }
-    final transactionResult = await _databaseService.getTransaction(
-        transactionId: transactionId);
+    final transactionResult =
+        await _databaseService.getTransaction(transactionId: transactionId);
     switch (transactionResult) {
       case Ok():
         final transactionLocal = transactionResult.value;
