@@ -14,13 +14,10 @@ class CustomButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       onPressed: onPressed,
+      onLongPress: () {},
       style: FilledButton.styleFrom(
         minimumSize: Size(double.infinity, 56.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        // textStyle: GoogleFonts.poppins(
-        //   fontSize: 20.0,
-        //   fontWeight: FontWeight.w600,
-        // ),
       ),
       child: Text(buttonText),
     );

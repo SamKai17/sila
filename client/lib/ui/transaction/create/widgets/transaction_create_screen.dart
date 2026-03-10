@@ -86,15 +86,15 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Summary"),
-                        Row(
-                          children: [
-                            Text("Total Items"),
-                            Spacer(),
-                            Text(widget.viewModel
-                                .getTotalItems(clientId: widget.clientId)
-                                .toString()),
-                          ],
-                        ),
+                        // Row(
+                        //   children: [
+                        //     Text("Total Items"),
+                        //     Spacer(),
+                        //     Text(widget.viewModel
+                        //         .getTotalItems(clientId: widget.clientId)
+                        //         .toString()),
+                        //   ],
+                        // ),
                         Row(
                           children: [
                             Text("Total Price"),
@@ -115,7 +115,7 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                     Expanded(
                       child: FilledButton(
                         onPressed: () {
-                          context.goNamed(
+                          context.pushNamed(
                             Routes.itemCreateName,
                             pathParameters: {'clientId': widget.clientId},
                             queryParameters: {'type': widget.type},
@@ -130,10 +130,14 @@ class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
                     Expanded(
                       child: FilledButton(
                         onPressed: () {
-                          context.goNamed(
+                          context.pushNamed(
                             Routes.transactionPaymentName,
-                            pathParameters: {'clientId': widget.clientId},
-                            queryParameters: {'type': widget.type},
+                            pathParameters: {
+                              'clientId': widget.clientId,
+                            },
+                            queryParameters: {
+                              'type': widget.type,
+                            },
                           );
                         },
                         child: Text("pay"),

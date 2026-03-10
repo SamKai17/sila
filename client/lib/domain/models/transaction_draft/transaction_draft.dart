@@ -1,5 +1,4 @@
 import 'package:client/domain/models/item/item.dart';
-import 'package:client/domain/models/payment/payment.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'transaction_draft.freezed.dart';
 part 'transaction_draft.g.dart';

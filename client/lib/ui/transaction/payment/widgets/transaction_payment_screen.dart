@@ -1,3 +1,4 @@
+import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
@@ -11,10 +12,14 @@ class TransactionPaymentScreen extends StatefulWidget {
     required TransactionPaymentViewModel this.viewModel,
     required String this.clientId,
     required String this.type,
+    // required String this.mode,
+    // Transaction? this.transaction,
   });
   final TransactionPaymentViewModel viewModel;
   final String clientId;
   final String type;
+  // final String mode;
+  // final Transaction? transaction;
 
   @override
   State<TransactionPaymentScreen> createState() =>
@@ -45,6 +50,13 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // print(widget.transaction);
+    // if (widget.mode == 'create') {
+    double totalPrice =
+        widget.viewModel.getTotalPrice(clientId: widget.clientId);
+    // // } else if (widget.mode == 'pay') {
+    // //   totalPrice = widget.transaction?.remainder ?? 0.0;
+    // // }
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -52,11 +64,12 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
         child: Column(
           children: [
             Text(
-              '${widget.viewModel.getTotalPrice(clientId: widget.clientId)}\$',
+              '${totalPrice}\$',
               style: TextStyle(
-                  fontSize: 36.0,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white38),
+                fontSize: 36.0,
+                fontWeight: FontWeight.w500,
+                color: Colors.white38,
+              ),
             ),
             Spacer(),
             Text(
@@ -130,18 +143,22 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
             CustomButtonWidget(
               buttonText: 'Pay',
               onPressed: () {
+                double paid = double.parse(value.isEmpty ? '0' : value);
                 widget.viewModel.setTransactionDraftPayment(
                   clientId: widget.clientId,
-                  value: double.parse(value.isEmpty ? '0' : value),
+                  value: paid,
                 );
-                // clearValue();
-                context.goNamed(
+                context.pushNamed(
                   Routes.transactionPreviewName,
-                  pathParameters: {'clientId': widget.clientId},
-                  queryParameters: {'type': widget.type},
+                  pathParameters: {
+                    'clientId': widget.clientId,
+                  },
+                  queryParameters: {
+                    'type': widget.type,
+                  },
                 );
               },
-            )
+            ),
           ],
         ),
       ),

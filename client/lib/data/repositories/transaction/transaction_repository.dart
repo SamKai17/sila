@@ -3,7 +3,6 @@ import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/utils/result.dart';
-import 'package:uuid/uuid.dart';
 
 class TransactionRepository {
   TransactionRepository({required DatabaseService databaseService})
@@ -11,6 +10,23 @@ class TransactionRepository {
 
   final DatabaseService _databaseService;
   List<Transaction> _transactions = [];
+
+  Future<Result<void>> addPayment(
+      {required double amount, required Transaction transaction}) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    int timeOfPayment = DateTime.now().millisecondsSinceEpoch;
+    double remainder = transaction.remainder - amount;
+    double totalPaid = transaction.totalPaid + amount;
+    return _databaseService.addPayment(
+      amount: amount,
+      transactionId: transaction.id,
+      remainder: remainder,
+      timeOfPayment: timeOfPayment,
+      totalPaid: totalPaid,
+    );
+  }
 
   Future<Result<String>> addTransaction({
     required double totalPrice,

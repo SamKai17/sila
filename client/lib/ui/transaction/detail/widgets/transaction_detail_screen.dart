@@ -1,7 +1,10 @@
+import 'package:client/routing/routes.dart';
+import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class TransactionDetailScreen extends StatefulWidget {
@@ -9,10 +12,12 @@ class TransactionDetailScreen extends StatefulWidget {
     super.key,
     required TransactionDetailViewModel this.viewModel,
     required String this.transactionId,
+    required String this.clientId,
   });
 
   final TransactionDetailViewModel viewModel;
   final String transactionId;
+  final String clientId;
 
   @override
   State<TransactionDetailScreen> createState() =>
@@ -35,109 +40,124 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       body: ListenableBuilder(
         builder: (context, child) {
           return Padding(
-            padding: const EdgeInsets.only(left: 28.0, right: 28.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'General Information',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 24.0),
-                Column(
-                  spacing: 32.0,
-                  children: [
-                    Row(
-                      spacing: 24.0,
-                      children: [
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Total',
-                            value:
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPrice : null}\$',
-                          ),
-                        ),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Remainder',
-                            value:
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.remainder : null}\$',
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      spacing: 24.0,
-                      children: [
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Paid',
-                            value:
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPaid : null}\$',
-                          ),
-                        ),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Date',
-                            value:
-                                '${widget.viewModel.transaction != null ? DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(widget.viewModel.transaction!.timeOfTransaction)) : null}',
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      spacing: 24.0,
-                      children: [
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Client',
-                            value: 'Oussama',
-                          ),
-                        ),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Type',
-                            value:
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.type : null}',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 32.0),
-                Text(
-                  'items',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 24.0),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ItemsTable(
-                        items: widget.viewModel.transaction != null
-                            ? widget.viewModel.transaction!.items ?? []
-                            : []),
+            padding: const EdgeInsets.all(20.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'General Information',
+                    style: TextStyle(fontSize: 20),
                   ),
-                ),
-                SizedBox(height: 32.0),
-                Text(
-                  'Payments',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 24.0),
-                if (widget.viewModel.transaction != null)
-                  if (widget.viewModel.transaction!.payments != null)
-                    ...widget.viewModel.transaction!.payments!.map(
-                      (payment) {
-                        return InformationCard(information: {
-                          'Payment Date':
-                              '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(payment.timeOfPayment))}',
-                          'Paid': '${payment.amount}\$'
-                        });
-                      },
-                    ).toList(),
-              ],
+                  SizedBox(height: 24.0),
+                  Row(
+                    spacing: 24.0,
+                    children: [
+                      Expanded(
+                        child: InfoCard(
+                          title: 'Total',
+                          value:
+                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPrice : null}\$',
+                        ),
+                      ),
+                      Expanded(
+                        child: InfoCard(
+                          title: 'Remainder',
+                          value:
+                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.remainder : null}\$',
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12.0),
+                  Row(
+                    spacing: 24.0,
+                    children: [
+                      Expanded(
+                        child: InfoCard(
+                          title: 'Paid',
+                          value:
+                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPaid : null}\$',
+                        ),
+                      ),
+                      Expanded(
+                        child: InfoCard(
+                          title: 'Date',
+                          value:
+                              '${widget.viewModel.transaction != null ? DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(widget.viewModel.transaction!.timeOfTransaction)) : null}',
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12.0),
+                  Row(
+                    spacing: 24.0,
+                    children: [
+                      Expanded(
+                        child: InfoCard(
+                          title: 'Client',
+                          value: 'Oussama',
+                        ),
+                      ),
+                      Expanded(
+                        child: InfoCard(
+                          title: 'Type',
+                          value:
+                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.type : null}',
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 32.0),
+                  Text(
+                    'items',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 24.0),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ItemsTable(
+                          items: widget.viewModel.transaction != null
+                              ? widget.viewModel.transaction!.items ?? []
+                              : []),
+                    ),
+                  ),
+                  SizedBox(height: 32.0),
+                  Text(
+                    'Payments',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 24.0),
+                  if (widget.viewModel.transaction != null)
+                    if (widget.viewModel.transaction!.payments != null)
+                      ...widget.viewModel.transaction!.payments!.map(
+                        (payment) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: InformationCard(information: {
+                              'Payment Date':
+                                  '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(payment.timeOfPayment))}',
+                              'Paid': '${payment.amount}\$'
+                            }),
+                          );
+                        },
+                      ).toList(),
+                  SizedBox(height: 32.0),
+                  CustomButtonWidget(
+                    buttonText: 'Pay',
+                    onPressed: () {
+                      context.pushNamed(
+                        Routes.paymentName,
+                        extra: {
+                          'clientId': widget.clientId,
+                          'transactionId': widget.viewModel.transaction!.id,
+                        },
+                      );
+                    },
+                  )
+                ],
+              ),
             ),
           );
         },

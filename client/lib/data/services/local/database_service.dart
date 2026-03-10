@@ -159,19 +159,71 @@ class DatabaseService {
     required String clientId,
   }) async {
     try {
-      // i need to filter by client
-      // print('clientId 2: $clientId');
       final List<Map<String, Object?>> transactionsMap = await _database!.query(
         _transactionTable,
         where: '$_transactionClientIdField = ?',
         whereArgs: [clientId],
       );
-      // print(transactionsMap);
       final transactions = transactionsMap.map((t) {
         return TransactionLocalModel.fromJson(t);
       }).toList();
-      // print("transactions: $transactions");
       return Result.ok(transactions);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<List<TransactionLocalModel>>> getItemsList({
+    required String transactionId,
+  }) async {
+    try {
+      final List<Map<String, Object?>> itemsMap = await _database!.query(
+        _itemTable,
+        where: '$_itemTransactionIdField = ?',
+        whereArgs: [transactionId],
+      );
+      final items = itemsMap.map((t) {
+        return TransactionLocalModel.fromJson(t);
+      }).toList();
+      return Result.ok(items);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> addPayment({
+    required String transactionId,
+    required double amount,
+    required int timeOfPayment,
+    required double remainder,
+    required double totalPaid,
+  }) async {
+    try {
+      final String id = Uuid().v4();
+      await _database!.transaction(
+        (txn) async {
+          await txn.insert(
+            _paymentTable,
+            {
+              _paymentIdField: id,
+              _paymentAmountField: amount,
+              _paymentTimeOfPaymentField: timeOfPayment,
+              _paymentTransactionIdField: transactionId
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+          await txn.update(
+            _transactionTable,
+            {
+              _transactionRemainderField: remainder,
+              _transactionTotalPaidField: totalPaid,
+            },
+            where: '$_transactionIdField = ?',
+            whereArgs: [transactionId],
+          );
+        },
+      );
+      return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
     }
@@ -228,7 +280,7 @@ class DatabaseService {
       );
       return Result.ok(transactionId);
     } on Exception catch (e) {
-      print(e);
+      // print(e);
       return Result.error(e);
     }
   }

@@ -68,7 +68,6 @@ class TransactionCreateViewModel extends ChangeNotifier {
   List<Item> _selectedItems = [];
 
   void deleteItems(String clientId) {
-    // _items = _items.where((item) => !_selectedItems.contains(item)).toList();
     _transactionDraftRepository.deleteItems(
         items: _selectedItems, clientId: clientId);
     _items = _transactionDraftRepository.getItems(clientId);

@@ -1,5 +1,6 @@
+import 'package:client/domain/models/item/item.dart';
+import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
-import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
@@ -38,6 +39,16 @@ class _TransactionPreviewScreenState extends State<TransactionPreviewScreen> {
     return ListenableBuilder(
       listenable: widget.viewModel,
       builder: (context, child) {
+        final tx = widget.viewModel.transaction;
+        double totalPrice =
+            widget.viewModel.getTotalPrice(clientId: widget.clientId);
+        if (tx == null) {
+          return Scaffold(
+            body: SizedBox(),
+          );
+        }
+        List<Item> items = tx.items;
+
         return Scaffold(
           appBar: AppBar(
             title: Text('Transaction Preview'),
@@ -49,41 +60,39 @@ class _TransactionPreviewScreenState extends State<TransactionPreviewScreen> {
               children: [
                 Text('Items'),
                 SizedBox(height: 12.0),
-                if (widget.viewModel.transaction != null)
-                  Card(
-                      child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child:
-                        ItemsTable(items: widget.viewModel.transaction!.items),
-                  )),
+                Card(
+                    child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ItemsTable(items: items),
+                )),
                 SizedBox(height: 32.0),
                 Text('Details'),
                 SizedBox(height: 12.0),
                 InformationCard(information: {
                   'Client': 'Oussama',
-                  'Paid': '\$${widget.viewModel.transaction?.paid}',
-                  'Total items': widget.viewModel
-                      .getTotalItems(clientId: widget.clientId)
-                      .toString(),
-                  'Total':
-                      '\$${widget.viewModel.getTotalPrice(clientId: widget.clientId)}',
+                  'Paid': '\$${tx.paid}',
+                  'Total': '${totalPrice}\$'
                 }),
                 Spacer(),
                 CustomButtonWidget(
                   buttonText: 'Confirm',
                   onPressed: () async {
-                    await widget.viewModel.addTransaction.execute(
-                        {'clientId': widget.clientId, 'type': widget.type});
-                    context.goNamed(Routes.transactionReceiptName,
-                        pathParameters: {
-                          'clientId': widget.clientId,
-                          'transactionId': widget.viewModel.transactionId!
-                        },
-                        queryParameters: {
-                          'type': widget.type,
-                        });
+                    await widget.viewModel.addTransaction.execute({
+                      'clientId': widget.clientId,
+                      'type': widget.type,
+                    });
+                    context.pushNamed(
+                      Routes.transactionReceiptName,
+                      pathParameters: {
+                        'clientId': widget.clientId,
+                        'transactionId': widget.viewModel.transactionId!,
+                      },
+                      queryParameters: {
+                        'type': widget.type,
+                      },
+                    );
                   },
-                )
+                ),
               ],
             ),
           ),

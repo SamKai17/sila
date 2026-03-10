@@ -1,5 +1,6 @@
 import 'package:client/data/repositories/transaction/transaction_draft_repository.dart';
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
+import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/domain/models/transaction_draft/transaction_draft.dart';
 import 'package:client/utils/command.dart';
 import 'package:client/utils/result.dart';
@@ -37,6 +38,7 @@ class TransactionPreviewViewModel extends ChangeNotifier {
 
   Future<Result<void>> _load(String clientId) async {
     try {
+      // maybe get the transaction here based on the mode
       final transactionDraftResult =
           _transactionDraftRepository.getTransactionDraft(clientId);
       switch (transactionDraftResult) {
@@ -44,12 +46,15 @@ class TransactionPreviewViewModel extends ChangeNotifier {
           transaction = transactionDraftResult.value;
           return Result.ok(null);
         case Error():
+          transaction = null;
           return Result.error(transactionDraftResult.error);
       }
     } finally {
       notifyListeners();
     }
   }
+
+
 
   Future<Result<void>> _addTransaction(Map<String, String> values) async {
     try {

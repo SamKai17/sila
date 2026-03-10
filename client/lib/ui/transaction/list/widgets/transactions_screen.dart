@@ -110,7 +110,7 @@ class TransactionCard extends StatelessWidget {
       onTap: () {
         // print('pressed');
         if (!viewModel.selectedMode) {
-          context.goNamed(Routes.transactionDetailName, pathParameters: {
+          context.pushNamed(Routes.transactionDetailName, pathParameters: {
             'clientId': clientId,
             'transactionId': transaction.id
           });
@@ -225,9 +225,19 @@ class TransactionCard extends StatelessWidget {
                   )
                 ],
               ),
+              // if (transaction.remainder != 0)
+              // maybe lead the button but with different style
               CustomButtonWidget(
                 buttonText: 'Pay',
-                onPressed: () {},
+                onPressed: () {
+                  context.pushNamed(
+                    Routes.paymentName,
+                    extra: {
+                      'clientId': clientId,
+                      'transactionId': transaction.id,
+                    } 
+                  );
+                },
               )
             ],
           ),

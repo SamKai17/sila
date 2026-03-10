@@ -8,6 +8,9 @@ import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart'
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/client/update/view_model/client_update_viewmodel.dart';
 import 'package:client/ui/core/theme/app_theme.dart';
+import 'package:client/ui/payment/payment/view_model/payment_viewmodel.dart';
+import 'package:client/ui/payment/preview/view_model/payment_preview_viewmodel.dart';
+import 'package:client/ui/payment/receipt/view_model/payment_receipt_viewmodel.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:client/ui/transaction/list/view_model/transactions_viewmodel.dart';
@@ -77,6 +80,21 @@ void main() {
     ),
     ChangeNotifierProvider(
       create: (context) => TransactionReceiptViewModel(
+        transactionRepository: context.read(),
+      ),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => PaymentViewModel(
+        transactionRepository: context.read(),
+      ),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => PaymentPreviewViewModel(
+        transactionRepository: context.read(),
+      ),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => PaymentReceiptViewModel(
         transactionRepository: context.read(),
       ),
     )

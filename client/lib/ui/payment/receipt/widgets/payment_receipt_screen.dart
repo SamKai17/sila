@@ -2,33 +2,33 @@ import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
+import 'package:client/ui/payment/receipt/view_model/payment_receipt_viewmodel.dart';
 import 'package:client/ui/transaction/receipt/view_model/transaction_receipt_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class TransactionReceiptScreen extends StatefulWidget {
-  const TransactionReceiptScreen({
+class PaymentReceiptScreen extends StatefulWidget {
+  const PaymentReceiptScreen({
     super.key,
-    required TransactionReceiptViewModel this.viewModel,
+    required PaymentReceiptViewModel this.viewModel,
     required String this.clientId,
     required String this.transactionId,
-    required String this.type,
+    // required String this.type,
   });
-  final TransactionReceiptViewModel viewModel;
+  final PaymentReceiptViewModel viewModel;
   final String clientId;
   final String transactionId;
-  final String type;
+  // final String type;
 
   @override
-  State<TransactionReceiptScreen> createState() =>
-      _TransactionReceiptScreenState();
+  State<PaymentReceiptScreen> createState() =>
+      _PaymentReceiptScreenState();
 }
 
-class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
+class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print("init preview...");
       widget.viewModel.load.execute(widget.transactionId);
     });
     super.initState();
@@ -139,6 +139,7 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
                 CustomButtonWidget(
                   buttonText: 'View Transaction',
                   onPressed: () {
+                    // context.goNamed(Routes.homeName);
                     context.goNamed(Routes.transactionDetailName,
                         pathParameters: {
                           'clientId': widget.clientId,
