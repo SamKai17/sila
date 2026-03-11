@@ -4,88 +4,58 @@ import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ClientDetailScreen extends StatefulWidget {
+class ClientDetailScreen extends ConsumerWidget {
   const ClientDetailScreen({
     super.key,
-    required ClientDetailViewModel this.viewModel,
     required String this.clientId,
   });
 
   final String clientId;
-  final ClientDetailViewModel viewModel;
   @override
-  State<ClientDetailScreen> createState() => _ClientDetailScreenState();
-}
-
-class _ClientDetailScreenState extends State<ClientDetailScreen> {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // print("init detail...");
-      widget.viewModel.load.execute(widget.clientId);
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    // print("detail: we disposing");
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("client"),
-        actions: [
-          IconButton(
-              onPressed: () {
-                context.goNamed(
-                  Routes.clientUpdateName,
-                  pathParameters: {'clientId': widget.viewModel.client!.id},
-                  extra: {
-                    'name': widget.viewModel.client!.name,
-                    'phone': widget.viewModel.client!.phone,
-                    'city': widget.viewModel.client!.city
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewModel = ref.watch(clientDetailViewModel(clientId));
+    return viewModel.when(
+      data: (client) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("client"),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    context.goNamed(
+                      Routes.clientUpdateName,
+                      pathParameters: {'clientId': client.id},
+                      extra: {
+                        'name': client.name,
+                        'phone': client.phone,
+                        'city': client.city
+                      },
+                    );
                   },
-                );
-              },
-              icon: Icon(Icons.edit))
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: SizedBox(
-          width: double.infinity,
-          child: ListenableBuilder(
-            listenable: widget.viewModel.load,
-            builder: (context, child) {
-              if (widget.viewModel.load.running) {
-                return LoaderWidget();
-              }
-              if (widget.viewModel.load.error) {
-                return Center(
-                  child: Text("an error happened!"),
-                );
-              }
-              return Column(
+                  icon: Icon(Icons.edit))
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
                 children: [
                   CircleAvatar(
                     radius: 50.0,
                     backgroundColor: AppPallete.avatarBackground,
                     foregroundColor: AppPallete.primary,
-                    child: Text('o'),
+                    child: Text(client.name[0]),
                   ),
                   Text(
-                    widget.viewModel.client?.name ?? 'name',
+                    client.name,
                     style:
                         TextStyle(fontSize: 24.0, fontWeight: FontWeight.w900),
                   ),
                   Text(
-                    widget.viewModel.client?.city ?? 'city',
+                    client.city,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w500,
@@ -93,7 +63,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     ),
                   ),
                   Text(
-                    widget.viewModel.client?.phone ?? 'phone',
+                    client.phone,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w500,
@@ -103,12 +73,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   SizedBox(height: 32),
                   GestureDetector(
                     onTap: () {
-                      context.goNamed(
-                        Routes.transactionsName,
-                        pathParameters: {
-                          'clientId': widget.viewModel.client!.id
-                        },
-                      );
+                      // context.goNamed(
+                      //   Routes.transactionsName,
+                      //   pathParameters: {'clientId': client!.id},
+                      // );
                     },
                     child: SizedBox(
                       height: 70.0,
@@ -122,13 +90,13 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                       Expanded(
                         child: FilledButton(
                             onPressed: () {
-                              context.goNamed(
-                                Routes.transactionCreateName,
-                                pathParameters: {
-                                  'clientId': widget.viewModel.client!.id
-                                },
-                                queryParameters: {'type': 'buy'},
-                              );
+                              // context.goNamed(
+                              //   Routes.transactionCreateName,
+                              //   pathParameters: {
+                              //     'clientId': client.id
+                              //   },
+                              //   queryParameters: {'type': 'buy'},
+                              // );
                             },
                             child: Text('Buy')),
                       ),
@@ -136,24 +104,38 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                       Expanded(
                         child: FilledButton(
                             onPressed: () {
-                              context.goNamed(
-                                Routes.transactionCreateName,
-                                pathParameters: {
-                                  'clientId': widget.viewModel.client!.id
-                                },
-                                queryParameters: {'type': 'sell'},
-                              );
+                              // context.goNamed(
+                              //   Routes.transactionCreateName,
+                              //   pathParameters: {
+                              //     'clientId': client.id
+                              //   },
+                              //   queryParameters: {'type': 'sell'},
+                              // );
                             },
                             child: Text('Sell')),
                       ),
                     ],
                   ),
                 ],
-              );
-            },
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
+      error: (error, stackTrace) {
+        return Scaffold(
+          body: Center(
+            child: Text('error'),
+          ),
+        );
+      },
+      loading: () {
+        return Scaffold(
+          body: Center(
+            child: LoaderWidget(),
+          ),
+        );
+      },
     );
   }
 }

@@ -96,10 +96,10 @@ class ClientCard extends ConsumerWidget {
         },
         onTap: () {
           if (!selectedMode) {
-            // context.goNamed(
-            //   Routes.clientDetailName,
-            //   pathParameters: {'clientId': client.id},
-            // );
+            context.pushNamed(
+              Routes.clientDetailName,
+              pathParameters: {'clientId': client.id},
+            );
           } else {
             if (isSelected) {
               selectedClientsNotifier.removeSelectedClient(client);

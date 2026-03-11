@@ -24,6 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final viewModel = ref.read(homeViewModel.notifier);
     final selectedMode = ref.watch(isClientSelectedMode);
     final clients = ref.watch(filteredClients(query));
+    final selectedClientsNotifier = ref.read(selectedClients.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,12 +44,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         leadingWidth: 82,
         leading: selectedMode
             ? ClearButton(
-                clear: ref.read(selectedClients.notifier).clearSelectedClients,
+                clear: selectedClientsNotifier.clearSelectedClients,
               )
             : null,
         actions: selectedMode
             ? [
-                DeleteButton(delete: viewModel.deleteClients),
+                DeleteButton(delete: () {
+                  viewModel.deleteClients();
+                  selectedClientsNotifier.clearSelectedClients();
+                }),
                 SizedBox(width: 32)
               ]
             : null,

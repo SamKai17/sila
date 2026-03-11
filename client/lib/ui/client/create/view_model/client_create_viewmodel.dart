@@ -1,26 +1,41 @@
+import 'dart:async';
 import 'package:client/data/repositories/client/client_repository.dart';
-import 'package:client/utils/command.dart';
+import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/utils/result.dart';
-import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ClientCreateViewModel extends ChangeNotifier {
-  ClientCreateViewModel({required ClientRepository clientRepository})
-      : _clientRepository = clientRepository {
-    addClient = Command1<void, Map<String, String>>(_addClient);
+final clientCreateViewModel =
+    AsyncNotifierProvider<ClientCreateViewModel, void>(
+        ClientCreateViewModel.new);
+
+class ClientCreateViewModel extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {
+    _clientRepository = ref.read(clientRepository);
   }
-  final ClientRepository _clientRepository;
 
-  late Command1 addClient;
+  late ClientRepository _clientRepository;
 
-  Future<Result<void>> _addClient(Map<String, String> values) async {
+  Future<void> addClient({
+    required String name,
+    required String city,
+    required String phone,
+  }) async {
     try {
-      await _clientRepository.addClient(
-          name: values['name'] ?? '',
-          city: values['city'] ?? '',
-          phone: values['phone'] ?? '');
-      return Result.ok(null);
+      state = AsyncValue.loading();
+      final result = await _clientRepository.addClient(
+        name: name,
+        city: city,
+        phone: phone,
+      );
+      switch (result) {
+        case Ok():
+          state = AsyncValue.data(null);
+        case Error():
+          state = AsyncValue.error(result.error, StackTrace.current);
+      }
     } finally {
-      notifyListeners();
+      ref.invalidate(homeViewModel);
     }
   }
 }

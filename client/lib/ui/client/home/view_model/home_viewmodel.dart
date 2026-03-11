@@ -16,6 +16,7 @@ final isClientSelected = Provider.family(
 
 final isClientSelectedMode = Provider(
   (ref) {
+    print('re run');
     final _selectedClients = ref.watch(selectedClients);
     return _selectedClients.isNotEmpty;
   },
@@ -32,11 +33,7 @@ final filteredClients = Provider.family<AsyncValue<List<Client>>, String>(
   },
 );
 
-final selectedClients = NotifierProvider<SelectedClients, List<Client>>(
-  () {
-    return SelectedClients();
-  },
-);
+final selectedClients = NotifierProvider<SelectedClients, List<Client>>(SelectedClients.new);
 
 class SelectedClients extends Notifier<List<Client>> {
   @override
@@ -45,13 +42,11 @@ class SelectedClients extends Notifier<List<Client>> {
   }
 
   void addSelectedClient(Client client) {
-    // print('adding');
     state = [...state, client];
     print(state);
   }
 
   void removeSelectedClient(Client client) {
-    // print('removing');
     final newList = [...state];
     newList.remove(client);
     state = newList;
@@ -70,11 +65,6 @@ class HomeViewModel extends AsyncNotifier<List<Client>> {
   }
 
   late ClientRepository _clientRepository;
-
-  // List<Client> _filteredClients = [];
-
-  // UnmodifiableListView<Client> get filteredClients =>
-  //     UnmodifiableListView(_filteredClients);
 
   Future<List<Client>> load() async {
     final result = await _clientRepository.getClientsList();
@@ -99,11 +89,5 @@ class HomeViewModel extends AsyncNotifier<List<Client>> {
           state = AsyncValue.error(result.error, StackTrace.current);
       }
     } finally {}
-  }
-
-  void filter(String query) {
-    // _filteredClients =
-    //     _clients.where((client) => client.name.contains(query)).toList();
-    // notifyListeners();
   }
 }

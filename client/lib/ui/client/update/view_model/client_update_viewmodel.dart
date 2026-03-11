@@ -1,53 +1,38 @@
+import 'dart:async';
 import 'package:client/data/repositories/client/client_repository.dart';
-import 'package:client/domain/models/client/client.dart';
-import 'package:client/utils/command.dart';
 import 'package:client/utils/result.dart';
-import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ClientUpdateViewModel extends ChangeNotifier {
-  ClientUpdateViewModel({required ClientRepository clientRepository})
-      : _clientRepository = clientRepository {
-    load = Command1<void, String>(_load);
-    updateClient = Command1<void, Map<String, String>>(_updateClient);
-  }
-  final ClientRepository _clientRepository;
-  late Command1 updateClient;
-  late Command1 load;
-  Client? _client;
-  Client? get client => _client;
+final clientUpdateViewModel = AsyncNotifierProvider(ClientUpdateViewModel.new);
 
-  
-    Future<Result<void>> _load(String id) async {
-    try {
-      final result = await _clientRepository.getClient(id);
-      switch (result) {
-        case Ok():
-          _client = result.value;
-          return Result.ok(null);
-        case Error():
-          return Result.error(result.error);
-      }
-    } finally {
-      notifyListeners();
-    }
+class ClientUpdateViewModel extends AsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {
+    _clientRepository = ref.read(clientRepository);
   }
 
-  Future<Result<void>> _updateClient(Map<String, String> values) async {
+  late ClientRepository _clientRepository;
+
+  Future<void> updateClient({
+    required String id,
+    required String name,
+    required String phone,
+    required String city,
+  }) async {
     try {
+      state = AsyncValue.loading();
       final result = await _clientRepository.updateClient(
-          id: values['id']!,
-          name: values['name']!,
-          phone: values['phone']!,
-          city: values['city']!);
-
+        id: id,
+        name: name,
+        phone: phone,
+        city: city,
+      );
       switch (result) {
         case Ok():
-          return Result.ok(null);
+          state = AsyncValue.data(null);
         case Error():
-          return Result.error(result.error);
+          state = AsyncValue.error(result.error, StackTrace.current);
       }
-    } finally {
-      notifyListeners();
-    }
+    } finally {}
   }
 }

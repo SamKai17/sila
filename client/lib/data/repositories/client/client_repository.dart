@@ -15,7 +15,6 @@ class ClientRepository {
       : _databaseService = databaseService;
   DatabaseService _databaseService;
 
-  // List<Client> _selectedClients = [];
 
   Future<Result<List<Client>>> getClientsList() async {
     if (!_databaseService.isOpen) {
@@ -61,22 +60,4 @@ class ClientRepository {
     }
     return _databaseService.deleteClients(ids);
   }
-
-  // bool get selectedMode => _selectedClients.length > 0;
-
-  // void addSelectedClient(Client client) {
-  //   _selectedClients.add(client);
-  // }
-
-  // void removeSelectedClient(Client client) {
-  //   _selectedClients.remove(client);
-  // }
-
-  // void clearSelectedClients() {
-  //   _selectedClients.clear();
-  // }
-
-  // bool isSelected(Client client) {
-  //   return _selectedClients.contains(client);
-  // }
 }

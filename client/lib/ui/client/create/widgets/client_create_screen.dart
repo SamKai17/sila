@@ -4,16 +4,16 @@ import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ClientCreateScreen extends StatefulWidget {
-  const ClientCreateScreen({super.key, required this.viewModel});
-  final ClientCreateViewModel viewModel;
+class ClientCreateScreen extends ConsumerStatefulWidget {
+  const ClientCreateScreen({super.key});
 
   @override
-  State<ClientCreateScreen> createState() => _ClientCreateScreenState();
+  ConsumerState<ClientCreateScreen> createState() => _ClientCreateScreenState();
 }
 
-class _ClientCreateScreenState extends State<ClientCreateScreen> {
+class _ClientCreateScreenState extends ConsumerState<ClientCreateScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -47,13 +47,14 @@ class _ClientCreateScreenState extends State<ClientCreateScreen> {
               CustomButtonWidget(
                   buttonText: 'save',
                   onPressed: () async {
-                    await widget.viewModel.addClient.execute({
-                      'name': _nameController.text,
-                      'phone': _phoneController.text,
-                      'city': _cityController.text
-                    });
-                    if (widget.viewModel.addClient.completed) {
-                      context.goNamed(Routes.homeName);
+                    await ref.read(clientCreateViewModel.notifier).addClient(
+                          name: _nameController.text,
+                          city: _cityController.text,
+                          phone: _phoneController.text,
+                        );
+                    if (context.mounted) {
+                      // shouldn't be here you should check for loading and error using listen maybe
+                      context.pop();
                     }
                   }),
             ],
