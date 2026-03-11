@@ -2,9 +2,9 @@ import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 class SearchField extends StatefulWidget {
-  const SearchField({super.key, required this.filter});
+  const SearchField({super.key, required this.reload});
 
-  final void Function(String query) filter;
+  final void Function(String) reload;
 
   @override
   State<SearchField> createState() => _SearchFieldState();
@@ -12,6 +12,7 @@ class SearchField extends StatefulWidget {
 
 class _SearchFieldState extends State<SearchField> {
   final TextEditingController _searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,10 +23,7 @@ class _SearchFieldState extends State<SearchField> {
       child: TextField(
         controller: _searchController,
         onChanged: (value) {
-          // print(value);
-          setState(() {
-            widget.filter(value);
-          });
+          widget.reload(value);
         },
         decoration: InputDecoration(
           hintText: "Search",
@@ -49,9 +47,7 @@ class _SearchFieldState extends State<SearchField> {
               ? IconButton(
                   onPressed: () {
                     _searchController.clear();
-                    setState(() {
-                      widget.filter('');
-                    });
+                    widget.reload('');
                   },
                   icon: Icon(Icons.close),
                 )

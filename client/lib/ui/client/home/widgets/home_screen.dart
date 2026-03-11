@@ -8,122 +8,89 @@ import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.viewModel});
-  final HomeViewModel viewModel;
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // print("init home...");
-      widget.viewModel.load.execute();
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // print("home: we disposing");
-    // TODO: implement dispose
-    super.dispose();
-  }
-
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  String query = '';
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.viewModel,
-      builder: (context, child) {
-        return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: true,
-            toolbarHeight: 72,
-            surfaceTintColor: AppPallete.background,
-            // backgroundColor: AppPallete.avatarBackground,
-            titleSpacing: 32.0,
-            title: !widget.viewModel.selectedMode
-                ? Text(
-                    "Sila",
-                    style: TextStyle(
-                      fontSize: 28.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  )
-                : null,
-            leadingWidth: 82,
-            leading: widget.viewModel.selectedMode
-                ? ClearButton(
-                    clear: widget.viewModel.clearSelectedClients,
-                  )
-                : null,
-            actions: widget.viewModel.selectedMode
-                ? [
-                    DeleteButton(
-                        delete: widget.viewModel.deleteClients.execute),
-                    SizedBox(width: 32)
-                  ]
-                : null,
-            bottom: PreferredSize(
-              preferredSize: Size.fromHeight(72.0),
-              child: SearchField(filter: widget.viewModel.filter),
-            ),
-          ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 32.0,
-                right: 32,
-                // top: 24.0,
-                bottom: 24.0,
-              ),
-              child: Column(children: [
-                // SizedBox(height: 32.0),
-                ListenableBuilder(
-                  listenable: widget.viewModel.load,
-                  builder: (context, child) {
-                    if (widget.viewModel.load.running) {
-                      return LoaderWidget();
-                    }
-                    if (widget.viewModel.load.error) {
-                      return Center(child: Text("no clients found"));
-                    }
-                    return child!;
-                  },
-                  child: ListenableBuilder(
-                    listenable: widget.viewModel,
-                    builder: (context, child) {
-                      final clients = widget.viewModel.filteredClients;
-                      return Column(
-                        spacing: 16.0,
-                        children: clients.map(
-                          (client) {
-                            return ClientCard(
-                              client: client,
-                              viewModel: widget.viewModel,
-                            );
-                          },
-                        ).toList(),
-                      );
-                    },
-                  ),
+    final viewModel = ref.read(homeViewModel.notifier);
+    final selectedMode = ref.watch(isClientSelectedMode);
+    final clients = ref.watch(filteredClients(query));
+
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        toolbarHeight: 72,
+        surfaceTintColor: AppPallete.background,
+        titleSpacing: 32.0,
+        title: !selectedMode
+            ? Text(
+                "Sila",
+                style: TextStyle(
+                  fontSize: 28.0,
+                  fontWeight: FontWeight.w500,
                 ),
-                // ),
-              ]),
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              context.goNamed(Routes.clientCreateName);
+              )
+            : null,
+        leadingWidth: 82,
+        leading: selectedMode
+            ? ClearButton(
+                clear: ref.read(selectedClients.notifier).clearSelectedClients,
+              )
+            : null,
+        actions: selectedMode
+            ? [
+                DeleteButton(delete: viewModel.deleteClients),
+                SizedBox(width: 32)
+              ]
+            : null,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(72.0),
+          child: SearchField(
+            reload: (String q) {
+              setState(() {
+                query = q;
+              });
             },
-            child: Icon(Icons.add),
           ),
-        );
-      },
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 32.0,
+            right: 32,
+            bottom: 24.0,
+          ),
+          child: switch (clients) {
+            AsyncValue(:final value?) => Column(
+                spacing: 16.0,
+                children: value.map(
+                  (client) {
+                    return ClientCard(
+                      client: client,
+                    );
+                  },
+                ).toList()),
+            AsyncValue(error: != null) => const Text('error fetching clients'),
+            AsyncValue() => LoaderWidget(),
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.goNamed(Routes.clientCreateName);
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

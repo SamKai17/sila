@@ -3,40 +3,29 @@ import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class ClientCard extends StatefulWidget {
+class ClientCard extends ConsumerWidget {
   const ClientCard({
     super.key,
     required this.client,
-    required this.viewModel,
   });
 
   final Client client;
-  final HomeViewModel viewModel;
 
   @override
-  State<ClientCard> createState() => _ClientCardState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isSelected = ref.watch(isClientSelected(client));
+    final selectedMode = ref.watch(isClientSelectedMode);
+    final selectedClientsNotifier = ref.read(selectedClients.notifier);
 
-class _ClientCardState extends State<ClientCard> {
-  // late bool isSelected;
-  @override
-  void initState() {
-    // print("rebuilding");
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // print("rebuilding inside");
     return SizedBox(
       width: double.infinity,
       child: GestureDetector(
         child: Card(
-          color: widget.viewModel.isSelected(widget.client)
-              ? AppPallete.selectedBackground
-              : AppPallete.surface,
+          color:
+              isSelected ? AppPallete.selectedBackground : AppPallete.surface,
           child: Padding(
             padding: const EdgeInsets.all(14.0),
             child: Row(
@@ -47,10 +36,9 @@ class _ClientCardState extends State<ClientCard> {
                       radius: 32.0,
                       backgroundColor: AppPallete.avatarBackground,
                       foregroundColor: AppPallete.primary,
-                      child: Text(widget.client.name[0].toUpperCase()),
-                      // child: Text('o'),
+                      child: Text(client.name[0].toUpperCase()),
                     ),
-                    if (widget.viewModel.isSelected(widget.client))
+                    if (isSelected)
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -75,7 +63,7 @@ class _ClientCardState extends State<ClientCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.client.name,
+                      client.name,
                       style: TextStyle(
                         fontSize: 18.0,
                         color: AppPallete.primary,
@@ -83,7 +71,7 @@ class _ClientCardState extends State<ClientCard> {
                       ),
                     ),
                     Text(
-                      widget.client.phone,
+                      client.phone,
                       style: TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w500,
@@ -99,24 +87,24 @@ class _ClientCardState extends State<ClientCard> {
           ),
         ),
         onLongPress: () {
-          // print("on long pressed");
-          if (!widget.viewModel.isSelected(widget.client)) {
-            widget.viewModel.addSelectedClient(widget.client);
+          print("on long pressed");
+          if (isSelected) {
+            selectedClientsNotifier.removeSelectedClient(client);
           } else {
-            widget.viewModel.removeSelectedClient(widget.client);
+            selectedClientsNotifier.addSelectedClient(client);
           }
         },
         onTap: () {
-          if (!widget.viewModel.selectedMode) {
-            context.goNamed(
-              Routes.clientDetailName,
-              pathParameters: {'clientId': widget.client.id},
-            );
+          if (!selectedMode) {
+            // context.goNamed(
+            //   Routes.clientDetailName,
+            //   pathParameters: {'clientId': client.id},
+            // );
           } else {
-            if (!widget.viewModel.isSelected(widget.client)) {
-              widget.viewModel.addSelectedClient(widget.client);
+            if (isSelected) {
+              selectedClientsNotifier.removeSelectedClient(client);
             } else {
-              widget.viewModel.removeSelectedClient(widget.client);
+              selectedClientsNotifier.addSelectedClient(client);
             }
           }
         },

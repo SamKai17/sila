@@ -18,87 +18,94 @@ import 'package:client/ui/transaction/payment/view_model/transaction_payment_vie
 import 'package:client/ui/transaction/preview/view_model/transaction_preview_viewmodel.dart';
 import 'package:client/ui/transaction/receipt/view_model/transaction_receipt_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MultiProvider(providers: [
-    Provider(
-      create: (context) => DatabaseService(),
-    ),
-    Provider(
-      create: (context) => ClientRepository(databaseService: context.read()),
-    ),
-    Provider(
-      create: (context) =>
-          TransactionRepository(databaseService: context.read()),
-    ),
-    Provider(
-      create: (context) =>
-          TransactionDraftRepository(databaseService: context.read()),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => HomeViewModel(clientRepository: context.read()),
-    ),
-    ChangeNotifierProvider(
-      create: (context) =>
-          ClientDetailViewModel(clientRepository: context.read()),
-    ),
-    ChangeNotifierProvider(
-      create: (context) =>
-          ClientUpdateViewModel(clientRepository: context.read()),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => ClientCreateViewModel(
-        clientRepository: context.read(),
-      ),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => TransactionCreateViewModel(
-        transactionDraftRepository: context.read(),
-      ),
-    ),
-    ChangeNotifierProvider(
-      create: (context) =>
-          TransactionsViewModel(transactionRepository: context.read()),
-    ),
-    ChangeNotifierProvider(
-      create: (context) =>
-          TransactionDetailViewModel(transactionRepository: context.read()),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => TransactionPaymentViewModel(
-        // transactionRepository: context.read(),
-        transactionDraftRepository: context.read(),
-      ),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => TransactionPreviewViewModel(
-        transactionRepository: context.read(),
-        transactionDraftRepository: context.read(),
-      ),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => TransactionReceiptViewModel(
-        transactionRepository: context.read(),
-      ),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => PaymentViewModel(
-        transactionRepository: context.read(),
-      ),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => PaymentPreviewViewModel(
-        transactionRepository: context.read(),
-      ),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => PaymentReceiptViewModel(
-        transactionRepository: context.read(),
-      ),
-    )
-  ], child: const MyApp()));
+  runApp(
+    // MultiProvider(
+    //   providers: [
+    //     Provider(
+    //       create: (context) => DatabaseService(),
+    //     ),
+    //     Provider(
+    //       create: (context) =>
+    //           ClientRepository(databaseService: context.read()),
+    //     ),
+    //     Provider(
+    //       create: (context) =>
+    //           TransactionRepository(databaseService: context.read()),
+    //     ),
+    //     Provider(
+    //       create: (context) =>
+    //           TransactionDraftRepository(databaseService: context.read()),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => HomeViewModel(clientRepository: context.read()),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) =>
+    //           ClientDetailViewModel(clientRepository: context.read()),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) =>
+    //           ClientUpdateViewModel(clientRepository: context.read()),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => ClientCreateViewModel(
+    //         clientRepository: context.read(),
+    //       ),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => TransactionCreateViewModel(
+    //         transactionDraftRepository: context.read(),
+    //       ),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) =>
+    //           TransactionsViewModel(transactionRepository: context.read()),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) =>
+    //           TransactionDetailViewModel(transactionRepository: context.read()),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => TransactionPaymentViewModel(
+    //         // transactionRepository: context.read(),
+    //         transactionDraftRepository: context.read(),
+    //       ),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => TransactionPreviewViewModel(
+    //         transactionRepository: context.read(),
+    //         transactionDraftRepository: context.read(),
+    //       ),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => TransactionReceiptViewModel(
+    //         transactionRepository: context.read(),
+    //       ),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => PaymentViewModel(
+    //         transactionRepository: context.read(),
+    //       ),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => PaymentPreviewViewModel(
+    //         transactionRepository: context.read(),
+    //       ),
+    //     ),
+    //     ChangeNotifierProvider(
+    //       create: (context) => PaymentReceiptViewModel(
+    //         transactionRepository: context.read(),
+    //       ),
+    //     )
+    //   ],
+      ProviderScope(child: const MyApp()),
+    // ),
+  );
 }
 
 class MyApp extends StatelessWidget {

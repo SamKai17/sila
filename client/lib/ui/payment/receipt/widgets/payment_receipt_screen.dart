@@ -139,7 +139,6 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
                 CustomButtonWidget(
                   buttonText: 'View Transaction',
                   onPressed: () {
-                    // context.goNamed(Routes.homeName);
                     context.goNamed(Routes.transactionDetailName,
                         pathParameters: {
                           'clientId': widget.clientId,

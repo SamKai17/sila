@@ -3,6 +3,11 @@ import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/utils/result.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final transactionRepository = Provider((ref) {
+  return TransactionRepository(databaseService: ref.read(databaseService));
+},);
 
 class TransactionRepository {
   TransactionRepository({required DatabaseService databaseService})
@@ -11,8 +16,10 @@ class TransactionRepository {
   final DatabaseService _databaseService;
   List<Transaction> _transactions = [];
 
-  Future<Result<void>> addPayment(
-      {required double amount, required Transaction transaction}) async {
+  Future<Result<void>> addPayment({
+    required double amount,
+    required Transaction transaction,
+  }) async {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }

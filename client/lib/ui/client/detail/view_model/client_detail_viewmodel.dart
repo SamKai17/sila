@@ -11,11 +11,11 @@ class ClientDetailViewModel extends ChangeNotifier {
   }) : _clientRepository = clientRepository {
     // print("loading detail...");
     load = Command1<void, String>(_load);
-    clientRepository.stream.listen(
-      (event) {
-        load.execute(id);
-      },
-    );
+    // clientRepository.stream.listen(
+    //   (event) {
+    //     load.execute(id);
+    //   },
+    // );
   }
   late String id;
   late Command1 load;

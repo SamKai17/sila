@@ -2,6 +2,15 @@ import 'package:client/data/services/local/database_service.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/transaction_draft/transaction_draft.dart';
 import 'package:client/utils/result.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final transactionDraftRepository = Provider(
+  (ref) {
+    return TransactionDraftRepository(
+      databaseService: ref.read(databaseService),
+    );
+  },
+);
 
 class TransactionDraftRepository {
   TransactionDraftRepository({required DatabaseService databaseService})

@@ -3,9 +3,14 @@ import 'package:client/domain/models/client/client.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/utils/result.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
+
+final databaseService = Provider((ref) {
+  return DatabaseService();
+},);
 
 class DatabaseService {
   static const _clientTable = 'clients';

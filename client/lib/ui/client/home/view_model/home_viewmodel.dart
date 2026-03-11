@@ -1,96 +1,109 @@
-import 'dart:collection';
+import 'dart:async';
 import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:client/domain/models/client/client.dart';
-import 'package:client/utils/command.dart';
 import 'package:client/utils/result.dart';
-import 'package:flutter/material.dart';
+import 'package:riverpod/riverpod.dart';
 
-class HomeViewModel extends ChangeNotifier {
-  HomeViewModel({required ClientRepository clientRepository})
-      : _clientRepository = clientRepository {
-    load = Command0(_load);
-    deleteClients = Command0(_deleteClients);
-    clientRepository.stream.listen(
-      (event) {
-        load.execute();
+final homeViewModel =
+    AsyncNotifierProvider<HomeViewModel, List<Client>>(HomeViewModel.new);
+
+final isClientSelected = Provider.family(
+  (ref, Client client) {
+    final _selectedClients = ref.watch(selectedClients);
+    return _selectedClients.contains(client);
+  },
+);
+
+final isClientSelectedMode = Provider(
+  (ref) {
+    final _selectedClients = ref.watch(selectedClients);
+    return _selectedClients.isNotEmpty;
+  },
+);
+
+final filteredClients = Provider.family<AsyncValue<List<Client>>, String>(
+  (ref, String query) {
+    final clientsList = ref.watch(homeViewModel);
+    return clientsList.whenData(
+      (value) {
+        return value.where((client) => client.name.contains(query)).toList();
       },
     );
-  }
-  final ClientRepository _clientRepository;
+  },
+);
 
-  late Command0 load;
-  late Command0 deleteClients;
+final selectedClients = NotifierProvider<SelectedClients, List<Client>>(
+  () {
+    return SelectedClients();
+  },
+);
 
-  List<Client> _clients = [];
-  List<Client> _filteredClients = [];
-
-  bool get selectedMode => _clientRepository.selectedMode;
-
-  bool isSelected(Client client) {
-    return _clientRepository.isSelected(client);
-  }
-
-  UnmodifiableListView<Client> get clients => UnmodifiableListView(_clients);
-  UnmodifiableListView<Client> get filteredClients =>
-      UnmodifiableListView(_filteredClients);
-
-  Future<Result<void>> _load() async {
-    try {
-      final result = await _clientRepository.getClientsList();
-      switch (result) {
-        case Ok():
-          _clients = result.value;
-          _filteredClients = _clients;
-          return Result.ok(null);
-        case Error():
-          return Result.error(result.error);
-      }
-    } finally {
-      notifyListeners();
-    }
-  }
-
-  Future<Result<void>> _deleteClients() async {
-    try {
-      final result = await _clientRepository.deleteClients();
-      switch (result) {
-        case Error():
-          return Result.error(result.error);
-        case Ok():
-      }
-      final clientResult = await _clientRepository.getClientsList();
-      switch (clientResult) {
-        case Ok():
-          _clients = clientResult.value;
-          _filteredClients = _clients;
-        case Error():
-          return Result.error(clientResult.error);
-      }
-      return clientResult;
-    } finally {
-      _clientRepository.clearSelectedClients();
-      notifyListeners();
-    }
-  }
-
-  void filter(String query) {
-    _filteredClients =
-        _clients.where((client) => client.name.contains(query)).toList();
-    notifyListeners();
+class SelectedClients extends Notifier<List<Client>> {
+  @override
+  List<Client> build() {
+    return [];
   }
 
   void addSelectedClient(Client client) {
-    _clientRepository.addSelectedClient(client);
-    notifyListeners();
+    // print('adding');
+    state = [...state, client];
+    print(state);
   }
 
   void removeSelectedClient(Client client) {
-    _clientRepository.removeSelectedClient(client);
-    notifyListeners();
+    // print('removing');
+    final newList = [...state];
+    newList.remove(client);
+    state = newList;
   }
 
   void clearSelectedClients() {
-    _clientRepository.clearSelectedClients();
-    notifyListeners();
+    state = [];
+  }
+}
+
+class HomeViewModel extends AsyncNotifier<List<Client>> {
+  @override
+  Future<List<Client>> build() {
+    _clientRepository = ref.read(clientRepository);
+    return load();
+  }
+
+  late ClientRepository _clientRepository;
+
+  // List<Client> _filteredClients = [];
+
+  // UnmodifiableListView<Client> get filteredClients =>
+  //     UnmodifiableListView(_filteredClients);
+
+  Future<List<Client>> load() async {
+    final result = await _clientRepository.getClientsList();
+    switch (result) {
+      case Ok():
+        return result.value;
+      case Error():
+        throw result.error;
+    }
+  }
+
+  Future<void> deleteClients() async {
+    try {
+      state = AsyncValue.loading();
+      final selectedClientsList = ref.read(selectedClients);
+      final ids = selectedClientsList.map((client) => client.id).toList();
+      final result = await _clientRepository.deleteClients(ids: ids);
+      switch (result) {
+        case Ok():
+          ref.invalidateSelf();
+        case Error():
+          state = AsyncValue.error(result.error, StackTrace.current);
+      }
+    } finally {}
+  }
+
+  void filter(String query) {
+    // _filteredClients =
+    //     _clients.where((client) => client.name.contains(query)).toList();
+    // notifyListeners();
   }
 }
