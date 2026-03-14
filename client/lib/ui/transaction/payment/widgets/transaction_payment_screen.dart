@@ -2,31 +2,28 @@ import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
+import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/payment/view_model/transaction_payment_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class TransactionPaymentScreen extends StatefulWidget {
+class TransactionPaymentScreen extends ConsumerStatefulWidget {
   const TransactionPaymentScreen({
     super.key,
-    required TransactionPaymentViewModel this.viewModel,
     required String this.clientId,
     required String this.type,
-    // required String this.mode,
-    // Transaction? this.transaction,
   });
-  final TransactionPaymentViewModel viewModel;
   final String clientId;
   final String type;
-  // final String mode;
-  // final Transaction? transaction;
 
   @override
-  State<TransactionPaymentScreen> createState() =>
+  ConsumerState<TransactionPaymentScreen> createState() =>
       _TransactionPaymentScreenState();
 }
 
-class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
+class _TransactionPaymentScreenState
+    extends ConsumerState<TransactionPaymentScreen> {
   String value = '';
 
   void updateValue(String newValue) {
@@ -50,13 +47,8 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // print(widget.transaction);
-    // if (widget.mode == 'create') {
-    double totalPrice =
-        widget.viewModel.getTotalPrice(clientId: widget.clientId);
-    // // } else if (widget.mode == 'pay') {
-    // //   totalPrice = widget.transaction?.remainder ?? 0.0;
-    // // }
+    final totalPrice = ref.watch(itemsTotalPrice(widget.clientId));
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -64,7 +56,7 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
         child: Column(
           children: [
             Text(
-              '${totalPrice}\$',
+              '\$${totalPrice}',
               style: TextStyle(
                 fontSize: 36.0,
                 fontWeight: FontWeight.w500,
@@ -144,10 +136,6 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
               buttonText: 'Pay',
               onPressed: () {
                 double paid = double.parse(value.isEmpty ? '0' : value);
-                widget.viewModel.setTransactionDraftPayment(
-                  clientId: widget.clientId,
-                  value: paid,
-                );
                 context.pushNamed(
                   Routes.transactionPreviewName,
                   pathParameters: {
@@ -156,6 +144,7 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
                   queryParameters: {
                     'type': widget.type,
                   },
+                  extra: paid,
                 );
               },
             ),
@@ -167,8 +156,11 @@ class _TransactionPaymentScreenState extends State<TransactionPaymentScreen> {
 }
 
 class PaymentButton extends StatelessWidget {
-  const PaymentButton(
-      {super.key, required String this.text, required this.onClick});
+  const PaymentButton({
+    super.key,
+    required String this.text,
+    required this.onClick,
+  });
   final String text;
   final Function onClick;
 
@@ -179,8 +171,6 @@ class PaymentButton extends StatelessWidget {
         onClick();
       },
       child: Container(
-        // height: 70.0,
-        // width: 70.0,
         child: Center(
             child: Text(
           text,

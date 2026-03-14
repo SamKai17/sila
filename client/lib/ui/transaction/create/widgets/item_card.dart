@@ -20,7 +20,6 @@ class ItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final items = ref.watch(transactionCreateViewModel);
     final selectedMode = ref.watch(isItemSelectedMode);
     final isSelected = ref.watch(isItemSelected(item));
     return GestureDetector(

@@ -44,7 +44,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 .showSnackBar(SnackBar(content: Text('an error happened')));
           },
           loading: () {
-            // print('loading');
           },
         );
       },

@@ -19,9 +19,9 @@ class TransactionCreateScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(transactionCreateViewModel);
+    final items = ref.watch(transactionCreateViewModel(clientId));
     final selectedMode = ref.watch(isItemSelectedMode);
-    final totalPrice = ref.watch(itemsTotalPrice);
+    final totalPrice = ref.watch(itemsTotalPrice(clientId));
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: selectedMode ? false : true,
@@ -38,7 +38,9 @@ class TransactionCreateScreen extends ConsumerWidget {
             ? [
                 DeleteButton(
                   delete: () {
-                    ref.read(transactionCreateViewModel.notifier).deleteItems();
+                    ref
+                        .read(transactionCreateViewModel(clientId).notifier)
+                        .deleteItems();
                     ref.read(selectedItems.notifier).clearSelectedItems();
                   },
                 ),
@@ -68,15 +70,6 @@ class TransactionCreateScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Summary"),
-                    // Row(
-                    //   children: [
-                    //     Text("Total Items"),
-                    //     Spacer(),
-                    //     Text(widget.viewModel
-                    //         .getTotalItems(clientId: widget.clientId)
-                    //         .toString()),
-                    //   ],
-                    // ),
                     Row(
                       children: [
                         Text("Total Price"),
@@ -111,15 +104,15 @@ class TransactionCreateScreen extends ConsumerWidget {
                 Expanded(
                   child: FilledButton(
                     onPressed: () {
-                      // context.pushNamed(
-                      //   Routes.transactionPaymentName,
-                      //   pathParameters: {
-                      //     'clientId': widget.clientId,
-                      //   },
-                      //   queryParameters: {
-                      //     'type': widget.type,
-                      //   },
-                      // );
+                      context.pushNamed(
+                        Routes.transactionPaymentName,
+                        pathParameters: {
+                          'clientId': clientId,
+                        },
+                        queryParameters: {
+                          'type': type,
+                        },
+                      );
                     },
                     child: Text("pay"),
                   ),

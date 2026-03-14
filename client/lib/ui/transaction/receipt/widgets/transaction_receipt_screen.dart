@@ -2,54 +2,41 @@ import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
+import 'package:client/ui/core/ui/loader_widget.dart';
+import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/receipt/view_model/transaction_receipt_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class TransactionReceiptScreen extends StatefulWidget {
+class TransactionReceiptScreen extends ConsumerWidget {
   const TransactionReceiptScreen({
     super.key,
-    required TransactionReceiptViewModel this.viewModel,
     required String this.clientId,
     required String this.transactionId,
     required String this.type,
   });
-  final TransactionReceiptViewModel viewModel;
   final String clientId;
   final String transactionId;
   final String type;
 
   @override
-  State<TransactionReceiptScreen> createState() =>
-      _TransactionReceiptScreenState();
-}
-
-class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      print("init preview...");
-      widget.viewModel.load.execute(widget.transactionId);
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.viewModel,
-      builder: (context, child) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transactionAsync =
+        ref.watch(transactionReceiptViewModel(transactionId));
+    return transactionAsync.when(
+      data: (transaction) {
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
             leading: IconButton(
               onPressed: () {
-                context.pop();
-                // context.goNamed(
-                //   Routes.transactionCreateName,
-                //   pathParameters: {'clientId': widget.clientId},
-                //   queryParameters: {'type': widget.type}
-                // );
+                ref.read(transactionCreateViewModel(clientId).notifier).clear();
+                if (context.mounted) {
+                  context.goNamed(Routes.transactionCreateName,
+                      pathParameters: {'clientId': clientId},
+                      queryParameters: {'type': type});
+                }
               },
               icon: Icon(Icons.close),
             ),
@@ -80,11 +67,8 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
                               margin: EdgeInsets.all(0.0),
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child: ItemsTable(
-                                    items: widget.viewModel.transaction != null
-                                        ? widget.viewModel.transaction!.items ??
-                                            []
-                                        : []),
+                                child:
+                                    ItemsTable(items: transaction.items ?? []),
                               )),
                           SizedBox(height: 32.0),
                           Text(
@@ -107,9 +91,8 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
                           SizedBox(height: 12.0),
                           InformationCard(information: {
                             'Payment Date':
-                                '${widget.viewModel.transaction != null ? DateTime.fromMillisecondsSinceEpoch(widget.viewModel.transaction!.payments?.last.timeOfPayment ?? 0) : null}',
-                            'Paid':
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.payments?.last.amount : null}\$',
+                                '${DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction)}',
+                            'Paid': '${transaction.totalPaid}\$',
                           }),
                           SizedBox(height: 32.0),
                           Text(
@@ -120,13 +103,10 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
                           SizedBox(height: 12.0),
                           InformationCard(information: {
                             'Transaction Date':
-                                '${widget.viewModel.transaction != null ? DateTime.fromMillisecondsSinceEpoch(widget.viewModel.transaction!.timeOfTransaction) : null}',
-                            'Total Paid':
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPaid : null}\$',
-                            'Remainder':
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.remainder : null}\$',
-                            'Total':
-                                '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPrice : null}\$',
+                                '${DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction)}',
+                            'Total Paid': '${transaction.totalPaid}\$',
+                            'Remainder': '${transaction.remainder}\$',
+                            'Total': '${transaction.totalPrice}\$',
                           }),
                         ],
                       ),
@@ -141,8 +121,8 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
                   onPressed: () {
                     context.goNamed(Routes.transactionDetailName,
                         pathParameters: {
-                          'clientId': widget.clientId,
-                          'transactionId': widget.transactionId
+                          'clientId': clientId,
+                          'transactionId': transactionId
                         });
                   },
                 ),
@@ -153,6 +133,20 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen> {
                 ),
               ],
             ),
+          ),
+        );
+      },
+      error: (error, stackTrace) {
+        return Scaffold(
+          body: Center(
+            child: Text('no transaction found'),
+          ),
+        );
+      },
+      loading: () {
+        return Scaffold(
+          body: Center(
+            child: LoaderWidget(),
           ),
         );
       },

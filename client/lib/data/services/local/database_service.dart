@@ -249,8 +249,6 @@ class DatabaseService {
     try {
       final transactionId = Uuid().v4();
       final paymentId = Uuid().v4();
-      // print('clientId 1: $clientId');
-      // print(items);
       await _database!.transaction(
         (txn) async {
           await txn.insert(
@@ -287,7 +285,6 @@ class DatabaseService {
       );
       return Result.ok(transactionId);
     } on Exception catch (e) {
-      // print(e);
       return Result.error(e);
     }
   }

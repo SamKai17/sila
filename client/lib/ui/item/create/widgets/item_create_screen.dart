@@ -58,10 +58,13 @@ class _ItemCreateScreenState extends ConsumerState<ItemCreateScreen> {
               CustomButtonWidget(
                 buttonText: 'Add',
                 onPressed: () {
-                  ref.read(transactionCreateViewModel.notifier).addItem(
-                      name: _nameController.text,
-                      price: double.parse(_priceController.text),
-                      quantity: int.parse(_quantityController.text));
+                  ref
+                      .read(
+                          transactionCreateViewModel(widget.clientId).notifier)
+                      .addItem(
+                          name: _nameController.text,
+                          price: double.parse(_priceController.text),
+                          quantity: int.parse(_quantityController.text));
                   if (context.mounted) {
                     context.pop();
                   }

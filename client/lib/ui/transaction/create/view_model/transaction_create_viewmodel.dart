@@ -1,16 +1,10 @@
-import 'dart:async';
-import 'dart:collection';
-import 'package:client/data/repositories/transaction/transaction_draft_repository.dart';
 import 'package:client/domain/models/item/item.dart';
-import 'package:client/utils/command.dart';
-import 'package:client/utils/result.dart';
-import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:uuid/uuid.dart';
 
-final itemsTotalPrice = Provider<double>(
-  (ref) {
-    final items = ref.watch(transactionCreateViewModel);
+final itemsTotalPrice = Provider.family<double, String>(
+  (ref, clientId) {
+    final items = ref.watch(transactionCreateViewModel(clientId));
     double total = 0.0;
     for (var item in items) {
       total += item.price * item.quantity;
@@ -19,14 +13,23 @@ final itemsTotalPrice = Provider<double>(
   },
 );
 
+// final transactionDraft = Provider.family((ref, clientId) {
+  
+// },);
+
 final transactionCreateViewModel =
-    NotifierProvider<TransactionCreateViewModel, List<Item>>(
-        TransactionCreateViewModel.new);
+    NotifierProvider.family<TransactionCreateViewModel, List<Item>, String>((clientId) {
+      return TransactionCreateViewModel();
+    },);
 
 class TransactionCreateViewModel extends Notifier<List<Item>> {
   @override
   List<Item> build() {
     return [];
+  }
+
+  void clear() {
+    state = [];
   }
 
   void addItem({

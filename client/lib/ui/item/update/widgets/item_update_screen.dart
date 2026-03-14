@@ -74,7 +74,7 @@ class _ItemUpdateScreenState extends ConsumerState<ItemUpdateScreen> {
               CustomButtonWidget(
                 buttonText: 'Save',
                 onPressed: () {
-                  ref.read(transactionCreateViewModel.notifier).updateItem(
+                  ref.read(transactionCreateViewModel(widget.clientId).notifier).updateItem(
                         id: widget.item.id,
                         name: _nameController.text,
                         price: double.parse(_priceController.text),

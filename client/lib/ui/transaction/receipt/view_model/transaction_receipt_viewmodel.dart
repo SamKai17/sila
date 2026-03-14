@@ -1,34 +1,38 @@
+import 'dart:async';
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
-import 'package:client/utils/command.dart';
 import 'package:client/utils/result.dart';
-import 'package:flutter/material.dart';
+import 'package:riverpod/riverpod.dart';
 
-class TransactionReceiptViewModel extends ChangeNotifier {
-  TransactionReceiptViewModel({
-    required TransactionRepository transactionRepository,
-  }) : _transactionRepository = transactionRepository {
-    load = Command1<void, String>(_load);
+final transactionReceiptViewModel = AsyncNotifierProvider.family<
+    TransactionReceiptViewModel,
+    Transaction,
+    String>(TransactionReceiptViewModel.new);
+
+class TransactionReceiptViewModel extends AsyncNotifier<Transaction> {
+  TransactionReceiptViewModel(this.transactionId);
+  final String transactionId;
+
+  @override
+  FutureOr<Transaction> build() {
+    _transactionRepository = ref.read(transactionRepository);
+    return load(transactionId);
   }
-  late Command1 load;
 
-  final TransactionRepository _transactionRepository;
+  late TransactionRepository _transactionRepository;
 
-  Transaction? transaction;
-
-  Future<Result<void>> _load(String transactionId) async {
+  Future<Transaction> load(String transactionId) async {
     try {
-      final transactionResult = await _transactionRepository.getTransaction(
+      final result = await _transactionRepository.getTransaction(
           transactionId: transactionId);
-      switch (transactionResult) {
+      switch (result) {
         case Ok():
-          transaction = transactionResult.value;
-          return Result.ok(null);
+          return result.value;
         case Error():
-          return Result.error(transactionResult.error);
+          throw result.error;
       }
-    } finally {
-      notifyListeners();
+    } catch (e) {
+      rethrow;
     }
   }
 }
