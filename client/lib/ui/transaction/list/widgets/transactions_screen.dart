@@ -110,10 +110,10 @@ class TransactionCard extends StatelessWidget {
       onTap: () {
         // print('pressed');
         if (!viewModel.selectedMode) {
-          context.pushNamed(Routes.transactionDetailName, pathParameters: {
-            'clientId': clientId,
-            'transactionId': transaction.id
-          });
+          // context.pushNamed(Routes.transactionDetailName, pathParameters: {
+          //   'clientId': clientId,
+          //   'transactionId': transaction.id
+          // });
         } else {
           // print('selected mode');
           if (viewModel.isSelected(transaction: transaction)) {
@@ -230,13 +230,13 @@ class TransactionCard extends StatelessWidget {
               CustomButtonWidget(
                 buttonText: 'Pay',
                 onPressed: () {
-                  context.pushNamed(
-                    Routes.paymentName,
-                    extra: {
-                      'clientId': clientId,
-                      'transactionId': transaction.id,
-                    } 
-                  );
+                  // context.pushNamed(
+                  //   Routes.paymentName,
+                  //   extra: {
+                  //     'clientId': clientId,
+                  //     'transactionId': transaction.id,
+                  //   } 
+                  // );
                 },
               )
             ],

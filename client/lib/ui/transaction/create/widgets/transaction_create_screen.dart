@@ -5,151 +5,130 @@ import 'package:client/ui/core/ui/delete_button.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/create/widgets/item_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class TransactionCreateScreen extends StatefulWidget {
+class TransactionCreateScreen extends ConsumerWidget {
   const TransactionCreateScreen({
     super.key,
-    required TransactionCreateViewModel this.viewModel,
     required String this.clientId,
     required String this.type,
   });
-  final TransactionCreateViewModel viewModel;
   final String clientId;
   final String type;
 
   @override
-  State<TransactionCreateScreen> createState() =>
-      _TransactionCreateScreenState();
-}
-
-class _TransactionCreateScreenState extends State<TransactionCreateScreen> {
-  @override
-  void initState() {
-    print('init page');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // print("init home...");
-      widget.viewModel.load.execute(widget.clientId);
-    });
-    // set the type
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.viewModel,
-      builder: (context, child) {
-        return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading:
-                widget.viewModel.selectedMode ? false : true,
-            toolbarHeight: 72,
-            surfaceTintColor: AppPallete.background,
-            title: !widget.viewModel.selectedMode ? Text("Transaction") : null,
-            leadingWidth: 82,
-            leading: widget.viewModel.selectedMode
-                ? ClearButton(
-                    clear: widget.viewModel.clearSelectedItems,
-                  )
-                : null,
-            actions: widget.viewModel.selectedMode
-                ? [
-                    DeleteButton(
-                      delete: () =>
-                          widget.viewModel.deleteItems(widget.clientId),
-                    ),
-                    SizedBox(width: 32)
-                  ]
-                : null,
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Column(
-              children: [
-                ...widget.viewModel.items.map(
-                  (item) {
-                    return ItemCard(
-                      item: item,
-                      viewModel: widget.viewModel,
-                      cliendId: widget.clientId,
-                      type: widget.type,
-                    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(transactionCreateViewModel);
+    final selectedMode = ref.watch(isItemSelectedMode);
+    final totalPrice = ref.watch(itemsTotalPrice);
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: selectedMode ? false : true,
+        toolbarHeight: 72,
+        surfaceTintColor: AppPallete.background,
+        title: !selectedMode ? Text("Transaction") : null,
+        leadingWidth: 82,
+        leading: selectedMode
+            ? ClearButton(
+                clear: ref.read(selectedItems.notifier).clearSelectedItems,
+              )
+            : null,
+        actions: selectedMode
+            ? [
+                DeleteButton(
+                  delete: () {
+                    ref.read(transactionCreateViewModel.notifier).deleteItems();
+                    ref.read(selectedItems.notifier).clearSelectedItems();
                   },
-                ).toList(),
-                Spacer(),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      spacing: 12.0,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                SizedBox(width: 32)
+              ]
+            : null,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          children: [
+            ...items.map(
+              (item) {
+                return ItemCard(
+                  item: item,
+                  cliendId: clientId,
+                  type: type,
+                );
+              },
+            ).toList(),
+            Spacer(),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Column(
+                  spacing: 12.0,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Summary"),
+                    // Row(
+                    //   children: [
+                    //     Text("Total Items"),
+                    //     Spacer(),
+                    //     Text(widget.viewModel
+                    //         .getTotalItems(clientId: widget.clientId)
+                    //         .toString()),
+                    //   ],
+                    // ),
+                    Row(
                       children: [
-                        Text("Summary"),
-                        // Row(
-                        //   children: [
-                        //     Text("Total Items"),
-                        //     Spacer(),
-                        //     Text(widget.viewModel
-                        //         .getTotalItems(clientId: widget.clientId)
-                        //         .toString()),
-                        //   ],
-                        // ),
-                        Row(
-                          children: [
-                            Text("Total Price"),
-                            Spacer(),
-                            Text(
-                                '${widget.viewModel.getTotalPrice(clientId: widget.clientId)}\$'),
-                          ],
-                        )
+                        Text("Total Price"),
+                        Spacer(),
+                        Text('${totalPrice}\$'),
                       ],
-                    ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 18.0,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      context.pushNamed(
+                        Routes.itemCreateName,
+                        pathParameters: {'clientId': clientId},
+                        queryParameters: {'type': type},
+                      );
+                    },
+                    child: Text("+ add item"),
                   ),
                 ),
                 SizedBox(
-                  height: 18.0,
+                  width: 18.0,
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () {
-                          context.pushNamed(
-                            Routes.itemCreateName,
-                            pathParameters: {'clientId': widget.clientId},
-                            queryParameters: {'type': widget.type},
-                          );
-                        },
-                        child: Text("+ add item"),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 18.0,
-                    ),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () {
-                          context.pushNamed(
-                            Routes.transactionPaymentName,
-                            pathParameters: {
-                              'clientId': widget.clientId,
-                            },
-                            queryParameters: {
-                              'type': widget.type,
-                            },
-                          );
-                        },
-                        child: Text("pay"),
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      // context.pushNamed(
+                      //   Routes.transactionPaymentName,
+                      //   pathParameters: {
+                      //     'clientId': widget.clientId,
+                      //   },
+                      //   queryParameters: {
+                      //     'type': widget.type,
+                      //   },
+                      // );
+                    },
+                    child: Text("pay"),
+                  ),
                 ),
               ],
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }

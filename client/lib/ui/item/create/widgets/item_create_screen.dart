@@ -4,23 +4,22 @@ import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ItemCreateScreen extends StatefulWidget {
+class ItemCreateScreen extends ConsumerStatefulWidget {
   const ItemCreateScreen({
     super.key,
-    required TransactionCreateViewModel this.viewModel,
     required String this.clientId,
     required String this.type,
   });
-  final TransactionCreateViewModel viewModel;
   final String clientId;
   final String type;
 
   @override
-  State<ItemCreateScreen> createState() => _ItemCreateScreenState();
+  ConsumerState<ItemCreateScreen> createState() => _ItemCreateScreenState();
 }
 
-class _ItemCreateScreenState extends State<ItemCreateScreen> {
+class _ItemCreateScreenState extends ConsumerState<ItemCreateScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
@@ -59,17 +58,18 @@ class _ItemCreateScreenState extends State<ItemCreateScreen> {
               CustomButtonWidget(
                 buttonText: 'Add',
                 onPressed: () {
-                  widget.viewModel.addItem(
-                    clientId: widget.clientId,
-                    name: _nameController.text,
-                    price: double.parse(_priceController.text),
-                    quantity: int.parse(_quantityController.text),
-                  );
-                  context.goNamed(
-                    Routes.transactionCreateName,
-                    pathParameters: {'clientId': widget.clientId},
-                    queryParameters: {'type': widget.type},
-                  );
+                  ref.read(transactionCreateViewModel.notifier).addItem(
+                      name: _nameController.text,
+                      price: double.parse(_priceController.text),
+                      quantity: int.parse(_quantityController.text));
+                  if (context.mounted) {
+                    context.pop();
+                  }
+                  // context.goNamed(
+                  //   Routes.transactionCreateName,
+                  //   pathParameters: {'clientId': widget.clientId},
+                  //   queryParameters: {'type': widget.type},
+                  // );
                 },
               ),
             ],

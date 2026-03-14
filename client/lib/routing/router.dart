@@ -63,6 +63,44 @@ final router = GoRouter(
                 );
               },
             ),
+            GoRoute(
+                name: Routes.transactionCreateName,
+                path: Routes.transactionCreate,
+                builder: (context, state) {
+                  // final extra = state.extra as Map<String, String>;
+                  final clientId = state.pathParameters['clientId']!;
+                  final type = state.uri.queryParameters['type']!;
+                  return TransactionCreateScreen(
+                    clientId: clientId,
+                    type: type,
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    name: Routes.itemCreateName,
+                    path: Routes.itemCreate,
+                    builder: (context, state) {
+                      final clientId = state.pathParameters['clientId']!;
+                      final type = state.uri.queryParameters['type'];
+                      return ItemCreateScreen(
+                        clientId: clientId,
+                        type: type!,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    name: Routes.itemUpdateName,
+                    path: Routes.itemUpdate,
+                    builder: (context, state) {
+                      final clientId = state.pathParameters['clientId']!;
+                      final Item item = state.extra as Item;
+                      return ItemUpdateScreen(
+                        item: item,
+                        clientId: clientId,
+                      );
+                    },
+                  ),
+                ])
             //         GoRoute(
             //           name: Routes.transactionsName,
             //           path: Routes.transactions,
@@ -88,47 +126,9 @@ final router = GoRouter(
             //             ),
             //           ],
             //         ),
-            //         GoRoute(
-            //           name: Routes.transactionCreateName,
-            //           path: Routes.transactionCreate,
-            //           builder: (context, state) {
-            //             // final extra = state.extra as Map<String, String>;
-            //             final clientId = state.pathParameters['clientId']!;
-            //             final type = state.uri.queryParameters['type'];
-            //             // print(type);
-            //             return TransactionCreateScreen(
-            //               viewModel: context.read(),
-            //               clientId: clientId,
-            //               type: type!,
-            //             );
-            //           },
+
             //           routes: [
-            //             GoRoute(
-            //               name: Routes.itemCreateName,
-            //               path: Routes.itemCreate,
-            //               builder: (context, state) {
-            //                 final clientId = state.pathParameters['clientId']!;
-            //                 final type = state.uri.queryParameters['type'];
-            //                 return ItemCreateScreen(
-            //                   viewModel: context.read(),
-            //                   clientId: clientId,
-            //                   type: type!,
-            //                 );
-            //               },
-            //             ),
-            //             GoRoute(
-            //               name: Routes.itemUpdateName,
-            //               path: Routes.itemUpdate,
-            //               builder: (context, state) {
-            //                 final clientId = state.pathParameters['clientId']!;
-            //                 final Item item = state.extra as Item;
-            //                 return ItemUpdateScreen(
-            //                   viewModel: context.read(),
-            //                   item: item,
-            //                   clientId: clientId,
-            //                 );
-            //               },
-            //             ),
+
             //             GoRoute(
             //               name: Routes.transactionPaymentName,
             //               path: Routes.transactionPayment,

@@ -4,58 +4,58 @@ import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class ItemCard extends StatelessWidget {
+class ItemCard extends ConsumerWidget {
   const ItemCard({
     super.key,
     required Item this.item,
-    required this.viewModel,
     required String this.cliendId,
     required String this.type,
   });
   final Item item;
-  final TransactionCreateViewModel viewModel;
   final String cliendId;
   final String type;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final items = ref.watch(transactionCreateViewModel);
+    final selectedMode = ref.watch(isItemSelectedMode);
+    final isSelected = ref.watch(isItemSelected(item));
     return GestureDetector(
       onTap: () {
-        if (!viewModel.selectedMode) {
-          context.goNamed(
+        if (selectedMode) {
+          if (isSelected) {
+            ref.read(selectedItems.notifier).removeSelectedItem(item);
+          } else {
+            ref.read(selectedItems.notifier).addSelectedItem(item);
+          }
+        } else {
+          context.pushNamed(
             Routes.itemUpdateName,
             pathParameters: {'clientId': cliendId},
             extra: item,
             queryParameters: {'type': type},
           );
-        } else {
-          if (viewModel.isSelected(item: item)) {
-            viewModel.removeSelectedItem(item: item);
-          } else {
-            viewModel.addSelectedItem(item: item);
-          }
         }
       },
       onLongPress: () {
-        if (viewModel.isSelected(item: item)) {
-          viewModel.removeSelectedItem(item: item);
+        if (isSelected) {
+          ref.read(selectedItems.notifier).removeSelectedItem(item);
         } else {
-          viewModel.addSelectedItem(item: item);
+          ref.read(selectedItems.notifier).addSelectedItem(item);
         }
       },
       child: Card(
-        color: viewModel.isSelected(item: item)
-            ? AppPallete.selectedBackground
-            : AppPallete.surface,
+        color: isSelected ? AppPallete.selectedBackground : AppPallete.surface,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Row(
             children: [
-              if (viewModel.selectedMode)
+              if (selectedMode)
                 Icon(
-                  viewModel.isSelected(item: item)
+                  isSelected
                       ? Icons.check_box
                       : Icons.check_box_outline_blank_outlined,
                 ),

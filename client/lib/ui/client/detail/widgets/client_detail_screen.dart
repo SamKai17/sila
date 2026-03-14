@@ -91,30 +91,28 @@ class ClientDetailScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: FilledButton(
-                            onPressed: () {
-                              // context.goNamed(
-                              //   Routes.transactionCreateName,
-                              //   pathParameters: {
-                              //     'clientId': client.id
-                              //   },
-                              //   queryParameters: {'type': 'buy'},
-                              // );
-                            },
-                            child: Text('Buy')),
+                          onPressed: () {
+                            context.goNamed(
+                              Routes.transactionCreateName,
+                              pathParameters: {'clientId': client.id},
+                              queryParameters: {'type': 'buy'},
+                            );
+                          },
+                          child: Text('Buy'),
+                        ),
                       ),
                       SizedBox(width: 16),
                       Expanded(
                         child: FilledButton(
-                            onPressed: () {
-                              // context.goNamed(
-                              //   Routes.transactionCreateName,
-                              //   pathParameters: {
-                              //     'clientId': client.id
-                              //   },
-                              //   queryParameters: {'type': 'sell'},
-                              // );
-                            },
-                            child: Text('Sell')),
+                          onPressed: () {
+                            context.goNamed(
+                              Routes.transactionCreateName,
+                              pathParameters: {'clientId': client.id},
+                              queryParameters: {'type': 'sell'},
+                            );
+                          },
+                          child: Text('Sell'),
+                        ),
                       ),
                     ],
                   ),
