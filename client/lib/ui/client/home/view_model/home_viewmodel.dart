@@ -5,7 +5,33 @@ import 'package:client/utils/result.dart';
 import 'package:riverpod/riverpod.dart';
 
 final homeViewModel =
-    AsyncNotifierProvider<HomeViewModel, List<Client>>(HomeViewModel.new);
+    AsyncNotifierProvider<HomeViewModel, void>(HomeViewModel.new);
+
+class HomeViewModel extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {
+    _clientRepository = ref.read(clientRepository);
+  }
+
+  late ClientRepository _clientRepository;
+
+  Future<void> deleteClients() async {
+    try {
+      state = AsyncValue.loading();
+      final selectedClientsList = ref.read(selectedClients);
+      final ids = selectedClientsList.map((client) => client.id).toList();
+      final result = await _clientRepository.deleteClients(ids: ids);
+      switch (result) {
+        case Ok():
+          state = AsyncValue.data(null);
+        case Error():
+          state = AsyncValue.error(result.error, StackTrace.current);
+      }
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+}
 
 final isClientSelected = Provider.family(
   (ref, Client client) {
@@ -16,24 +42,39 @@ final isClientSelected = Provider.family(
 
 final isClientSelectedMode = Provider(
   (ref) {
-    print('re run');
     final _selectedClients = ref.watch(selectedClients);
     return _selectedClients.isNotEmpty;
   },
 );
 
-final filteredClients = Provider.family<AsyncValue<List<Client>>, String>(
-  (ref, String query) {
-    final clientsList = ref.watch(homeViewModel);
+final queryProvider = NotifierProvider<Querying, String>(Querying.new);
+
+class Querying extends Notifier<String> {
+  @override
+  String build() {
+    return '';
+  }
+
+  void addQuery(String newQuery) {
+    state = newQuery;
+  }
+}
+
+final filteredClients = Provider<AsyncValue<List<Client>>>(
+  (ref) {
+    final clientsList = ref.watch(clientsProvider);
+    final _query = ref.watch(queryProvider);
+
     return clientsList.whenData(
       (value) {
-        return value.where((client) => client.name.contains(query)).toList();
+        return value.where((client) => client.name.contains(_query)).toList();
       },
     );
   },
 );
 
-final selectedClients = NotifierProvider<SelectedClients, List<Client>>(SelectedClients.new);
+final selectedClients =
+    NotifierProvider<SelectedClients, List<Client>>(SelectedClients.new);
 
 class SelectedClients extends Notifier<List<Client>> {
   @override
@@ -43,7 +84,6 @@ class SelectedClients extends Notifier<List<Client>> {
 
   void addSelectedClient(Client client) {
     state = [...state, client];
-    print(state);
   }
 
   void removeSelectedClient(Client client) {
@@ -54,40 +94,5 @@ class SelectedClients extends Notifier<List<Client>> {
 
   void clearSelectedClients() {
     state = [];
-  }
-}
-
-class HomeViewModel extends AsyncNotifier<List<Client>> {
-  @override
-  Future<List<Client>> build() {
-    _clientRepository = ref.read(clientRepository);
-    return load();
-  }
-
-  late ClientRepository _clientRepository;
-
-  Future<List<Client>> load() async {
-    final result = await _clientRepository.getClientsList();
-    switch (result) {
-      case Ok():
-        return result.value;
-      case Error():
-        throw result.error;
-    }
-  }
-
-  Future<void> deleteClients() async {
-    try {
-      state = AsyncValue.loading();
-      final selectedClientsList = ref.read(selectedClients);
-      final ids = selectedClientsList.map((client) => client.id).toList();
-      final result = await _clientRepository.deleteClients(ids: ids);
-      switch (result) {
-        case Ok():
-          ref.invalidateSelf();
-        case Error():
-          state = AsyncValue.error(result.error, StackTrace.current);
-      }
-    } finally {}
   }
 }

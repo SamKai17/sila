@@ -1,7 +1,7 @@
-import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
+import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,38 +28,60 @@ class _ClientCreateScreenState extends ConsumerState<ClientCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(clientCreateViewModel).isLoading;
+    ref.listen(
+      clientCreateViewModel,
+      (previous, next) {
+        next.when(
+          data: (data) {
+            if (context.mounted) {
+              context.pop();
+            }
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('an error happened')));
+          },
+          loading: () {},
+        );
+      },
+    );
     return Scaffold(
       appBar: AppBar(title: Text("Client Create")),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
-        child: Form(
-          child: Column(
-            children: [
-              CustomFieldWidget(hintText: 'name', controller: _nameController),
-              SizedBox(height: 32.0),
-              CustomFieldWidget(
-                hintText: 'phone',
-                controller: _phoneController,
+        child: isLoading
+            ? Center(
+                child: LoaderWidget(),
+              )
+            : Form(
+                child: Column(
+                  children: [
+                    CustomFieldWidget(
+                        hintText: 'name', controller: _nameController),
+                    SizedBox(height: 32.0),
+                    CustomFieldWidget(
+                      hintText: 'phone',
+                      controller: _phoneController,
+                    ),
+                    SizedBox(height: 32.0),
+                    CustomFieldWidget(
+                        hintText: 'city', controller: _cityController),
+                    Spacer(),
+                    CustomButtonWidget(
+                        buttonText: 'save',
+                        onPressed: () async {
+                          await ref
+                              .read(clientCreateViewModel.notifier)
+                              .addClient(
+                                name: _nameController.text,
+                                city: _cityController.text,
+                                phone: _phoneController.text,
+                              );
+                        }),
+                  ],
+                ),
               ),
-              SizedBox(height: 32.0),
-              CustomFieldWidget(hintText: 'city', controller: _cityController),
-              Spacer(),
-              CustomButtonWidget(
-                  buttonText: 'save',
-                  onPressed: () async {
-                    await ref.read(clientCreateViewModel.notifier).addClient(
-                          name: _nameController.text,
-                          city: _cityController.text,
-                          phone: _phoneController.text,
-                        );
-                    if (context.mounted) {
-                      // shouldn't be here you should check for loading and error using listen maybe
-                      context.pop();
-                    }
-                  }),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -13,6 +13,7 @@ class ClientDetailScreen extends ConsumerWidget {
   });
 
   final String clientId;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.watch(clientDetailViewModel(clientId));
@@ -23,18 +24,19 @@ class ClientDetailScreen extends ConsumerWidget {
             title: Text("client"),
             actions: [
               IconButton(
-                  onPressed: () {
-                    context.goNamed(
-                      Routes.clientUpdateName,
-                      pathParameters: {'clientId': client.id},
-                      extra: {
-                        'name': client.name,
-                        'phone': client.phone,
-                        'city': client.city
-                      },
-                    );
-                  },
-                  icon: Icon(Icons.edit))
+                onPressed: () {
+                  context.pushNamed(
+                    Routes.clientUpdateName,
+                    pathParameters: {'clientId': client.id},
+                    extra: {
+                      'name': client.name,
+                      'phone': client.phone,
+                      'city': client.city
+                    },
+                  );
+                },
+                icon: Icon(Icons.edit),
+              )
             ],
           ),
           body: Padding(

@@ -1,3 +1,4 @@
+import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
@@ -19,12 +20,51 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String query = '';
+
   @override
   Widget build(BuildContext context) {
-    final viewModel = ref.read(homeViewModel.notifier);
     final selectedMode = ref.watch(isClientSelectedMode);
-    final clients = ref.watch(filteredClients(query));
     final selectedClientsNotifier = ref.read(selectedClients.notifier);
+    // final viewModelNotifier = ref.read(homeViewModel.notifier);
+    final deleteClients = ref.watch(homeViewModel);
+    final clients = ref.watch(filteredClients);
+    final isLoading = clients.isLoading || deleteClients.isLoading;
+
+    ref.listen(
+      filteredClients,
+      (previous, next) {
+        // print('here');
+        next.when(
+          data: (data) {
+            // print('data');
+          },
+          error: (error, stackTrace) {
+            // print('error');
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('an error happened')));
+          },
+          loading: () {
+            // print('loading');
+          },
+        );
+      },
+    );
+
+    ref.listen(
+      homeViewModel,
+      (previous, next) {
+        next.when(
+          data: (data) {
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('an error happened')));
+          },
+          loading: () {
+          },
+        );
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -50,7 +90,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: selectedMode
             ? [
                 DeleteButton(delete: () {
-                  viewModel.deleteClients();
+                  ref.read(homeViewModel.notifier).deleteClients();
                   selectedClientsNotifier.clearSelectedClients();
                 }),
                 SizedBox(width: 32)
@@ -61,37 +101,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: SearchField(
             reload: (String q) {
               setState(() {
-                query = q;
+                ref.read(queryProvider.notifier).addQuery(q);
               });
             },
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 32.0,
-            right: 32,
-            bottom: 24.0,
-          ),
-          child: switch (clients) {
-            AsyncValue(:final value?) => Column(
-                spacing: 16.0,
-                children: value.map(
-                  (client) {
-                    return ClientCard(
-                      client: client,
-                    );
-                  },
-                ).toList()),
-            AsyncValue(error: != null) => const Text('error fetching clients'),
-            AsyncValue() => LoaderWidget(),
-          },
-        ),
-      ),
+      body: isLoading
+          ? Center(
+              child: LoaderWidget(),
+            )
+          : clients.when(
+              data: (data) {
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 32.0,
+                      right: 32,
+                      bottom: 24.0,
+                    ),
+                    child: Column(
+                      spacing: 16.0,
+                      children: data.map(
+                        (client) {
+                          return ClientCard(
+                            // key: key,
+                            client: client,
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ),
+                );
+              },
+              error: (error, stackTrace) {
+                return Center(
+                  child: Text('couldn\'t fetch client'),
+                );
+              },
+              loading: () {},
+            ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'clientCreate',
         onPressed: () {
-          context.goNamed(Routes.clientCreateName);
+          context.pushNamed(Routes.clientCreateName);
         },
         child: Icon(Icons.add),
       ),

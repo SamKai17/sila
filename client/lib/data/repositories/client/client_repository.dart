@@ -4,6 +4,13 @@ import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';
 import 'package:riverpod/riverpod.dart';
 
+final clientsProvider = StreamProvider<List<Client>>(
+  (ref) {
+    final clientsStream = ref.watch(clientRepository).watch();
+    return clientsStream;
+  },
+);
+
 final clientRepository = Provider(
   (ref) {
     return ClientRepository(databaseService: ref.read(databaseService));
@@ -15,12 +22,28 @@ class ClientRepository {
       : _databaseService = databaseService;
   DatabaseService _databaseService;
 
+  final _controller = StreamController<void>.broadcast();
 
-  Future<Result<List<Client>>> getClientsList() async {
+  Stream<List<Client>> watch() async* {
+    yield await getClientsList();
+    await for (var _ in _controller.stream) {
+      yield await getClientsList();
+    }
+  }
+
+  Future<List<Client>> getClientsList() async {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    return _databaseService.getClientsList();
+    // await Future.delayed(Duration(seconds: 2));
+    // throw Exception('error');
+    final result = await _databaseService.getClientsList();
+    switch (result) {
+      case Ok():
+        return result.value;
+      case Error():
+        throw result.error;
+    }
   }
 
   Future<Result<void>> addClient(
@@ -30,15 +53,18 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    return _databaseService.addClient(name: name, phone: phone, city: city);
+    final result =
+        _databaseService.addClient(name: name, phone: phone, city: city);
+    _controller.add(null);
+    return result;
   }
 
-  Future<Result<Client>> getClient(String id) async {
-    if (!_databaseService.isOpen) {
-      await _databaseService.open();
-    }
-    return _databaseService.getClient(id);
-  }
+  // Future<Result<Client>> getClient(String id) async {
+  //   if (!_databaseService.isOpen) {
+  //     await _databaseService.open();
+  //   }
+  //   return _databaseService.getClient(id);
+  // }
 
   Future<Result<void>> updateClient({
     required String id,
@@ -49,8 +75,9 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final result = await _databaseService.updateClient(
+    final result = _databaseService.updateClient(
         id: id, name: name, phone: phone, city: city);
+    _controller.add(null);
     return result;
   }
 
@@ -58,6 +85,8 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    return _databaseService.deleteClients(ids);
+    final result = _databaseService.deleteClients(ids);
+    _controller.add(null);
+    return result;
   }
 }

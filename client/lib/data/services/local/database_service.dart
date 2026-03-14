@@ -8,9 +8,11 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
-final databaseService = Provider((ref) {
-  return DatabaseService();
-},);
+final databaseService = Provider(
+  (ref) {
+    return DatabaseService();
+  },
+);
 
 class DatabaseService {
   static const _clientTable = 'clients';

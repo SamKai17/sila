@@ -87,7 +87,6 @@ class ClientCard extends ConsumerWidget {
           ),
         ),
         onLongPress: () {
-          print("on long pressed");
           if (isSelected) {
             selectedClientsNotifier.removeSelectedClient(client);
           } else {

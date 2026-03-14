@@ -39,146 +39,146 @@ final router = GoRouter(
             return ClientCreateScreen();
           },
         ),
+        GoRoute(
+          name: Routes.clientDetailName,
+          path: Routes.clientDetail,
+          builder: (context, state) {
+            final clientId = state.pathParameters['clientId']!;
+            return ClientDetailScreen(
+              clientId: clientId,
+            );
+          },
+          routes: [
             GoRoute(
-              name: Routes.clientDetailName,
-              path: Routes.clientDetail,
+              name: Routes.clientUpdateName,
+              path: Routes.clientUpdate,
               builder: (context, state) {
                 final clientId = state.pathParameters['clientId']!;
-                return ClientDetailScreen(
+                final values = state.extra as Map<String, String>;
+                return ClientUpdateScreen(
                   clientId: clientId,
+                  name: values['name']!,
+                  phone: values['phone']!,
+                  city: values['city']!,
                 );
               },
-              routes: [
-                GoRoute(
-                  name: Routes.clientUpdateName,
-                  path: Routes.clientUpdate,
-                  builder: (context, state) {
-                    final clientId = state.pathParameters['clientId']!;
-                    final values = state.extra as Map<String, String>;
-                    return ClientUpdateScreen(
-                      clientId: clientId,
-                      name: values['name']!,
-                      phone: values['phone']!,
-                      city: values['city']!,
-                    );
-                  },
-                ),
-        //         GoRoute(
-        //           name: Routes.transactionsName,
-        //           path: Routes.transactions,
-        //           builder: (context, state) {
-        //             final String clientId = state.pathParameters['clientId']!;
-        //             return TransactionsScreen(
-        //                 viewModel: context.read(), clientId: clientId);
-        //           },
-        //           routes: [
-        //             GoRoute(
-        //               name: Routes.transactionDetailName,
-        //               path: Routes.transactionDetail,
-        //               builder: (context, state) {
-        //                 final String transactionId =
-        //                     state.pathParameters['transactionId']!;
-        //                 final String clientId = state.pathParameters['clientId']!;
-        //                 return TransactionDetailScreen(
-        //                   viewModel: context.read(),
-        //                   transactionId: transactionId,
-        //                   clientId: clientId,
-        //                 );
-        //               },
-        //             ),
-        //           ],
-        //         ),
-        //         GoRoute(
-        //           name: Routes.transactionCreateName,
-        //           path: Routes.transactionCreate,
-        //           builder: (context, state) {
-        //             // final extra = state.extra as Map<String, String>;
-        //             final clientId = state.pathParameters['clientId']!;
-        //             final type = state.uri.queryParameters['type'];
-        //             // print(type);
-        //             return TransactionCreateScreen(
-        //               viewModel: context.read(),
-        //               clientId: clientId,
-        //               type: type!,
-        //             );
-        //           },
-        //           routes: [
-        //             GoRoute(
-        //               name: Routes.itemCreateName,
-        //               path: Routes.itemCreate,
-        //               builder: (context, state) {
-        //                 final clientId = state.pathParameters['clientId']!;
-        //                 final type = state.uri.queryParameters['type'];
-        //                 return ItemCreateScreen(
-        //                   viewModel: context.read(),
-        //                   clientId: clientId,
-        //                   type: type!,
-        //                 );
-        //               },
-        //             ),
-        //             GoRoute(
-        //               name: Routes.itemUpdateName,
-        //               path: Routes.itemUpdate,
-        //               builder: (context, state) {
-        //                 final clientId = state.pathParameters['clientId']!;
-        //                 final Item item = state.extra as Item;
-        //                 return ItemUpdateScreen(
-        //                   viewModel: context.read(),
-        //                   item: item,
-        //                   clientId: clientId,
-        //                 );
-        //               },
-        //             ),
-        //             GoRoute(
-        //               name: Routes.transactionPaymentName,
-        //               path: Routes.transactionPayment,
-        //               builder: (context, state) {
-        //                 final clientId = state.pathParameters['clientId']!;
-        //                 final type = state.uri.queryParameters['type']!;
-        //                 return TransactionPaymentScreen(
-        //                   viewModel: context.read(),
-        //                   clientId: clientId,
-        //                   type: type,
-        //                 );
-        //               },
-        //               routes: [
-        //                 GoRoute(
-        //                   name: Routes.transactionPreviewName,
-        //                   path: Routes.transactionPreview,
-        //                   builder: (context, state) {
-        //                     final clientId = state.pathParameters['clientId']!;
-        //                     final type = state.uri.queryParameters['type']!;
-        //                     return TransactionPreviewScreen(
-        //                       viewModel: context.read(),
-        //                       clientId: clientId,
-        //                       type: type,
-        //                     );
-        //                   },
-        //                   routes: [
-        //                     GoRoute(
-        //                       name: Routes.transactionReceiptName,
-        //                       path: Routes.transactionReceipt,
-        //                       builder: (context, state) {
-        //                         final clientId = state.pathParameters['clientId']!;
-        //                         final transactionId =
-        //                             state.pathParameters['transactionId']!;
-        //                         final type = state.uri.queryParameters['type'];
-        //                         return TransactionReceiptScreen(
-        //                           viewModel: context.read(),
-        //                           clientId: clientId,
-        //                           type: type!,
-        //                           transactionId: transactionId,
-        //                         );
-        //                       },
-        //                     ),
-        //                   ],
-        //                 ),
-        //               ],
-        //             ),
-        //           ],
-        //         ),
-        //       ],
-        //     ),
+            ),
+            //         GoRoute(
+            //           name: Routes.transactionsName,
+            //           path: Routes.transactions,
+            //           builder: (context, state) {
+            //             final String clientId = state.pathParameters['clientId']!;
+            //             return TransactionsScreen(
+            //                 viewModel: context.read(), clientId: clientId);
+            //           },
+            //           routes: [
+            //             GoRoute(
+            //               name: Routes.transactionDetailName,
+            //               path: Routes.transactionDetail,
+            //               builder: (context, state) {
+            //                 final String transactionId =
+            //                     state.pathParameters['transactionId']!;
+            //                 final String clientId = state.pathParameters['clientId']!;
+            //                 return TransactionDetailScreen(
+            //                   viewModel: context.read(),
+            //                   transactionId: transactionId,
+            //                   clientId: clientId,
+            //                 );
+            //               },
+            //             ),
+            //           ],
+            //         ),
+            //         GoRoute(
+            //           name: Routes.transactionCreateName,
+            //           path: Routes.transactionCreate,
+            //           builder: (context, state) {
+            //             // final extra = state.extra as Map<String, String>;
+            //             final clientId = state.pathParameters['clientId']!;
+            //             final type = state.uri.queryParameters['type'];
+            //             // print(type);
+            //             return TransactionCreateScreen(
+            //               viewModel: context.read(),
+            //               clientId: clientId,
+            //               type: type!,
+            //             );
+            //           },
+            //           routes: [
+            //             GoRoute(
+            //               name: Routes.itemCreateName,
+            //               path: Routes.itemCreate,
+            //               builder: (context, state) {
+            //                 final clientId = state.pathParameters['clientId']!;
+            //                 final type = state.uri.queryParameters['type'];
+            //                 return ItemCreateScreen(
+            //                   viewModel: context.read(),
+            //                   clientId: clientId,
+            //                   type: type!,
+            //                 );
+            //               },
+            //             ),
+            //             GoRoute(
+            //               name: Routes.itemUpdateName,
+            //               path: Routes.itemUpdate,
+            //               builder: (context, state) {
+            //                 final clientId = state.pathParameters['clientId']!;
+            //                 final Item item = state.extra as Item;
+            //                 return ItemUpdateScreen(
+            //                   viewModel: context.read(),
+            //                   item: item,
+            //                   clientId: clientId,
+            //                 );
+            //               },
+            //             ),
+            //             GoRoute(
+            //               name: Routes.transactionPaymentName,
+            //               path: Routes.transactionPayment,
+            //               builder: (context, state) {
+            //                 final clientId = state.pathParameters['clientId']!;
+            //                 final type = state.uri.queryParameters['type']!;
+            //                 return TransactionPaymentScreen(
+            //                   viewModel: context.read(),
+            //                   clientId: clientId,
+            //                   type: type,
+            //                 );
+            //               },
+            //               routes: [
+            //                 GoRoute(
+            //                   name: Routes.transactionPreviewName,
+            //                   path: Routes.transactionPreview,
+            //                   builder: (context, state) {
+            //                     final clientId = state.pathParameters['clientId']!;
+            //                     final type = state.uri.queryParameters['type']!;
+            //                     return TransactionPreviewScreen(
+            //                       viewModel: context.read(),
+            //                       clientId: clientId,
+            //                       type: type,
+            //                     );
+            //                   },
+            //                   routes: [
+            //                     GoRoute(
+            //                       name: Routes.transactionReceiptName,
+            //                       path: Routes.transactionReceipt,
+            //                       builder: (context, state) {
+            //                         final clientId = state.pathParameters['clientId']!;
+            //                         final transactionId =
+            //                             state.pathParameters['transactionId']!;
+            //                         final type = state.uri.queryParameters['type'];
+            //                         return TransactionReceiptScreen(
+            //                           viewModel: context.read(),
+            //                           clientId: clientId,
+            //                           type: type!,
+            //                           transactionId: transactionId,
+            //                         );
+            //                       },
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ],
+            //             ),
+            //           ],
+            //         ),
+            //       ],
+            //     ),
           ],
         ),
         // GoRoute(

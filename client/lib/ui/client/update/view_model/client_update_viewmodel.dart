@@ -3,7 +3,9 @@ import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:client/utils/result.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final clientUpdateViewModel = AsyncNotifierProvider(ClientUpdateViewModel.new);
+final clientUpdateViewModel =
+    AsyncNotifierProvider<ClientUpdateViewModel, void>(
+        ClientUpdateViewModel.new);
 
 class ClientUpdateViewModel extends AsyncNotifier<void> {
   @override
@@ -33,6 +35,8 @@ class ClientUpdateViewModel extends AsyncNotifier<void> {
         case Error():
           state = AsyncValue.error(result.error, StackTrace.current);
       }
-    } finally {}
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:client/data/repositories/client/client_repository.dart';
-import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/utils/result.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -34,8 +33,8 @@ class ClientCreateViewModel extends AsyncNotifier<void> {
         case Error():
           state = AsyncValue.error(result.error, StackTrace.current);
       }
-    } finally {
-      ref.invalidate(homeViewModel);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 }
