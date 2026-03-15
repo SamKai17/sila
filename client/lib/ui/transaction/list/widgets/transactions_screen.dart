@@ -1,3 +1,4 @@
+import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
@@ -20,7 +21,7 @@ class TransactionsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transactions = ref.watch(transactionsViewModel(clientId));
+    final transactions = ref.watch(transactionsProvider(clientId));
     final selectedMode = ref.watch(isTransactionselectedMode);
     return Scaffold(
       appBar: AppBar(

@@ -4,38 +4,21 @@ import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/utils/result.dart';
 import 'package:riverpod/riverpod.dart';
 
-final transactionsViewModel = AsyncNotifierProvider.family<
-    TransactionsViewModel,
-    List<Transaction>,
-    String>(TransactionsViewModel.new);
+final transactionsViewModel =
+    AsyncNotifierProvider.family<TransactionsViewModel, void, String>(
+        TransactionsViewModel.new);
 
-class TransactionsViewModel extends AsyncNotifier<List<Transaction>> {
+class TransactionsViewModel extends AsyncNotifier<void> {
   TransactionsViewModel(this.clientId);
 
   final String clientId;
 
   @override
-  FutureOr<List<Transaction>> build() {
+  FutureOr<void> build() {
     _transactionRepository = ref.read(transactionRepository);
-    return load(clientId);
   }
 
   late TransactionRepository _transactionRepository;
-
-  Future<List<Transaction>> load(String clientId) async {
-    try {
-      final result =
-          await _transactionRepository.getTransactionsList(clientId: clientId);
-      switch (result) {
-        case Ok():
-          return result.value;
-        case Error():
-          throw result.error;
-      }
-    } catch (e) {
-      rethrow;
-    }
-  }
 
   Future<void> deleteTransactions(String clientId) async {
     try {
@@ -47,7 +30,7 @@ class TransactionsViewModel extends AsyncNotifier<List<Transaction>> {
           transactionsIds: transactionIds);
       switch (result) {
         case Ok():
-          ref.invalidateSelf();
+          state = AsyncValue.data(null);
         case Error():
           state = AsyncValue.error(result.error, StackTrace.current);
       }

@@ -1,9 +1,18 @@
+import 'dart:async';
 import 'package:client/data/services/local/database_service.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final transactionsProvider = StreamProvider.family<List<Transaction>, String>(
+  (ref, clientId) {
+    final clientsStream =
+        ref.watch(transactionRepository).watch(clientId: clientId);
+    return clientsStream;
+  },
+);
 
 final transactionRepository = Provider(
   (ref) {
@@ -16,7 +25,42 @@ class TransactionRepository {
       : _databaseService = databaseService;
 
   final DatabaseService _databaseService;
-  List<Transaction> _transactions = [];
+
+  final _controller = StreamController<void>.broadcast();
+
+  Stream<List<Transaction>> watch({required String clientId}) async* {
+    yield await getTransactionsList(clientId: clientId);
+    await for (var _ in _controller.stream) {
+      yield await getTransactionsList(clientId: clientId);
+    }
+  }
+
+  Future<List<Transaction>> getTransactionsList(
+      {required String clientId}) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    final transactions =
+        await _databaseService.getTransactionsList(clientId: clientId);
+    switch (transactions) {
+      case Ok():
+        return transactions.value
+            .map(
+              (transaction) => Transaction(
+                id: transaction.id,
+                totalPrice: transaction.totalPrice,
+                remainder: transaction.remainder,
+                totalPaid: transaction.totalPaid,
+                type: transaction.type,
+                timeOfTransaction: transaction.timeOfTransaction,
+                clientId: transaction.clientId,
+              ),
+            )
+            .toList();
+      case Error():
+        throw transactions.error;
+    }
+  }
 
   Future<Result<void>> addPayment({
     required double amount,
@@ -49,7 +93,7 @@ class TransactionRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    return _databaseService.addTransaction(
+    final result = _databaseService.addTransaction(
       clientId: clientId,
       paid: paid,
       remainder: remainder,
@@ -59,6 +103,8 @@ class TransactionRepository {
       totalPrice: totalPrice,
       items: items,
     );
+    _controller.add(null);
+    return result;
   }
 
   Future<Result<void>> deleteTransactions(
@@ -66,36 +112,10 @@ class TransactionRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    return _databaseService.deleteTransactions(
-        transactionsIds: transactionsIds);
-  }
-
-  Future<Result<List<Transaction>>> getTransactionsList(
-      {required String clientId}) async {
-    if (!_databaseService.isOpen) {
-      await _databaseService.open();
-    }
-    final transactions =
-        await _databaseService.getTransactionsList(clientId: clientId);
-    switch (transactions) {
-      case Ok():
-        _transactions = transactions.value
-            .map(
-              (transaction) => Transaction(
-                id: transaction.id,
-                totalPrice: transaction.totalPrice,
-                remainder: transaction.remainder,
-                totalPaid: transaction.totalPaid,
-                type: transaction.type,
-                timeOfTransaction: transaction.timeOfTransaction,
-                clientId: transaction.clientId,
-              ),
-            )
-            .toList();
-      case Error():
-        return Result.error(transactions.error);
-    }
-    return Result.ok(_transactions);
+    _controller.add(null);
+    final result =
+        _databaseService.deleteTransactions(transactionsIds: transactionsIds);
+    return result;
   }
 
   Future<Result<Transaction>> getTransaction({
