@@ -4,41 +4,29 @@ import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class TransactionDetailScreen extends StatefulWidget {
+class TransactionDetailScreen extends ConsumerWidget {
   const TransactionDetailScreen({
     super.key,
-    required TransactionDetailViewModel this.viewModel,
     required String this.transactionId,
     required String this.clientId,
   });
 
-  final TransactionDetailViewModel viewModel;
   final String transactionId;
   final String clientId;
 
   @override
-  State<TransactionDetailScreen> createState() =>
-      _TransactionDetailScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transactionAsync =
+        ref.watch(transactionDetailViewModel(transactionId));
 
-class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.viewModel.load.execute(widget.transactionId);
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: ListenableBuilder(
-        builder: (context, child) {
+      body: transactionAsync.when(
+        data: (transaction) {
           return Padding(
             padding: const EdgeInsets.all(20.0),
             child: SingleChildScrollView(
@@ -56,15 +44,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       Expanded(
                         child: InfoCard(
                           title: 'Total',
-                          value:
-                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPrice : null}\$',
+                          value: '\$${transaction.totalPrice}',
                         ),
                       ),
                       Expanded(
                         child: InfoCard(
                           title: 'Remainder',
-                          value:
-                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.remainder : null}\$',
+                          value: '\$${transaction.remainder}',
                         ),
                       ),
                     ],
@@ -76,15 +62,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       Expanded(
                         child: InfoCard(
                           title: 'Paid',
-                          value:
-                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.totalPaid : null}\$',
+                          value: '\$${transaction.totalPaid}',
                         ),
                       ),
                       Expanded(
                         child: InfoCard(
                           title: 'Date',
                           value:
-                              '${widget.viewModel.transaction != null ? DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(widget.viewModel.transaction!.timeOfTransaction)) : null}',
+                              '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction))}',
                         ),
                       ),
                     ],
@@ -102,8 +87,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       Expanded(
                         child: InfoCard(
                           title: 'Type',
-                          value:
-                              '${widget.viewModel.transaction != null ? widget.viewModel.transaction!.type : null}',
+                          value: transaction.type,
                         ),
                       ),
                     ],
@@ -117,10 +101,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: ItemsTable(
-                          items: widget.viewModel.transaction != null
-                              ? widget.viewModel.transaction!.items ?? []
-                              : []),
+                      child: ItemsTable(items: transaction.items ?? []),
                     ),
                   ),
                   SizedBox(height: 32.0),
@@ -129,31 +110,30 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     style: TextStyle(fontSize: 20),
                   ),
                   SizedBox(height: 24.0),
-                  if (widget.viewModel.transaction != null)
-                    if (widget.viewModel.transaction!.payments != null)
-                      ...widget.viewModel.transaction!.payments!.map(
-                        (payment) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10.0),
-                            child: InformationCard(information: {
-                              'Payment Date':
-                                  '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(payment.timeOfPayment))}',
-                              'Paid': '${payment.amount}\$'
-                            }),
-                          );
-                        },
-                      ).toList(),
+                  if (transaction.payments != null)
+                    ...transaction.payments!.map(
+                      (payment) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: InformationCard(information: {
+                            'Payment Date':
+                                '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(payment.timeOfPayment))}',
+                            'Paid': '${payment.amount}\$'
+                          }),
+                        );
+                      },
+                    ).toList(),
                   SizedBox(height: 32.0),
                   CustomButtonWidget(
                     buttonText: 'Pay',
                     onPressed: () {
-                      context.pushNamed(
-                        Routes.paymentName,
-                        extra: {
-                          'clientId': widget.clientId,
-                          'transactionId': widget.viewModel.transaction!.id,
-                        },
-                      );
+                      // context.pushNamed(
+                      //   Routes.paymentName,
+                      //   extra: {
+                      //     'clientId': clientId,
+                      //     'transactionId': widget.viewModel.transaction!.id,
+                      //   },
+                      // );
                     },
                   )
                 ],
@@ -161,7 +141,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             ),
           );
         },
-        listenable: widget.viewModel,
+        error: (error, stackTrace) {},
+        loading: () {},
       ),
     );
   }

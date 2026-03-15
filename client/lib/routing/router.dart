@@ -113,62 +113,42 @@ final router = GoRouter(
                     },
                     routes: [
                       GoRoute(
-                        name: Routes.transactionPreviewName,
-                        path: Routes.transactionPreview,
-                        builder: (context, state) {
-                          final clientId = state.pathParameters['clientId']!;
-                          final type = state.uri.queryParameters['type']!;
-                          final paid = state.extra as double;
-                          return TransactionPreviewScreen(
-                            clientId: clientId,
-                            type: type,
-                            paid: paid,
-                          );
-                        },
-                        routes: [
-                                GoRoute(
-                                  name: Routes.transactionReceiptName,
-                                  path: Routes.transactionReceipt,
-                                  builder: (context, state) {
-                                    final clientId = state.pathParameters['clientId']!;
-                                    final transactionId =
-                                        state.pathParameters['transactionId']!;
-                                    final type = state.uri.queryParameters['type'];
-                                    return TransactionReceiptScreen(
-                                      clientId: clientId,
-                                      type: type!,
-                                      transactionId: transactionId,
-                                    );
-                                  },
-                                ),
-                        ]
-                      ),
+                          name: Routes.transactionPreviewName,
+                          path: Routes.transactionPreview,
+                          builder: (context, state) {
+                            final clientId = state.pathParameters['clientId']!;
+                            final type = state.uri.queryParameters['type']!;
+                            final paid = state.extra as double;
+                            return TransactionPreviewScreen(
+                              clientId: clientId,
+                              type: type,
+                              paid: paid,
+                            );
+                          },
+                          routes: [
+                            GoRoute(
+                              name: Routes.transactionReceiptName,
+                              path: Routes.transactionReceipt,
+                              builder: (context, state) {
+                                final clientId =
+                                    state.pathParameters['clientId']!;
+                                final transactionId =
+                                    state.pathParameters['transactionId']!;
+                                final type = state.uri.queryParameters['type'];
+                                return TransactionReceiptScreen(
+                                  clientId: clientId,
+                                  type: type!,
+                                  transactionId: transactionId,
+                                );
+                              },
+                            ),
+                          ]),
                     ]),
               ],
             ),
-            //         GoRoute(
-            //           name: Routes.transactionsName,
-            //           path: Routes.transactions,
-            //           builder: (context, state) {
-            //             final String clientId = state.pathParameters['clientId']!;
-            //             return TransactionsScreen(
-            //                 viewModel: context.read(), clientId: clientId);
-            //           },
+
             //           routes: [
-            //             GoRoute(
-            //               name: Routes.transactionDetailName,
-            //               path: Routes.transactionDetail,
-            //               builder: (context, state) {
-            //                 final String transactionId =
-            //                     state.pathParameters['transactionId']!;
-            //                 final String clientId = state.pathParameters['clientId']!;
-            //                 return TransactionDetailScreen(
-            //                   viewModel: context.read(),
-            //                   transactionId: transactionId,
-            //                   clientId: clientId,
-            //                 );
-            //               },
-            //             ),
+
             //           ],
             //         ),
 
@@ -186,6 +166,28 @@ final router = GoRouter(
             //         ),
             //       ],
             //     ),
+            GoRoute(
+                name: Routes.transactionsName,
+                path: Routes.transactions,
+                builder: (context, state) {
+                  final String clientId = state.pathParameters['clientId']!;
+                  return TransactionsScreen(clientId: clientId);
+                },
+                routes: [
+                  GoRoute(
+                    name: Routes.transactionDetailName,
+                    path: Routes.transactionDetail,
+                    builder: (context, state) {
+                      final String transactionId =
+                          state.pathParameters['transactionId']!;
+                      final String clientId = state.pathParameters['clientId']!;
+                      return TransactionDetailScreen(
+                        transactionId: transactionId,
+                        clientId: clientId,
+                      );
+                    },
+                  ),
+                ]),
           ],
         ),
         // GoRoute(

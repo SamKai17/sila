@@ -75,10 +75,10 @@ class ClientDetailScreen extends ConsumerWidget {
                   SizedBox(height: 32),
                   GestureDetector(
                     onTap: () {
-                      // context.goNamed(
-                      //   Routes.transactionsName,
-                      //   pathParameters: {'clientId': client!.id},
-                      // );
+                      context.pushNamed(
+                        Routes.transactionsName,
+                        pathParameters: {'clientId': client.id},
+                      );
                     },
                     child: SizedBox(
                       height: 70.0,

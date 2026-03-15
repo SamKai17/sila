@@ -4,96 +4,93 @@ import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/delete_button.dart';
+import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:client/ui/transaction/list/view_model/transactions_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class TransactionsScreen extends StatefulWidget {
+class TransactionsScreen extends ConsumerWidget {
   const TransactionsScreen({
     super.key,
-    required TransactionsViewModel this.viewModel,
     required String this.clientId,
   });
-  final TransactionsViewModel viewModel;
   final String clientId;
 
   @override
-  State<TransactionsScreen> createState() => _TransactionsScreenState();
-}
-
-class _TransactionsScreenState extends State<TransactionsScreen> {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.viewModel.load.execute(widget.clientId);
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.viewModel,
-      builder: (context, child) {
-        final transactions = widget.viewModel.transactions;
-        return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading:
-                widget.viewModel.selectedMode ? false : true,
-            toolbarHeight: 72,
-            surfaceTintColor: AppPallete.background,
-            title: !widget.viewModel.selectedMode ? Text("Transaction") : null,
-            leadingWidth: 82,
-            leading: widget.viewModel.selectedMode
-                ? ClearButton(
-                    clear: widget.viewModel.clearSelectedTransactions,
-                  )
-                : null,
-            actions: widget.viewModel.selectedMode
-                ? [
-                    DeleteButton(
-                      delete: () =>
-                          widget.viewModel.deleteTransactions(widget.clientId),
-                    ),
-                    SizedBox(width: 32)
-                  ]
-                : null,
-          ),
-          body: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transactions = ref.watch(transactionsViewModel(clientId));
+    final selectedMode = ref.watch(isTransactionselectedMode);
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: selectedMode ? false : true,
+        toolbarHeight: 72,
+        surfaceTintColor: AppPallete.background,
+        title: !selectedMode ? Text("Transaction") : null,
+        leadingWidth: 82,
+        leading: selectedMode
+            ? ClearButton(
+                clear: ref
+                    .read(selectedTransactions.notifier)
+                    .clearSelectedTransactions,
+              )
+            : null,
+        actions: selectedMode
+            ? [
+                DeleteButton(delete: () async {
+                  await ref
+                      .read(transactionsViewModel(clientId).notifier)
+                      .deleteTransactions(clientId);
+                  ref
+                      .read(selectedTransactions.notifier)
+                      .clearSelectedTransactions();
+                }),
+                SizedBox(width: 32)
+              ]
+            : null,
+      ),
+      body: transactions.when(
+        data: (data) {
+          return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(18.0),
               child: Column(
-                // crossAxisAlignment: CrossAxisAlignment.center,
                 spacing: 16.0,
-                children: transactions.map(
+                children: data.map(
                   (transaction) {
                     return TransactionCard(
                       transaction: transaction,
-                      viewModel: widget.viewModel,
-                      clientId: widget.clientId,
+                      clientId: clientId,
                     );
                   },
                 ).toList(),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+        error: (error, stackTrace) {
+          return Center(
+            child: Text('no transactions found'),
+          );
+        },
+        loading: () {
+          return Center(
+            child: LoaderWidget(),
+          );
+        },
+      ),
     );
   }
 }
 
-class TransactionCard extends StatelessWidget {
+class TransactionCard extends ConsumerWidget {
   const TransactionCard({
     super.key,
     required Transaction this.transaction,
-    required TransactionsViewModel this.viewModel,
     required String this.clientId,
   });
   final Transaction transaction;
-  final TransactionsViewModel viewModel;
   final String clientId;
 
   int getPercentage({
@@ -101,41 +98,47 @@ class TransactionCard extends StatelessWidget {
     required double totalPaid,
   }) {
     double result = (totalPaid * 100) / total;
+    if (result > 100) result = 100;
     return result.toInt();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedMode = ref.watch(isTransactionselectedMode);
+    final isSelected = ref.watch(isTransactionSelected(transaction));
+
     return GestureDetector(
       onTap: () {
-        // print('pressed');
-        if (!viewModel.selectedMode) {
-          // context.pushNamed(Routes.transactionDetailName, pathParameters: {
-          //   'clientId': clientId,
-          //   'transactionId': transaction.id
-          // });
+        if (!selectedMode) {
+          context.pushNamed(Routes.transactionDetailName, pathParameters: {
+            'clientId': clientId,
+            'transactionId': transaction.id
+          });
         } else {
-          // print('selected mode');
-          if (viewModel.isSelected(transaction: transaction)) {
-            // print('remove selected item');
-            viewModel.removeSelectedTransaction(transaction: transaction);
+          if (isSelected) {
+            ref
+                .read(selectedTransactions.notifier)
+                .removeSelectedTransaction(transaction);
           } else {
-            viewModel.addSelectedTransaction(transaction: transaction);
+            ref
+                .read(selectedTransactions.notifier)
+                .addSelectedTransaction(transaction);
           }
         }
       },
       onLongPress: () {
-        // print('long press');
-        if (viewModel.isSelected(transaction: transaction)) {
-          viewModel.removeSelectedTransaction(transaction: transaction);
+        if (isSelected) {
+          ref
+              .read(selectedTransactions.notifier)
+              .removeSelectedTransaction(transaction);
         } else {
-          viewModel.addSelectedTransaction(transaction: transaction);
+          ref
+              .read(selectedTransactions.notifier)
+              .addSelectedTransaction(transaction);
         }
       },
       child: Card(
-        color: viewModel.isSelected(transaction: transaction)
-            ? AppPallete.selectedBackground
-            : AppPallete.surface,
+        color: isSelected ? AppPallete.selectedBackground : AppPallete.surface,
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Column(
@@ -149,9 +152,9 @@ class TransactionCard extends StatelessWidget {
                     style: TextStyle(fontSize: 24.0),
                   ),
                   Spacer(),
-                  if (viewModel.selectedMode)
+                  if (selectedMode)
                     Icon(
-                      viewModel.isSelected(transaction: transaction)
+                      isSelected
                           ? Icons.check_box
                           : Icons.check_box_outline_blank_outlined,
                     ),
@@ -185,8 +188,9 @@ class TransactionCard extends StatelessWidget {
                   ),
                   FractionallySizedBox(
                     widthFactor: getPercentage(
-                            total: transaction.totalPrice,
-                            totalPaid: transaction.totalPaid) /
+                          total: transaction.totalPrice,
+                          totalPaid: transaction.totalPaid,
+                        ) /
                         100,
                     child: Container(
                       height: 10,
@@ -235,7 +239,7 @@ class TransactionCard extends StatelessWidget {
                   //   extra: {
                   //     'clientId': clientId,
                   //     'transactionId': transaction.id,
-                  //   } 
+                  //   }
                   // );
                 },
               )

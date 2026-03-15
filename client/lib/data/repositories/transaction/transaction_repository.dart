@@ -138,7 +138,6 @@ class TransactionRepository {
           items: items,
           payments: payments,
         );
-        // print('tran: $transaction');
         return Result.ok(transaction);
       case Error():
         return Result.error(transactionResult.error);

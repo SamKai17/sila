@@ -1,75 +1,97 @@
-import 'dart:collection';
-
+import 'dart:async';
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
-import 'package:client/utils/command.dart';
 import 'package:client/utils/result.dart';
-import 'package:flutter/material.dart';
+import 'package:riverpod/riverpod.dart';
 
-class TransactionsViewModel extends ChangeNotifier {
-  TransactionsViewModel({required TransactionRepository transactionRepository})
-      : _transactionRepository = transactionRepository {
-    load = Command1<void, String>(_load);
+final transactionsViewModel = AsyncNotifierProvider.family<
+    TransactionsViewModel,
+    List<Transaction>,
+    String>(TransactionsViewModel.new);
+
+class TransactionsViewModel extends AsyncNotifier<List<Transaction>> {
+  TransactionsViewModel(this.clientId);
+
+  final String clientId;
+
+  @override
+  FutureOr<List<Transaction>> build() {
+    _transactionRepository = ref.read(transactionRepository);
+    return load(clientId);
   }
 
-  final TransactionRepository _transactionRepository;
+  late TransactionRepository _transactionRepository;
 
-  late Command1 load;
-
-  List<Transaction> _transactions = [];
-
-  UnmodifiableListView<Transaction> get transactions =>
-      UnmodifiableListView(_transactions);
-
-  Future<Result<void>> _load(String clientId) async {
+  Future<List<Transaction>> load(String clientId) async {
     try {
       final result =
           await _transactionRepository.getTransactionsList(clientId: clientId);
       switch (result) {
         case Ok():
-          _transactions = result.value;
-          return Result.ok(null);
+          return result.value;
         case Error():
-          return Result.error(result.error);
+          throw result.error;
       }
-    } finally {
-      notifyListeners();
+    } catch (e) {
+      rethrow;
     }
   }
 
-  List<Transaction> _selectedTransactions = [];
-
   Future<void> deleteTransactions(String clientId) async {
-    // you should probably load the items again instead of doing it yourself
-    // _transactions = _selectedTransactions
-    //     .where((transaction) => !_selectedTransactions.contains(transaction))
-    //     .toList();
-    List<String> transactionIds =
-        _selectedTransactions.map((e) => e.id).toList();
-    _transactionRepository.deleteTransactions(transactionsIds: transactionIds);
-    _selectedTransactions.clear();
-    _load(clientId);
-    // notifyListeners();
+    try {
+      state = AsyncValue.loading();
+      final _selectedTransactions = ref.read(selectedTransactions);
+      List<String> transactionIds =
+          _selectedTransactions.map((e) => e.id).toList();
+      final result = await _transactionRepository.deleteTransactions(
+          transactionsIds: transactionIds);
+      switch (result) {
+        case Ok():
+          ref.invalidateSelf();
+        case Error():
+          state = AsyncValue.error(result.error, StackTrace.current);
+      }
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+}
+
+final isTransactionSelected = Provider.family(
+  (ref, Transaction transaction) {
+    final _selectedTransactions = ref.watch(selectedTransactions);
+    return _selectedTransactions.contains(transaction);
+  },
+);
+
+final isTransactionselectedMode = Provider(
+  (ref) {
+    final _selectedTransactions = ref.watch(selectedTransactions);
+    return _selectedTransactions.isNotEmpty;
+  },
+);
+
+final selectedTransactions =
+    NotifierProvider<SelectedTransactions, List<Transaction>>(
+        SelectedTransactions.new);
+
+class SelectedTransactions extends Notifier<List<Transaction>> {
+  @override
+  List<Transaction> build() {
+    return [];
   }
 
-  void addSelectedTransaction({required Transaction transaction}) {
-    _selectedTransactions.add(transaction);
-    notifyListeners();
+  void addSelectedTransaction(Transaction transaction) {
+    state = [...state, transaction];
   }
 
-  void removeSelectedTransaction({required Transaction transaction}) {
-    _selectedTransactions.remove(transaction);
-    notifyListeners();
+  void removeSelectedTransaction(Transaction transaction) {
+    final newList = [...state];
+    newList.remove(transaction);
+    state = newList;
   }
 
   void clearSelectedTransactions() {
-    _selectedTransactions.clear();
-    notifyListeners();
+    state = [];
   }
-
-  bool isSelected({required Transaction transaction}) {
-    return _selectedTransactions.contains(transaction);
-  }
-
-  bool get selectedMode => !_selectedTransactions.isEmpty;
 }
