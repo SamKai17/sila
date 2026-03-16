@@ -235,13 +235,13 @@ class TransactionCard extends ConsumerWidget {
               CustomButtonWidget(
                 buttonText: 'Pay',
                 onPressed: () {
-                  // context.pushNamed(
-                  //   Routes.paymentName,
-                  //   extra: {
-                  //     'clientId': clientId,
-                  //     'transactionId': transaction.id,
-                  //   }
-                  // );
+                  context.pushNamed(
+                    Routes.paymentName,
+                    queryParameters: {
+                      'clientId': clientId,
+                      'transactionId': transaction.id,
+                    },
+                  );
                 },
               )
             ],

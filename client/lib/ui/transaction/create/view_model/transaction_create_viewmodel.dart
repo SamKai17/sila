@@ -13,10 +13,6 @@ final itemsTotalPrice = Provider.family<double, String>(
   },
 );
 
-// final transactionDraft = Provider.family((ref, clientId) {
-  
-// },);
-
 final transactionCreateViewModel =
     NotifierProvider.family<TransactionCreateViewModel, List<Item>, String>((clientId) {
       return TransactionCreateViewModel();

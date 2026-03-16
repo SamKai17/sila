@@ -1,3 +1,4 @@
+import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
@@ -20,8 +21,7 @@ class TransactionDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transactionAsync =
-        ref.watch(transactionDetailViewModel(transactionId));
+    final transactionAsync = ref.watch(transactionProvider(transactionId));
 
     return Scaffold(
       appBar: AppBar(),
@@ -127,13 +127,13 @@ class TransactionDetailScreen extends ConsumerWidget {
                   CustomButtonWidget(
                     buttonText: 'Pay',
                     onPressed: () {
-                      // context.pushNamed(
-                      //   Routes.paymentName,
-                      //   extra: {
-                      //     'clientId': clientId,
-                      //     'transactionId': widget.viewModel.transaction!.id,
-                      //   },
-                      // );
+                      context.pushNamed(
+                        Routes.paymentName,
+                        queryParameters: {
+                          'clientId': clientId,
+                          'transactionId': transaction.id,
+                        },
+                      );
                     },
                   )
                 ],

@@ -1,3 +1,4 @@
+import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
@@ -23,7 +24,7 @@ class TransactionReceiptScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionAsync =
-        ref.watch(transactionReceiptViewModel(transactionId));
+        ref.watch(transactionProvider(transactionId));
     return transactionAsync.when(
       data: (transaction) {
         return Scaffold(
@@ -92,7 +93,7 @@ class TransactionReceiptScreen extends ConsumerWidget {
                           InformationCard(information: {
                             'Payment Date':
                                 '${DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction)}',
-                            'Paid': '${transaction.totalPaid}\$',
+                            'Paid': '${transaction.payments?.last.amount}\$',
                           }),
                           SizedBox(height: 32.0),
                           Text(
@@ -119,6 +120,9 @@ class TransactionReceiptScreen extends ConsumerWidget {
                 CustomButtonWidget(
                   buttonText: 'View Transaction',
                   onPressed: () {
+                    ref
+                        .read(transactionCreateViewModel(clientId).notifier)
+                        .clear();
                     context.goNamed(Routes.transactionDetailName,
                         pathParameters: {
                           'clientId': clientId,

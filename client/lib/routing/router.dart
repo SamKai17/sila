@@ -1,13 +1,8 @@
 import 'package:client/domain/models/item/item.dart';
-import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
-import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
 import 'package:client/ui/client/create/widgets/client_create_screen.dart';
-import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/client/detail/widgets/client_detail_screen.dart';
-import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/client/home/widgets/home_screen.dart';
-import 'package:client/ui/client/update/view_model/client_update_viewmodel.dart';
 import 'package:client/ui/client/update/widgets/client_update_screen.dart';
 import 'package:client/ui/item/create/widgets/item_create_screen.dart';
 import 'package:client/ui/item/update/widgets/item_update_screen.dart';
@@ -146,26 +141,6 @@ final router = GoRouter(
                     ]),
               ],
             ),
-
-            //           routes: [
-
-            //           ],
-            //         ),
-
-            //           routes: [
-
-            //               routes: [
-
-            //                   routes: [
-
-            //                   ],
-            //                 ),
-            //               ],
-            //             ),
-            //           ],
-            //         ),
-            //       ],
-            //     ),
             GoRoute(
                 name: Routes.transactionsName,
                 path: Routes.transactions,
@@ -190,36 +165,7 @@ final router = GoRouter(
                 ]),
           ],
         ),
-        // GoRoute(
-        //   name: Routes.paymentName,
-        //   path: Routes.payment,
-        //   builder: (context, state) {
-        //             final extra = state.extra as Map<String, Object>;
-        //     final transactionId = extra['transactionId'] as String;
-        //     final clientId = extra['clientId'] as String;
-        //     return PaymentScreen(
-        //       viewModel: context.read(),
-        //       transactionId: transactionId,
-        //       clientId: clientId
-        //     );
-        //   },
-        //   routes: [
-        //     GoRoute(
-        //       name: Routes.paymentPreviewName,
-        //       path: Routes.paymentPreview,
-        //       builder: (context, state) {
-        //         final extra = state.extra as Map<String, Object>;
-        //         final amount = extra['amount'] as double;
-        //         final transaction = extra['transaction'] as Transaction;
-        //         final clientId = extra['clientId'] as String;
-        //         return PaymentPreviewScreen(
-        //           viewModel: context.read(),
-        //           transaction: transaction,
-        //           amount: amount,
-        //           clientId: clientId
-        //         );
-        //       },
-        //       routes: [
+
         //         GoRoute(
         //           name: Routes.paymentReceiptName,
         //           path: Routes.paymentReceipt,
@@ -234,9 +180,35 @@ final router = GoRouter(
         //             );
         //           },
         //         ),
-        //       ],
-        //     ),
       ],
+    ),
+    GoRoute(
+      name: Routes.paymentName,
+      path: Routes.payment,
+      builder: (context, state) {
+        final transactionId = state.uri.queryParameters['transactionId'] as String;
+        final clientId = state.uri.queryParameters['clientId'] as String;
+        return PaymentScreen(
+          transactionId: transactionId,
+          clientId: clientId,
+        );
+      },
+      routes: [
+            GoRoute(
+              name: Routes.paymentPreviewName,
+              path: Routes.paymentPreview,
+              builder: (context, state) {
+                final paid = state.extra as double;
+                final transactionId = state.uri.queryParameters['transactionId'] as String;
+                final clientId = state.uri.queryParameters['clientId'] as String;
+                return PaymentPreviewScreen(
+                  transactionId: transactionId,
+                  paid: paid,
+                  clientId: clientId
+                );
+              },
+            ),
+      ]
     )
   ],
 );

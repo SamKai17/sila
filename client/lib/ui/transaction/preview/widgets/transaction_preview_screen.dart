@@ -24,6 +24,16 @@ class TransactionPreviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     double totalPrice = ref.watch(itemsTotalPrice(clientId));
     List<Item> items = ref.watch(transactionCreateViewModel(clientId));
+    ref.listen(
+      transactionPreviewViewModel,
+      (previous, next) {
+        next.when(
+          data: (data) {},
+          error: (error, stackTrace) {},
+          loading: () {},
+        );
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(

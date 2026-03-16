@@ -1,31 +1,40 @@
+import 'dart:async';
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
-import 'package:client/utils/command.dart';
 import 'package:client/utils/result.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PaymentPreviewViewModel extends ChangeNotifier {
-  PaymentPreviewViewModel({
-    required TransactionRepository transactionRepository,
-  }) : _transactionRepository = transactionRepository {
-    addPayment = Command1<void, Map<String, Object>>(_addPayment);
+final paymentPreviewViewModel =
+    AsyncNotifierProvider<PaymentPreviewViewModel, void>(
+        PaymentPreviewViewModel.new);
+
+class PaymentPreviewViewModel extends AsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {
+    _transactionRepository = ref.read(transactionRepository);
+    throw UnimplementedError();
   }
 
-  final TransactionRepository _transactionRepository;
-  late Command1 addPayment;
-  Future<Result<void>> _addPayment(Map<String, Object> values) async {
+  late TransactionRepository _transactionRepository;
+
+  Future<void> addPayment({
+    required double paid,
+    required Transaction transaction,
+  }) async {
     try {
+      state = AsyncValue.loading();
       final result = await _transactionRepository.addPayment(
-          amount: values['amount'] as double,
-          transaction: values['transaction'] as Transaction);
+        amount: paid,
+        transaction: transaction,
+      );
       switch (result) {
         case Ok():
-          return Result.ok(null);
+          state = AsyncValue.data(null);
         case Error():
-          return Result.error(result.error);
+          state = AsyncValue.error(result.error, StackTrace.current);
       }
-    } finally {
-      notifyListeners();
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 }

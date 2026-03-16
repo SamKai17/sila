@@ -1,34 +1,28 @@
+import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
+import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:client/ui/payment/payment/view_model/payment_viewmodel.dart';
+import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class PaymentScreen extends StatefulWidget {
+class PaymentScreen extends ConsumerStatefulWidget {
   const PaymentScreen({
     super.key,
-    required PaymentViewModel this.viewModel,
     required String this.transactionId,
     required String this.clientId,
   });
-  final PaymentViewModel viewModel;
   final String clientId;
   final String transactionId;
 
   @override
-  State<PaymentScreen> createState() => _PaymentScreenState();
+  ConsumerState<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-class _PaymentScreenState extends State<PaymentScreen> {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.viewModel.load.execute(widget.transactionId);
-    });
-    super.initState();
-  }
-
+class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   String value = '';
 
   void updateValue(String newValue) {
@@ -52,17 +46,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.viewModel,
-      builder: (context, child) {
-        return Scaffold(
-          appBar: AppBar(),
-          body: Padding(
+    final transactionAsync =
+        ref.watch(transactionProvider(widget.transactionId));
+    return Scaffold(
+      appBar: AppBar(),
+      body: transactionAsync.when(
+        data: (transaction) {
+          return Padding(
             padding: const EdgeInsets.all(18.0),
             child: Column(
               children: [
                 Text(
-                  '${widget.viewModel.transaction?.remainder}\$',
+                  '\$${transaction.remainder}',
                   style: TextStyle(
                     fontSize: 36.0,
                     fontWeight: FontWeight.w500,
@@ -79,7 +74,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 Container(
                   height: 550.0,
-                  // color: Colors.amber,
                   child: GridView.count(
                     crossAxisCount: 3,
                     mainAxisSpacing: 35.0,
@@ -144,19 +138,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     double paid = double.parse(value.isEmpty ? '0' : value);
                     context.pushNamed(
                       Routes.paymentPreviewName,
-                      extra: {
-                        'amount': paid,
-                        'transaction': widget.viewModel.transaction!,
+                      queryParameters: {
                         'clientId': widget.clientId,
+                        'transactionId': widget.transactionId,
                       },
+                      extra: paid,
                     );
                   },
                 ),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+        error: (error, stackTrace) {
+          return Center(
+            child: Text('hello'),
+          );
+        },
+        loading: () {
+          return Center(
+            child: LoaderWidget(),
+          );
+        },
+      ),
     );
   }
 }
@@ -174,8 +178,6 @@ class PaymentButton extends StatelessWidget {
         onClick();
       },
       child: Container(
-        // height: 70.0,
-        // width: 70.0,
         child: Center(
             child: Text(
           text,

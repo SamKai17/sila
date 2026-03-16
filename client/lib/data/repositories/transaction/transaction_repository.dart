@@ -8,11 +8,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final transactionsProvider = StreamProvider.family<List<Transaction>, String>(
   (ref, clientId) {
-    final clientsStream =
+    final transactionsListStream =
         ref.watch(transactionRepository).watch(clientId: clientId);
-    return clientsStream;
+    return transactionsListStream;
   },
 );
+final transactionProvider = StreamProvider.family<Transaction, String>((ref, transactionId) {
+    final transactionStream =
+        ref.watch(transactionRepository).watchTransaction(transactionId: transactionId);
+    return transactionStream;
+
+},);
 
 final transactionRepository = Provider(
   (ref) {
@@ -21,17 +27,30 @@ final transactionRepository = Provider(
 );
 
 class TransactionRepository {
-  TransactionRepository({required DatabaseService databaseService})
-      : _databaseService = databaseService;
+  TransactionRepository({
+    required DatabaseService databaseService,
+  }) : _databaseService = databaseService;
 
   final DatabaseService _databaseService;
 
-  final _controller = StreamController<void>.broadcast();
+  final _transactionsListController = StreamController<void>.broadcast();
+  final _transactionController = StreamController<void>.broadcast();
 
-  Stream<List<Transaction>> watch({required String clientId}) async* {
+  Stream<List<Transaction>> watch({
+    required String clientId,
+  }) async* {
     yield await getTransactionsList(clientId: clientId);
-    await for (var _ in _controller.stream) {
+    await for (var _ in _transactionsListController.stream) {
       yield await getTransactionsList(clientId: clientId);
+    }
+  }
+
+  Stream<Transaction> watchTransaction({
+    required String transactionId,
+  }) async* {
+    yield await getTransaction(transactionId: transactionId);
+    await for (var _ in _transactionController.stream) {
+      yield await getTransaction(transactionId: transactionId);
     }
   }
 
@@ -72,13 +91,16 @@ class TransactionRepository {
     int timeOfPayment = DateTime.now().millisecondsSinceEpoch;
     double remainder = transaction.remainder - amount;
     double totalPaid = transaction.totalPaid + amount;
-    return _databaseService.addPayment(
+    final result = _databaseService.addPayment(
       amount: amount,
       transactionId: transaction.id,
       remainder: remainder,
       timeOfPayment: timeOfPayment,
       totalPaid: totalPaid,
     );
+    _transactionController.add(null);
+    _transactionsListController.add(null);
+    return result;
   }
 
   Future<Result<String>> addTransaction({
@@ -103,7 +125,7 @@ class TransactionRepository {
       totalPrice: totalPrice,
       items: items,
     );
-    _controller.add(null);
+    _transactionsListController.add(null);
     return result;
   }
 
@@ -112,13 +134,13 @@ class TransactionRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    _controller.add(null);
+    _transactionsListController.add(null);
     final result =
         _databaseService.deleteTransactions(transactionsIds: transactionsIds);
     return result;
   }
 
-  Future<Result<Transaction>> getTransaction({
+  Future<Transaction> getTransaction({
     required String transactionId,
   }) async {
     if (!_databaseService.isOpen) {
@@ -131,7 +153,8 @@ class TransactionRepository {
       case Ok():
         items = itemsResult.value;
       case Error():
-        return Result.error(itemsResult.error);
+        throw itemsResult.error;
+        // return Result.error(itemsResult.error);
     }
     final paymentsResult =
         await _databaseService.getPayments(transactionId: transactionId);
@@ -140,7 +163,8 @@ class TransactionRepository {
       case Ok():
         payments = paymentsResult.value;
       case Error():
-        return Result.error(paymentsResult.error);
+        throw paymentsResult.error;
+        // return Result.error(paymentsResult.error);
     }
     final transactionResult =
         await _databaseService.getTransaction(transactionId: transactionId);
@@ -158,9 +182,10 @@ class TransactionRepository {
           items: items,
           payments: payments,
         );
-        return Result.ok(transaction);
+        return transaction;
       case Error():
-        return Result.error(transactionResult.error);
+        throw transactionResult.error;
+        // return Result.error(transactionResult.error);
     }
   }
 }
