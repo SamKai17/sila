@@ -1,5 +1,6 @@
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/routing/routes.dart';
+import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
@@ -23,8 +24,8 @@ class TransactionReceiptScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transactionAsync =
-        ref.watch(transactionProvider(transactionId));
+    final transactionAsync = ref.watch(transactionProvider(transactionId));
+    final client = ref.watch(clientDetailViewModel(clientId)).value;
     return transactionAsync.when(
       data: (transaction) {
         return Scaffold(
@@ -79,9 +80,9 @@ class TransactionReceiptScreen extends ConsumerWidget {
                           ),
                           SizedBox(height: 12.0),
                           InformationCard(information: {
-                            'Name': 'Oussama',
-                            'Phone': '0689231289',
-                            'City': 'Casablanca',
+                            'Name': client?.name ?? 'Error',
+                            'Phone': client?.phone ?? 'Error',
+                            'City': client?.city ?? 'Error',
                           }),
                           SizedBox(height: 32.0),
                           Text(

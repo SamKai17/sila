@@ -1,5 +1,6 @@
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/routing/routes.dart';
+import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
@@ -24,6 +25,7 @@ class TransactionPreviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     double totalPrice = ref.watch(itemsTotalPrice(clientId));
     List<Item> items = ref.watch(transactionCreateViewModel(clientId));
+    final client = ref.watch(clientDetailViewModel(clientId)).value;
     ref.listen(
       transactionPreviewViewModel,
       (previous, next) {
@@ -55,7 +57,7 @@ class TransactionPreviewScreen extends ConsumerWidget {
             Text('Details'),
             SizedBox(height: 12.0),
             InformationCard(information: {
-              'Client': 'Oussama',
+              'Client': client?.name ?? 'Error',
               'Paid': '\$${paid}',
               'Total': '\$${totalPrice}'
             }),
