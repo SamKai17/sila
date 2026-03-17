@@ -29,6 +29,8 @@ abstract final class Routes {
   static const paymentPreviewName = 'paymentPreview';
   static const paymentReceipt = 'receipt/:transactionId';
   static const paymentReceiptName = 'paymentReceipt';
+  static const paymentEdit = 'payment-edit';
+  static const paymentEditName = 'paymentEdit';
   static const itemsEdit = 'items-edit';
   static const itemsEditName = 'itemsEdit';
 }

@@ -1,4 +1,5 @@
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/create/widgets/client_create_screen.dart';
@@ -7,6 +8,7 @@ import 'package:client/ui/client/home/widgets/home_screen.dart';
 import 'package:client/ui/client/update/widgets/client_update_screen.dart';
 import 'package:client/ui/item/create/widgets/item_create_screen.dart';
 import 'package:client/ui/item/update/widgets/item_update_screen.dart';
+import 'package:client/ui/payment/edit/widgets/payment_edit_screen.dart';
 import 'package:client/ui/payment/payment/widgets/payment_screen.dart';
 import 'package:client/ui/payment/preview/widgets/payment_preview_screen.dart';
 import 'package:client/ui/payment/receipt/widgets/payment_receipt_screen.dart';
@@ -82,11 +84,9 @@ final router = GoRouter(
                       required double price,
                       required int quantity,
                     });
-                    // final type = state.uri.queryParameters['type'];
                     return ItemCreateScreen(
                       clientId: clientId,
                       create: create,
-                      // type: type!,
                     );
                   },
                 ),
@@ -192,6 +192,20 @@ final router = GoRouter(
                               clientId: clientId,
                               transaction: transaction,
                               oldItems: oldItems,
+                            );
+                          },
+                        ),
+                        GoRoute(
+                          name: Routes.paymentEditName,
+                          path: Routes.paymentEdit,
+                          builder: (context, state) {
+                            final values = state.extra as Map<String, Object>;
+                            final transaction =
+                                values['transaction'] as Transaction;
+                            final payment = values['payment'] as Payment;
+                            return PaymentEditScreen(
+                              transaction: transaction,
+                              payment: payment,
                             );
                           },
                         )

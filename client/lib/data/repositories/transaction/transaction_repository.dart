@@ -93,7 +93,7 @@ class TransactionRepository {
     int timeOfPayment = DateTime.now().millisecondsSinceEpoch;
     double remainder = transaction.remainder - amount;
     double totalPaid = transaction.totalPaid + amount;
-    final result = _databaseService.addPayment(
+    final result = await _databaseService.addPayment(
       amount: amount,
       transactionId: transaction.id,
       remainder: remainder,
@@ -103,6 +103,30 @@ class TransactionRepository {
     _transactionController.add(null);
     _transactionsListController.add(null);
     return result;
+  }
+
+  Future<void> updatePayment({
+    required Transaction transaction,
+    required Payment payment,
+    required double newAmount,
+  }) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    final double oldAmount =
+        transaction.payments?.firstWhere((e) => e.id == payment.id).amount ??
+            0.0;
+    double totalPaid = (transaction.totalPaid - oldAmount) + newAmount;
+    double remainder = transaction.totalPrice - totalPaid;
+    await _databaseService.updatePayment(
+      transactionId: transaction.id,
+      totalPaid: totalPaid,
+      remainder: remainder,
+      paymentId: payment.id,
+      paid: newAmount,
+    );
+    _transactionController.add(null);
+    _transactionsListController.add(null);
   }
 
   Future<void> updateItems({
@@ -118,7 +142,7 @@ class TransactionRepository {
       total += item.price * item.quantity;
     }
     double remainder = total - transaction.totalPaid;
-    final result = _databaseService.updateItems(
+    await _databaseService.updateItems(
       transactionId: transaction.id,
       total: total,
       remainder: remainder,
@@ -141,7 +165,7 @@ class TransactionRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final result = _databaseService.addTransaction(
+    final result = await _databaseService.addTransaction(
       clientId: clientId,
       paid: paid,
       remainder: remainder,

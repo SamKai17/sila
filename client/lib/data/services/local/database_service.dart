@@ -237,6 +237,45 @@ class DatabaseService {
     }
   }
 
+  Future<Result<void>> updatePayment({
+    required String transactionId,
+    required double totalPaid,
+    required double remainder,
+    required String paymentId,
+    required double paid,
+  }) async {
+    // transactionId
+    // totalPaid
+    // paymentId
+    // amount
+    try {
+      await _database!.transaction(
+        (txn) async {
+          await txn.update(
+            _transactionTable,
+            {
+              _transactionTotalPaidField: totalPaid,
+              _transactionRemainderField: remainder,
+            },
+            where: '$_transactionIdField = ?',
+            whereArgs: [transactionId],
+          );
+          await txn.update(
+            _paymentTable,
+            {
+              _paymentAmountField: paid,
+            },
+            where: '$_paymentIdField = ?',
+            whereArgs: [paymentId],
+          );
+        },
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
   Future<Result<void>> updateItems({
     required String transactionId,
     required double total,
@@ -244,48 +283,48 @@ class DatabaseService {
     required List<Item> itemsToAdd,
     required List<Item> itemsToDelete,
   }) async {
-    await _database!.transaction(
-      (txn) async {
-        // transaction id
-        // total
-        // remainder
-        // items
-        await txn.update(
-          _transactionTable,
-          {
-            _transactionTotalPriceField: total,
-            _transactionRemainderField: remainder,
-          },
-          where: '$_transactionIdField = ?',
-          whereArgs: [transactionId],
-        );
-        itemsToAdd.forEach(
-          (item) async {
-            await txn.insert(
-              _itemTable,
-              {
-                _itemIdField: item.id,
-                _itemNameField: item.name,
-                _itemQuantityField: item.quantity,
-                _itemPriceField: item.price,
-                _itemTransactionIdField: transactionId,
-              },
-              conflictAlgorithm: ConflictAlgorithm.replace,
-            );
-          },
-        );
-        itemsToDelete.forEach(
-          (item) async {
-            await txn.delete(
-              _itemTable,
-              where: '$_itemIdField = ?',
-              whereArgs: [item.id],
-            );
-          },
-        );
-      },
-    );
-    return Result.ok(null);
+    try {
+      await _database!.transaction(
+        (txn) async {
+          await txn.update(
+            _transactionTable,
+            {
+              _transactionTotalPriceField: total,
+              _transactionRemainderField: remainder,
+            },
+            where: '$_transactionIdField = ?',
+            whereArgs: [transactionId],
+          );
+          itemsToAdd.forEach(
+            (item) async {
+              await txn.insert(
+                _itemTable,
+                {
+                  _itemIdField: item.id,
+                  _itemNameField: item.name,
+                  _itemQuantityField: item.quantity,
+                  _itemPriceField: item.price,
+                  _itemTransactionIdField: transactionId,
+                },
+                conflictAlgorithm: ConflictAlgorithm.replace,
+              );
+            },
+          );
+          itemsToDelete.forEach(
+            (item) async {
+              await txn.delete(
+                _itemTable,
+                where: '$_itemIdField = ?',
+                whereArgs: [item.id],
+              );
+            },
+          );
+        },
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
   }
 
   Future<Result<String>> addTransaction({

@@ -110,7 +110,8 @@ class TransactionDetailScreen extends ConsumerWidget {
                         },
                         extra: {
                           'transaction': transaction,
-                          'oldItems': transaction.items?.map((e) => e).toList() ?? []
+                          'oldItems':
+                              transaction.items?.map((e) => e).toList() ?? []
                         },
                       );
                     },
@@ -132,11 +133,24 @@ class TransactionDetailScreen extends ConsumerWidget {
                       (payment) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10.0),
-                          child: InformationCard(information: {
-                            'Payment Date':
-                                '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(payment.timeOfPayment))}',
-                            'Paid': '${payment.amount}\$'
-                          }),
+                          child: GestureDetector(
+                            onTap: () {
+                              context.pushNamed(Routes.paymentEditName,
+                                  pathParameters: {
+                                    'clientId': clientId,
+                                    'transactionId': transactionId,
+                                  },
+                                  extra: {
+                                    'transaction': transaction,
+                                    'payment': payment
+                                  });
+                            },
+                            child: InformationCard(information: {
+                              'Payment Date':
+                                  '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(payment.timeOfPayment))}',
+                              'Paid': '${payment.amount}\$'
+                            }),
+                          ),
                         );
                       },
                     ).toList(),
