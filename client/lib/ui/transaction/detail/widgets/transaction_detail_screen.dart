@@ -100,10 +100,25 @@ class TransactionDetailScreen extends ConsumerWidget {
                     style: TextStyle(fontSize: 20),
                   ),
                   SizedBox(height: 24.0),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ItemsTable(items: transaction.items ?? []),
+                  GestureDetector(
+                    onTap: () {
+                      context.pushNamed(
+                        Routes.itemsEditName,
+                        pathParameters: {
+                          'transactionId': transactionId,
+                          'clientId': clientId,
+                        },
+                        extra: {
+                          'transaction': transaction,
+                          'oldItems': transaction.items?.map((e) => e).toList() ?? []
+                        },
+                      );
+                    },
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: ItemsTable(items: transaction.items ?? []),
+                      ),
                     ),
                   ),
                   SizedBox(height: 32.0),

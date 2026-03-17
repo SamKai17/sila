@@ -1,4 +1,5 @@
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/create/widgets/client_create_screen.dart';
 import 'package:client/ui/client/detail/widgets/client_detail_screen.dart';
@@ -11,6 +12,7 @@ import 'package:client/ui/payment/preview/widgets/payment_preview_screen.dart';
 import 'package:client/ui/payment/receipt/widgets/payment_receipt_screen.dart';
 import 'package:client/ui/transaction/create/widgets/transaction_create_screen.dart';
 import 'package:client/ui/transaction/detail/widgets/transaction_detail_screen.dart';
+import 'package:client/ui/transaction/items_edit/widgets/items_edit_screen.dart';
 import 'package:client/ui/transaction/list/widgets/transactions_screen.dart';
 import 'package:client/ui/transaction/payment/widgets/transaction_payment_screen.dart';
 import 'package:client/ui/transaction/preview/widgets/transaction_preview_screen.dart';
@@ -62,7 +64,6 @@ final router = GoRouter(
               name: Routes.transactionCreateName,
               path: Routes.transactionCreate,
               builder: (context, state) {
-                // final extra = state.extra as Map<String, String>;
                 final clientId = state.pathParameters['clientId']!;
                 final type = state.uri.queryParameters['type']!;
                 return TransactionCreateScreen(
@@ -76,10 +77,16 @@ final router = GoRouter(
                   path: Routes.itemCreate,
                   builder: (context, state) {
                     final clientId = state.pathParameters['clientId']!;
-                    final type = state.uri.queryParameters['type'];
+                    final create = state.extra as void Function({
+                      required String name,
+                      required double price,
+                      required int quantity,
+                    });
+                    // final type = state.uri.queryParameters['type'];
                     return ItemCreateScreen(
                       clientId: clientId,
-                      type: type!,
+                      create: create,
+                      // type: type!,
                     );
                   },
                 ),
@@ -88,10 +95,18 @@ final router = GoRouter(
                   path: Routes.itemUpdate,
                   builder: (context, state) {
                     final clientId = state.pathParameters['clientId']!;
-                    final Item item = state.extra as Item;
+                    final values = state.extra as Map<String, Object>;
+                    final item = values['item'] as Item;
+                    final update = values['update'] as Function({
+                      required String id,
+                      required String name,
+                      required double price,
+                      required int quantity,
+                    });
                     return ItemUpdateScreen(
                       item: item,
                       clientId: clientId,
+                      update: update,
                     );
                   },
                 ),
@@ -150,21 +165,70 @@ final router = GoRouter(
                 },
                 routes: [
                   GoRoute(
-                    name: Routes.transactionDetailName,
-                    path: Routes.transactionDetail,
-                    builder: (context, state) {
-                      final String transactionId =
-                          state.pathParameters['transactionId']!;
-                      final String clientId = state.pathParameters['clientId']!;
-                      return TransactionDetailScreen(
-                        transactionId: transactionId,
-                        clientId: clientId,
-                      );
-                    },
-                  ),
+                      name: Routes.transactionDetailName,
+                      path: Routes.transactionDetail,
+                      builder: (context, state) {
+                        final String transactionId =
+                            state.pathParameters['transactionId']!;
+                        final String clientId =
+                            state.pathParameters['clientId']!;
+                        return TransactionDetailScreen(
+                          transactionId: transactionId,
+                          clientId: clientId,
+                        );
+                      },
+                      routes: [
+                        GoRoute(
+                          name: Routes.itemsEditName,
+                          path: Routes.itemsEdit,
+                          builder: (context, state) {
+                            final values = state.extra as Map<String, Object>;
+                            final transaction =
+                                values['transaction'] as Transaction;
+                            final oldItems = values['oldItems'] as List<Item>;
+                            final clientId =
+                                state.pathParameters['clientId'] as String;
+                            return ItemsEditScreen(
+                              clientId: clientId,
+                              transaction: transaction,
+                              oldItems: oldItems,
+                            );
+                          },
+                        )
+                      ]),
                 ]),
           ],
         ),
+      ],
+    ),
+    GoRoute(
+        name: Routes.paymentName,
+        path: Routes.payment,
+        builder: (context, state) {
+          final transactionId =
+              state.uri.queryParameters['transactionId'] as String;
+          final clientId = state.uri.queryParameters['clientId'] as String;
+          return PaymentScreen(
+            transactionId: transactionId,
+            clientId: clientId,
+          );
+        },
+        routes: [
+          GoRoute(
+            name: Routes.paymentPreviewName,
+            path: Routes.paymentPreview,
+            builder: (context, state) {
+              final paid = state.extra as double;
+              final transactionId =
+                  state.uri.queryParameters['transactionId'] as String;
+              final clientId = state.uri.queryParameters['clientId'] as String;
+              return PaymentPreviewScreen(
+                  transactionId: transactionId, paid: paid, clientId: clientId);
+            },
+          ),
+        ])
+  ],
+);
 
         //         GoRoute(
         //           name: Routes.paymentReceiptName,
@@ -180,35 +244,3 @@ final router = GoRouter(
         //             );
         //           },
         //         ),
-      ],
-    ),
-    GoRoute(
-      name: Routes.paymentName,
-      path: Routes.payment,
-      builder: (context, state) {
-        final transactionId = state.uri.queryParameters['transactionId'] as String;
-        final clientId = state.uri.queryParameters['clientId'] as String;
-        return PaymentScreen(
-          transactionId: transactionId,
-          clientId: clientId,
-        );
-      },
-      routes: [
-            GoRoute(
-              name: Routes.paymentPreviewName,
-              path: Routes.paymentPreview,
-              builder: (context, state) {
-                final paid = state.extra as double;
-                final transactionId = state.uri.queryParameters['transactionId'] as String;
-                final clientId = state.uri.queryParameters['clientId'] as String;
-                return PaymentPreviewScreen(
-                  transactionId: transactionId,
-                  paid: paid,
-                  clientId: clientId
-                );
-              },
-            ),
-      ]
-    )
-  ],
-);

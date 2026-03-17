@@ -14,18 +14,31 @@ final itemsTotalPrice = Provider.family<double, String>(
 );
 
 final transactionCreateViewModel =
-    NotifierProvider.family<TransactionCreateViewModel, List<Item>, String>((clientId) {
-      return TransactionCreateViewModel();
-    },);
+    NotifierProvider.family<TransactionCreateViewModel, List<Item>, String>(
+  (clientId) {
+    return TransactionCreateViewModel(<Item>[]);
+  },
+);
 
 class TransactionCreateViewModel extends Notifier<List<Item>> {
+  TransactionCreateViewModel(this.items);
+  final items;
+
   @override
   List<Item> build() {
-    return [];
+    return items;
   }
 
   void clear() {
     state = [];
+  }
+
+  double totalPrice() {
+    double total = 0.0;
+    for (var item in state) {
+      total += item.price * item.quantity;
+    }
+    return total;
   }
 
   void addItem({
@@ -61,6 +74,7 @@ class TransactionCreateViewModel extends Notifier<List<Item>> {
   void deleteItems() {
     final toRemoveItems = ref.read(selectedItems);
     state = state.where((item) => !toRemoveItems.contains(item)).toList();
+    // return toRemoveItems;
   }
 }
 

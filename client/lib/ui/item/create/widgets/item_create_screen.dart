@@ -2,6 +2,7 @@ import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
+import 'package:client/ui/transaction/items_edit/view_model/items_edit_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -10,10 +11,15 @@ class ItemCreateScreen extends ConsumerStatefulWidget {
   const ItemCreateScreen({
     super.key,
     required String this.clientId,
-    required String this.type,
+    required this.create,
   });
+  final void Function({
+    required String name,
+    required double price,
+    required int quantity,
+  }) create;
   final String clientId;
-  final String type;
+  // final String type;
 
   @override
   ConsumerState<ItemCreateScreen> createState() => _ItemCreateScreenState();
@@ -58,13 +64,19 @@ class _ItemCreateScreenState extends ConsumerState<ItemCreateScreen> {
               CustomButtonWidget(
                 buttonText: 'Add',
                 onPressed: () {
-                  ref
-                      .read(
-                          transactionCreateViewModel(widget.clientId).notifier)
-                      .addItem(
-                          name: _nameController.text,
-                          price: double.parse(_priceController.text),
-                          quantity: int.parse(_quantityController.text));
+                  // ref
+                  //     .read(
+                  //         transactionCreateViewModel(widget.clientId).notifier)
+                  //     .addItem(
+                  //         name: _nameController.text,
+                  //         price: double.parse(_priceController.text),
+                  //         quantity: int.parse(_quantityController.text));
+                  widget.create(
+                    name: _nameController.text,
+                    price: double.parse(_priceController.text),
+                    quantity: int.parse(_quantityController.text),
+                  );
+                  // ref.read(itemsEditViewModel([]));
                   if (context.mounted) {
                     context.pop();
                   }

@@ -2,6 +2,7 @@ import 'package:client/data/services/local/models/transaction/transaction_local_
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
+import 'package:client/ui/transaction/items_edit/view_model/items_edit_viewmodel.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart';
@@ -234,6 +235,57 @@ class DatabaseService {
     } on Exception catch (e) {
       return Result.error(e);
     }
+  }
+
+  Future<Result<void>> updateItems({
+    required String transactionId,
+    required double total,
+    required double remainder,
+    required List<Item> itemsToAdd,
+    required List<Item> itemsToDelete,
+  }) async {
+    await _database!.transaction(
+      (txn) async {
+        // transaction id
+        // total
+        // remainder
+        // items
+        await txn.update(
+          _transactionTable,
+          {
+            _transactionTotalPriceField: total,
+            _transactionRemainderField: remainder,
+          },
+          where: '$_transactionIdField = ?',
+          whereArgs: [transactionId],
+        );
+        itemsToAdd.forEach(
+          (item) async {
+            await txn.insert(
+              _itemTable,
+              {
+                _itemIdField: item.id,
+                _itemNameField: item.name,
+                _itemQuantityField: item.quantity,
+                _itemPriceField: item.price,
+                _itemTransactionIdField: transactionId,
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          },
+        );
+        itemsToDelete.forEach(
+          (item) async {
+            await txn.delete(
+              _itemTable,
+              where: '$_itemIdField = ?',
+              whereArgs: [item.id],
+            );
+          },
+        );
+      },
+    );
+    return Result.ok(null);
   }
 
   Future<Result<String>> addTransaction({

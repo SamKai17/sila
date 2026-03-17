@@ -13,12 +13,14 @@ final transactionsProvider = StreamProvider.family<List<Transaction>, String>(
     return transactionsListStream;
   },
 );
-final transactionProvider = StreamProvider.family<Transaction, String>((ref, transactionId) {
-    final transactionStream =
-        ref.watch(transactionRepository).watchTransaction(transactionId: transactionId);
+final transactionProvider = StreamProvider.family<Transaction, String>(
+  (ref, transactionId) {
+    final transactionStream = ref
+        .watch(transactionRepository)
+        .watchTransaction(transactionId: transactionId);
     return transactionStream;
-
-},);
+  },
+);
 
 final transactionRepository = Provider(
   (ref) {
@@ -103,6 +105,30 @@ class TransactionRepository {
     return result;
   }
 
+  Future<void> updateItems({
+    required List<Item> itemsToAdd,
+    required List<Item> itemsToDelete,
+    required Transaction transaction,
+  }) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    double total = 0.0;
+    for (var item in itemsToAdd) {
+      total += item.price * item.quantity;
+    }
+    double remainder = total - transaction.totalPaid;
+    final result = _databaseService.updateItems(
+      transactionId: transaction.id,
+      total: total,
+      remainder: remainder,
+      itemsToAdd: itemsToAdd,
+      itemsToDelete: itemsToDelete,
+    );
+    _transactionController.add(null);
+    _transactionsListController.add(null);
+  }
+
   Future<Result<String>> addTransaction({
     required double totalPrice,
     required double totalPaid,
@@ -154,7 +180,7 @@ class TransactionRepository {
         items = itemsResult.value;
       case Error():
         throw itemsResult.error;
-        // return Result.error(itemsResult.error);
+      // return Result.error(itemsResult.error);
     }
     final paymentsResult =
         await _databaseService.getPayments(transactionId: transactionId);
@@ -164,7 +190,7 @@ class TransactionRepository {
         payments = paymentsResult.value;
       case Error():
         throw paymentsResult.error;
-        // return Result.error(paymentsResult.error);
+      // return Result.error(paymentsResult.error);
     }
     final transactionResult =
         await _databaseService.getTransaction(transactionId: transactionId);
@@ -185,7 +211,7 @@ class TransactionRepository {
         return transaction;
       case Error():
         throw transactionResult.error;
-        // return Result.error(transactionResult.error);
+      // return Result.error(transactionResult.error);
     }
   }
 }

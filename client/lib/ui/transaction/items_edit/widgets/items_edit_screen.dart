@@ -1,27 +1,31 @@
+import 'package:client/domain/models/item/item.dart';
+import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
 import 'package:client/ui/core/ui/delete_button.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/create/widgets/item_card.dart';
+import 'package:client/ui/transaction/items_edit/view_model/items_edit_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class TransactionCreateScreen extends ConsumerWidget {
-  const TransactionCreateScreen({
+class ItemsEditScreen extends ConsumerWidget {
+  const ItemsEditScreen({
     super.key,
+    required Transaction this.transaction,
     required String this.clientId,
-    required String this.type,
+    required List<Item> this.oldItems,
   });
+  final List<Item> oldItems;
   final String clientId;
-  final String type;
+  final Transaction transaction;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(transactionCreateViewModel(clientId));
+    final items = ref.watch(itemsEditViewModel(oldItems));
     final selectedMode = ref.watch(isItemSelectedMode);
-    final totalPrice = ref.watch(itemsTotalPrice(clientId));
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: selectedMode ? false : true,
@@ -39,7 +43,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                 DeleteButton(
                   delete: () {
                     ref
-                        .read(transactionCreateViewModel(clientId).notifier)
+                        .read(itemsEditViewModel(oldItems).notifier)
                         .deleteItems();
                     ref.read(selectedItems.notifier).clearSelectedItems();
                   },
@@ -58,7 +62,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                   item: item,
                   cliendId: clientId,
                   update: ref
-                      .read(transactionCreateViewModel(clientId).notifier)
+                      .read(itemsEditViewModel(oldItems).notifier)
                       .updateItem,
                 );
               },
@@ -77,9 +81,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                         Text("Total Price"),
                         Spacer(),
                         Text(
-                          // '${ref.read(transactionCreateViewModel(clientId).notifier).totalPrice()}\$'),
-                          '\$${totalPrice}',
-                        ),
+                            '\$${ref.read(itemsEditViewModel(oldItems).notifier).totalPrice()}'),
                       ],
                     )
                   ],
@@ -97,8 +99,9 @@ class TransactionCreateScreen extends ConsumerWidget {
                       context.pushNamed(
                         Routes.itemCreateName,
                         pathParameters: {'clientId': clientId},
-                        // queryParameters: {'type': type},
-                        extra: ref.read(transactionCreateViewModel(clientId).notifier).addItem,
+                        extra: ref
+                            .read(itemsEditViewModel(oldItems).notifier)
+                            .addItem,
                       );
                     },
                     child: Text("+ add item"),
@@ -109,18 +112,17 @@ class TransactionCreateScreen extends ConsumerWidget {
                 ),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {
-                      context.pushNamed(
-                        Routes.transactionPaymentName,
-                        pathParameters: {
-                          'clientId': clientId,
-                        },
-                        queryParameters: {
-                          'type': type,
-                        },
-                      );
+                    onPressed: () async {
+                      await ref.read(updateItems.notifier).updateItems(
+                            transaction: transaction,
+                            newItems: items,
+                            oldItems: oldItems,
+                          );
+                      if (context.mounted) {
+                        context.pop();
+                      }
                     },
-                    child: Text("pay"),
+                    child: Text("Save"),
                   ),
                 ),
               ],
@@ -128,6 +130,13 @@ class TransactionCreateScreen extends ConsumerWidget {
           ],
         ),
       ),
+      // floatingActionButton: Padding(
+      //   padding: const EdgeInsets.only(bottom: 58.0),
+      //   child: FloatingActionButton(
+      //     onPressed: () {},
+      //     child: Icon(Icons.add),
+      //   ),
+      // ),
     );
   }
 }

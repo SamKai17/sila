@@ -8,15 +8,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class ItemCard extends ConsumerWidget {
-  const ItemCard({
-    super.key,
-    required Item this.item,
-    required String this.cliendId,
-    required String this.type,
-  });
+  const ItemCard(
+      {super.key,
+      required Item this.item,
+      required String this.cliendId,
+      required this.update
+      // required String this.type,
+      });
   final Item item;
   final String cliendId;
-  final String type;
+  final void Function({
+    required String id,
+    required String name,
+    required double price,
+    required int quantity,
+  }) update;
+  // final String type;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,8 +41,10 @@ class ItemCard extends ConsumerWidget {
           context.pushNamed(
             Routes.itemUpdateName,
             pathParameters: {'clientId': cliendId},
-            extra: item,
-            queryParameters: {'type': type},
+            extra: {
+              'item': item,
+              'update': update,
+            },
           );
         }
       },
