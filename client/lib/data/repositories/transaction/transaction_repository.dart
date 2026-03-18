@@ -105,6 +105,34 @@ class TransactionRepository {
     return result;
   }
 
+  Future<void> deletePayments({
+    required List<String> paymentsIds,
+    required Transaction transaction,
+  }) async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    List<Payment> payments = transaction.payments ?? [];
+    double totalPaid = 0;
+    payments.forEach(
+      (payment) {
+        int index = paymentsIds.indexWhere((id) => payment.id == id);
+        if (index == -1) {
+          totalPaid += payment.amount;
+        }
+      },
+    );
+    double remainder = transaction.totalPrice - totalPaid;
+    await _databaseService.deletePayments(
+      paymentsIds: paymentsIds,
+      totalPaid: totalPaid,
+      remainder: remainder,
+      transactionId: transaction.id,
+    );
+    _transactionController.add(null);
+    _transactionsListController.add(null);
+  }
+
   Future<void> updatePayment({
     required Transaction transaction,
     required Payment payment,

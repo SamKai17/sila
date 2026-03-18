@@ -237,6 +237,36 @@ class DatabaseService {
     }
   }
 
+  Future<Result<void>> deletePayments({
+    required List<String> paymentsIds,
+    required double totalPaid,
+    required double remainder,
+    required String transactionId,
+  }) async {
+    try {
+      await _database!.transaction(
+        (txn) async {
+          await txn.update(
+            _transactionTable,
+            {
+              _transactionTotalPaidField: totalPaid,
+              _transactionRemainderField: remainder
+            },
+            where: '$_transactionIdField = ?',
+            whereArgs: [transactionId],
+          );
+          for (var id in paymentsIds) {
+            await txn.delete(_paymentTable,
+                where: '$_paymentIdField = ?', whereArgs: [id]);
+          }
+        },
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
   Future<Result<void>> updatePayment({
     required String transactionId,
     required double totalPaid,
