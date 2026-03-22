@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AuthViewmodel extends ChangeNotifier {
+class AuthViewmodel {
   Future<void> login({
     required String username,
     required String password,
@@ -12,5 +12,4 @@ class AuthViewmodel extends ChangeNotifier {
     required String confirmPassword,
   }) async {}
 
-  Future<void> getUserData() async {}
 }

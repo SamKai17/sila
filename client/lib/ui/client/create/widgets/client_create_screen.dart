@@ -34,8 +34,10 @@ class _ClientCreateScreenState extends ConsumerState<ClientCreateScreen> {
       (previous, next) {
         next.when(
           data: (data) {
-            if (context.mounted) {
-              context.pop();
+            if (previous != null && previous.hasValue && next.hasValue) {
+              if (context.mounted) {
+                context.pop();
+              }
             }
           },
           error: (error, stackTrace) {

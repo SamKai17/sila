@@ -3,8 +3,6 @@ import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
-import 'package:client/ui/payment/payment/view_model/payment_viewmodel.dart';
-import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

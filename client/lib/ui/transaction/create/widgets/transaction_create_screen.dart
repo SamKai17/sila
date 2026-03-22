@@ -19,9 +19,10 @@ class TransactionCreateScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(transactionCreateViewModel(clientId));
-    final selectedMode = ref.watch(isItemSelectedMode);
-    final totalPrice = ref.watch(itemsTotalPrice(clientId));
+    final items = ref.watch(itemsCart(clientId));
+    final selectedMode = ref.watch(itemSelectedMode);
+    final totalPrice = ref.read(itemsCart(clientId).notifier).totalPrice();
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: selectedMode ? false : true,
@@ -38,10 +39,8 @@ class TransactionCreateScreen extends ConsumerWidget {
             ? [
                 DeleteButton(
                   delete: () {
-                    ref
-                        .read(transactionCreateViewModel(clientId).notifier)
-                        .deleteItems();
                     ref.read(selectedItems.notifier).clearSelectedItems();
+                    ref.read(itemsCart(clientId).notifier).deleteItems();
                   },
                 ),
                 SizedBox(width: 32)
@@ -57,9 +56,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                 return ItemCard(
                   item: item,
                   cliendId: clientId,
-                  update: ref
-                      .read(transactionCreateViewModel(clientId).notifier)
-                      .updateItem,
+                  update: ref.read(itemsCart(clientId).notifier).updateItem,
                 );
               },
             ).toList(),
@@ -76,10 +73,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                       children: [
                         Text("Total Price"),
                         Spacer(),
-                        Text(
-                          // '${ref.read(transactionCreateViewModel(clientId).notifier).totalPrice()}\$'),
-                          '\$${totalPrice}',
-                        ),
+                        Text('${totalPrice}\$'),
                       ],
                     )
                   ],
@@ -98,7 +92,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                         Routes.itemCreateName,
                         pathParameters: {'clientId': clientId},
                         // queryParameters: {'type': type},
-                        extra: ref.read(transactionCreateViewModel(clientId).notifier).addItem,
+                        extra: ref.read(itemsCart(clientId).notifier).addItem,
                       );
                     },
                     child: Text("+ add item"),

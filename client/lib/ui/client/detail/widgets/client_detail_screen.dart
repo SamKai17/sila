@@ -11,13 +11,12 @@ class ClientDetailScreen extends ConsumerWidget {
     super.key,
     required String this.clientId,
   });
-
   final String clientId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.watch(clientDetailViewModel(clientId));
-    return viewModel.when(
+    final clientAsync = ref.watch(clientProvider(clientId));
+    return clientAsync.when(
       data: (client) {
         return Scaffold(
           appBar: AppBar(
@@ -92,7 +91,7 @@ class ClientDetailScreen extends ConsumerWidget {
                       Expanded(
                         child: FilledButton(
                           onPressed: () {
-                            context.goNamed(
+                            context.pushNamed(
                               Routes.transactionCreateName,
                               pathParameters: {'clientId': client.id},
                               queryParameters: {'type': 'buy'},
@@ -105,7 +104,7 @@ class ClientDetailScreen extends ConsumerWidget {
                       Expanded(
                         child: FilledButton(
                           onPressed: () {
-                            context.goNamed(
+                            context.pushNamed(
                               Routes.transactionCreateName,
                               pathParameters: {'clientId': client.id},
                               queryParameters: {'type': 'sell'},

@@ -6,7 +6,6 @@ import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
-import 'package:client/ui/transaction/receipt/view_model/transaction_receipt_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,15 +24,16 @@ class TransactionReceiptScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionAsync = ref.watch(transactionProvider(transactionId));
-    final client = ref.watch(clientDetailViewModel(clientId)).value;
+    final client = ref.watch(clientProvider(clientId)).value;
     return transactionAsync.when(
       data: (transaction) {
+        print(transaction);
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
             leading: IconButton(
               onPressed: () {
-                ref.read(transactionCreateViewModel(clientId).notifier).clear();
+                ref.read(itemsCart(clientId).notifier).clear();
                 if (context.mounted) {
                   context.goNamed(Routes.transactionCreateName,
                       pathParameters: {'clientId': clientId},
@@ -91,11 +91,13 @@ class TransactionReceiptScreen extends ConsumerWidget {
                                 fontSize: 20.0, fontWeight: FontWeight.w500),
                           ),
                           SizedBox(height: 12.0),
-                          InformationCard(information: {
-                            'Payment Date':
-                                '${DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction)}',
-                            'Paid': '${transaction.payments?.last.amount}\$',
-                          }),
+                          if (transaction.payments != null)
+                            InformationCard(information: {
+                              'Payment Date':
+                                  '${DateTime.fromMillisecondsSinceEpoch(transaction.payments!.isNotEmpty ? transaction.payments!.last.timeOfPayment : 0)}',
+                              'Paid':
+                                  '${transaction.payments!.isNotEmpty ? transaction.payments!.last.amount : 0}\$',
+                            }),
                           SizedBox(height: 32.0),
                           Text(
                             'Transaction detail',
@@ -121,9 +123,7 @@ class TransactionReceiptScreen extends ConsumerWidget {
                 CustomButtonWidget(
                   buttonText: 'View Transaction',
                   onPressed: () {
-                    ref
-                        .read(transactionCreateViewModel(clientId).notifier)
-                        .clear();
+                    ref.read(itemsCart(clientId).notifier).clear();
                     context.goNamed(Routes.transactionDetailName,
                         pathParameters: {
                           'clientId': clientId,

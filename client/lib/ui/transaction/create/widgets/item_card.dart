@@ -13,7 +13,6 @@ class ItemCard extends ConsumerWidget {
       required Item this.item,
       required String this.cliendId,
       required this.update
-      // required String this.type,
       });
   final Item item;
   final String cliendId;
@@ -23,11 +22,10 @@ class ItemCard extends ConsumerWidget {
     required double price,
     required int quantity,
   }) update;
-  // final String type;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedMode = ref.watch(isItemSelectedMode);
+    final selectedMode = ref.watch(itemSelectedMode);
     final isSelected = ref.watch(isItemSelected(item));
     return GestureDetector(
       onTap: () {

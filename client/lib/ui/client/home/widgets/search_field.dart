@@ -16,10 +16,7 @@ class _SearchFieldState extends State<SearchField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // color: AppPallete.avatarBackground,
       padding: EdgeInsetsGeometry.only(left: 32.0, right: 32.0, bottom: 24.0),
-
-      // width: double.infinity,
       child: TextField(
         controller: _searchController,
         onChanged: (value) {

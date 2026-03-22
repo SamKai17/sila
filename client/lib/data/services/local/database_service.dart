@@ -256,8 +256,11 @@ class DatabaseService {
             whereArgs: [transactionId],
           );
           for (var id in paymentsIds) {
-            await txn.delete(_paymentTable,
-                where: '$_paymentIdField = ?', whereArgs: [id]);
+            await txn.delete(
+              _paymentTable,
+              where: '$_paymentIdField = ?',
+              whereArgs: [id],
+            );
           }
         },
       );

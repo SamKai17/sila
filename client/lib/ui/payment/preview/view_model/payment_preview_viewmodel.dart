@@ -12,7 +12,6 @@ class PaymentPreviewViewModel extends AsyncNotifier<void> {
   @override
   FutureOr<void> build() {
     _transactionRepository = ref.read(transactionRepository);
-    throw UnimplementedError();
   }
 
   late TransactionRepository _transactionRepository;

@@ -1,5 +1,4 @@
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
-import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
@@ -7,7 +6,6 @@ import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:client/ui/payment/preview/view_model/payment_preview_viewmodel.dart';
-import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +24,30 @@ class PaymentPreviewScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionAsync = ref.watch(transactionProvider(transactionId));
-    final client = ref.watch(clientDetailViewModel(clientId)).value;
+    final client = ref.watch(clientProvider(clientId)).value;
+    ref.listen(
+      paymentPreviewViewModel,
+      (previous, next) {
+        next.when(
+          data: (data) {
+            if (context.mounted) {
+              context.pushNamed(Routes.transactionReceiptName, pathParameters: {
+                'clientId': clientId,
+                'transactionId': transactionId,
+              }, queryParameters: {
+                'type': transactionAsync.value?.type,
+                // fix this
+              });
+            }
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('an error happened')));
+          },
+          loading: () {},
+        );
+      },
+    );
     return Scaffold(
         appBar: AppBar(
           title: Text('Transaction Preview'),
@@ -60,14 +81,6 @@ class PaymentPreviewScreen extends ConsumerWidget {
                       await ref
                           .read(paymentPreviewViewModel.notifier)
                           .addPayment(paid: paid, transaction: transaction);
-                      context.pushNamed(Routes.transactionReceiptName,
-                          pathParameters: {
-                            'clientId': clientId,
-                            'transactionId': transaction.id,
-                          },
-                          queryParameters: {
-                            'type': transaction.type,
-                          });
                     },
                   ),
                 ],

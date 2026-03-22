@@ -18,7 +18,9 @@ class TransactionDetailViewModel extends AsyncNotifier<void> {
 
   late TransactionRepository _transactionRepository;
 
-  Future<void> deletePayments({required Transaction transaction}) async {
+  Future<void> deletePayments({
+    required Transaction transaction,
+  }) async {
     try {
       state = AsyncValue.loading();
       final selectedPaymentsList = ref.read(selectedPayments);
@@ -27,12 +29,12 @@ class TransactionDetailViewModel extends AsyncNotifier<void> {
         paymentsIds: ids,
         transaction: transaction,
       );
-      // switch (result) {
-      //   case Ok():
-      //     state = AsyncValue.data(null);
-      //   case Error():
-      //     state = AsyncValue.error(result.error, StackTrace.current);
-      // }
+      switch (result) {
+        case Ok():
+          state = AsyncValue.data(null);
+        case Error():
+          state = AsyncValue.error(result.error, StackTrace.current);
+      }
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
     }
@@ -46,7 +48,7 @@ final isPaymentselected = Provider.family(
   },
 );
 
-final isPaymentselectedMode = Provider(
+final paymentselectedMode = Provider(
   (ref) {
     final _selectedPayments = ref.watch(selectedPayments);
     return _selectedPayments.isNotEmpty;

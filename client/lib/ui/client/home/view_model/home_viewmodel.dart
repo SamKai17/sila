@@ -4,10 +4,11 @@ import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';
 import 'package:riverpod/riverpod.dart';
 
-final homeViewModel =
-    AsyncNotifierProvider<HomeViewModel, void>(HomeViewModel.new);
+final deleteClientsViewModel =
+    AsyncNotifierProvider<DeleteClientsViewModel, void>(
+        DeleteClientsViewModel.new);
 
-class HomeViewModel extends AsyncNotifier<void> {
+class DeleteClientsViewModel extends AsyncNotifier<void> {
   @override
   Future<void> build() async {
     _clientRepository = ref.read(clientRepository);
@@ -40,7 +41,7 @@ final isClientSelected = Provider.family(
   },
 );
 
-final isClientSelectedMode = Provider(
+final clientsSelectedMode = Provider(
   (ref) {
     final _selectedClients = ref.watch(selectedClients);
     return _selectedClients.isNotEmpty;

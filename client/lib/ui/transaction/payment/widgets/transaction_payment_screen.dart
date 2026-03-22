@@ -25,7 +25,6 @@ class _TransactionPaymentScreenState
   String value = '';
 
   void updateValue(String newValue) {
-    // 0 shouldn't be first
     if (newValue == '0' && value.isEmpty) {
       return;
     }
@@ -45,7 +44,8 @@ class _TransactionPaymentScreenState
 
   @override
   Widget build(BuildContext context) {
-    final totalPrice = ref.watch(itemsTotalPrice(widget.clientId));
+    double totalPrice =
+        ref.read(itemsCart(widget.clientId).notifier).totalPrice();
 
     return Scaffold(
       appBar: AppBar(),
@@ -61,7 +61,6 @@ class _TransactionPaymentScreenState
                 color: Colors.white38,
               ),
             ),
-            Spacer(),
             Text(
               '$value\$',
               style: TextStyle(fontSize: 36.0, fontWeight: FontWeight.w500),
@@ -69,15 +68,11 @@ class _TransactionPaymentScreenState
             SizedBox(
               height: 48.0,
             ),
-            Container(
-              height: 550.0,
-              // color: Colors.amber,
+            Expanded(
               child: GridView.count(
                 crossAxisCount: 3,
-                mainAxisSpacing: 35.0,
-                crossAxisSpacing: 35.0,
-                childAspectRatio: 0.25 / 0.25,
-                physics: NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0,
                 children: [
                   PaymentButton(
                     text: '9',
@@ -129,6 +124,9 @@ class _TransactionPaymentScreenState
                   ),
                 ],
               ),
+            ),
+            SizedBox(
+              height: 12,
             ),
             CustomButtonWidget(
               buttonText: 'Pay',

@@ -4,6 +4,7 @@ import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart'
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
+import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/preview/view_model/transaction_preview_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -23,15 +24,25 @@ class TransactionPreviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    double totalPrice = ref.watch(itemsTotalPrice(clientId));
-    List<Item> items = ref.watch(transactionCreateViewModel(clientId));
-    final client = ref.watch(clientDetailViewModel(clientId)).value;
+    double totalPrice = ref.read(itemsCart(clientId).notifier).totalPrice();
+    List<Item> items = ref.watch(itemsCart(clientId));
+    final client = ref.watch(clientProvider(clientId)).value;
+    final isLoading = ref.watch(transactionPreviewViewModel).isLoading;
     ref.listen(
       transactionPreviewViewModel,
       (previous, next) {
         next.when(
-          data: (data) {},
-          error: (error, stackTrace) {},
+          data: (data) {
+            // if (previous != null && previous.hasValue && next.hasValue) {
+            //   if (context.mounted) {
+            //     context.pop();
+            //   }
+            // }
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('an error happened')));
+          },
           loading: () {},
         );
       },
@@ -41,56 +52,60 @@ class TransactionPreviewScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text('Transaction Preview'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Items'),
-            SizedBox(height: 12.0),
-            Card(
-                child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ItemsTable(items: items),
-            )),
-            SizedBox(height: 32.0),
-            Text('Details'),
-            SizedBox(height: 12.0),
-            InformationCard(information: {
-              'Client': client?.name ?? 'Error',
-              'Paid': '\$${paid}',
-              'Total': '\$${totalPrice}'
-            }),
-            Spacer(),
-            CustomButtonWidget(
-              buttonText: 'Confirm',
-              onPressed: () async {
-                final transactionId = await ref
-                    .read(transactionPreviewViewModel.notifier)
-                    .addTransaction(
-                      totalPrice: totalPrice,
-                      paid: paid,
-                      items: items,
-                      type: type,
-                      clientId: clientId,
-                    );
-                if (transactionId != null) {
-                  context.pushNamed(
-                    Routes.transactionReceiptName,
-                    pathParameters: {
-                      'clientId': clientId,
-                      'transactionId': transactionId,
+      body: isLoading
+          ? Center(
+              child: LoaderWidget(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Items'),
+                  SizedBox(height: 12.0),
+                  Card(
+                      child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ItemsTable(items: items),
+                  )),
+                  SizedBox(height: 32.0),
+                  Text('Details'),
+                  SizedBox(height: 12.0),
+                  InformationCard(information: {
+                    'Client': client?.name ?? 'Error',
+                    'Paid': '\$${paid}',
+                    'Total': '\$${totalPrice}'
+                  }),
+                  Spacer(),
+                  CustomButtonWidget(
+                    buttonText: 'Confirm',
+                    onPressed: () async {
+                      final transactionId = await ref
+                          .read(transactionPreviewViewModel.notifier)
+                          .addTransaction(
+                            totalPrice: totalPrice,
+                            paid: paid,
+                            items: items,
+                            type: type,
+                            clientId: clientId,
+                          );
+                      if (transactionId != null) {
+                        context.pushNamed(
+                          Routes.transactionReceiptName,
+                          pathParameters: {
+                            'clientId': clientId,
+                            'transactionId': transactionId,
+                          },
+                          queryParameters: {
+                            'type': type,
+                          },
+                        );
+                      }
                     },
-                    queryParameters: {
-                      'type': type,
-                    },
-                  );
-                }
-              },
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

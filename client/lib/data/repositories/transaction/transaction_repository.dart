@@ -9,14 +9,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final transactionsProvider = StreamProvider.family<List<Transaction>, String>(
   (ref, clientId) {
     final transactionsListStream =
-        ref.watch(transactionRepository).watch(clientId: clientId);
+        ref.read(transactionRepository).watch(clientId: clientId);
     return transactionsListStream;
   },
 );
 final transactionProvider = StreamProvider.family<Transaction, String>(
   (ref, transactionId) {
     final transactionStream = ref
-        .watch(transactionRepository)
+        .read(transactionRepository)
         .watchTransaction(transactionId: transactionId);
     return transactionStream;
   },
@@ -105,7 +105,7 @@ class TransactionRepository {
     return result;
   }
 
-  Future<void> deletePayments({
+  Future<Result<void>> deletePayments({
     required List<String> paymentsIds,
     required Transaction transaction,
   }) async {
@@ -123,7 +123,7 @@ class TransactionRepository {
       },
     );
     double remainder = transaction.totalPrice - totalPaid;
-    await _databaseService.deletePayments(
+    final result = await _databaseService.deletePayments(
       paymentsIds: paymentsIds,
       totalPaid: totalPaid,
       remainder: remainder,
@@ -131,9 +131,10 @@ class TransactionRepository {
     );
     _transactionController.add(null);
     _transactionsListController.add(null);
+    return result;
   }
 
-  Future<void> updatePayment({
+  Future<Result<void>> updatePayment({
     required Transaction transaction,
     required Payment payment,
     required double newAmount,
@@ -146,7 +147,7 @@ class TransactionRepository {
             0.0;
     double totalPaid = (transaction.totalPaid - oldAmount) + newAmount;
     double remainder = transaction.totalPrice - totalPaid;
-    await _databaseService.updatePayment(
+    final result = await _databaseService.updatePayment(
       transactionId: transaction.id,
       totalPaid: totalPaid,
       remainder: remainder,
@@ -155,9 +156,10 @@ class TransactionRepository {
     );
     _transactionController.add(null);
     _transactionsListController.add(null);
+    return result;
   }
 
-  Future<void> updateItems({
+  Future<Result<void>> updateItems({
     required List<Item> itemsToAdd,
     required List<Item> itemsToDelete,
     required Transaction transaction,
@@ -170,7 +172,7 @@ class TransactionRepository {
       total += item.price * item.quantity;
     }
     double remainder = total - transaction.totalPaid;
-    await _databaseService.updateItems(
+    final result = await _databaseService.updateItems(
       transactionId: transaction.id,
       total: total,
       remainder: remainder,
@@ -179,6 +181,7 @@ class TransactionRepository {
     );
     _transactionController.add(null);
     _transactionsListController.add(null);
+    return result;
   }
 
   Future<Result<String>> addTransaction({
@@ -232,7 +235,6 @@ class TransactionRepository {
         items = itemsResult.value;
       case Error():
         throw itemsResult.error;
-      // return Result.error(itemsResult.error);
     }
     final paymentsResult =
         await _databaseService.getPayments(transactionId: transactionId);
@@ -242,7 +244,6 @@ class TransactionRepository {
         payments = paymentsResult.value;
       case Error():
         throw paymentsResult.error;
-      // return Result.error(paymentsResult.error);
     }
     final transactionResult =
         await _databaseService.getTransaction(transactionId: transactionId);
@@ -263,7 +264,6 @@ class TransactionRepository {
         return transaction;
       case Error():
         throw transactionResult.error;
-      // return Result.error(transactionResult.error);
     }
   }
 }

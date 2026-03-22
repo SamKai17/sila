@@ -18,8 +18,9 @@ final clientRepository = Provider(
 );
 
 class ClientRepository {
-  ClientRepository({required DatabaseService databaseService})
-      : _databaseService = databaseService;
+  ClientRepository({
+    required DatabaseService databaseService,
+  }) : _databaseService = databaseService;
   DatabaseService _databaseService;
 
   final _controller = StreamController<void>.broadcast();
@@ -36,7 +37,6 @@ class ClientRepository {
       await _databaseService.open();
     }
     // await Future.delayed(Duration(seconds: 2));
-    // throw Exception('error');
     final result = await _databaseService.getClientsList();
     switch (result) {
       case Ok():
@@ -53,9 +53,9 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final result =
-        _databaseService.addClient(name: name, phone: phone, city: city);
     _controller.add(null);
+    final result =
+        await _databaseService.addClient(name: name, phone: phone, city: city);
     return result;
   }
 
@@ -75,7 +75,7 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final result = _databaseService.updateClient(
+    final result = await _databaseService.updateClient(
         id: id, name: name, phone: phone, city: city);
     _controller.add(null);
     return result;
@@ -85,7 +85,7 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final result = _databaseService.deleteClients(ids);
+    final result = await _databaseService.deleteClients(ids);
     _controller.add(null);
     return result;
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
+import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final paymentEditViewModel = AsyncNotifierProvider(PaymentEditViewModel.new);
@@ -19,7 +20,14 @@ class PaymentEditViewModel extends AsyncNotifier<void> {
     required Payment payment,
     required double newAmount,
   }) async {
-    await _transactionRepository.updatePayment(
+    state = AsyncValue.loading();
+    final result = await _transactionRepository.updatePayment(
         transaction: transaction, payment: payment, newAmount: newAmount);
+    switch (result) {
+      case Ok():
+        state = AsyncValue.data(null);
+      case Error():
+        state = AsyncValue.error(result.error, StackTrace.current);
+    }
   }
 }

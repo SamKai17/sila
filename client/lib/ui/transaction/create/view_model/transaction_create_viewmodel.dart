@@ -2,26 +2,15 @@ import 'package:client/domain/models/item/item.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:uuid/uuid.dart';
 
-final itemsTotalPrice = Provider.family<double, String>(
-  (ref, clientId) {
-    final items = ref.watch(transactionCreateViewModel(clientId));
-    double total = 0.0;
-    for (var item in items) {
-      total += item.price * item.quantity;
-    }
-    return total;
-  },
-);
-
-final transactionCreateViewModel =
-    NotifierProvider.family<TransactionCreateViewModel, List<Item>, String>(
+final itemsCart =
+    NotifierProvider.family<ItemsCart, List<Item>, String>(
   (clientId) {
-    return TransactionCreateViewModel(<Item>[]);
+    return ItemsCart(<Item>[]);
   },
 );
 
-class TransactionCreateViewModel extends Notifier<List<Item>> {
-  TransactionCreateViewModel(this.items);
+class ItemsCart extends Notifier<List<Item>> {
+  ItemsCart(this.items);
   final items;
 
   @override
@@ -74,7 +63,6 @@ class TransactionCreateViewModel extends Notifier<List<Item>> {
   void deleteItems() {
     final toRemoveItems = ref.read(selectedItems);
     state = state.where((item) => !toRemoveItems.contains(item)).toList();
-    // return toRemoveItems;
   }
 }
 
@@ -85,7 +73,7 @@ final isItemSelected = Provider.family(
   },
 );
 
-final isItemSelectedMode = Provider(
+final itemSelectedMode = Provider(
   (ref) {
     final _selectedClients = ref.watch(selectedItems);
     return _selectedClients.isNotEmpty;

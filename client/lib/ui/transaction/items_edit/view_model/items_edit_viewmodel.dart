@@ -7,8 +7,7 @@ import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final itemsEditViewModel = NotifierProvider.autoDispose
-    .family<TransactionCreateViewModel, List<Item>, List<Item>>(
-        TransactionCreateViewModel.new);
+    .family<ItemsCart, List<Item>, List<Item>>(ItemsCart.new);
 
 final updateItems = AsyncNotifierProvider(UpdateItems.new);
 
@@ -24,26 +23,12 @@ class UpdateItems extends AsyncNotifier<void> {
     required List<Item> oldItems,
     required List<Item> newItems,
   }) {
-    final List<String> oldItemsIds = oldItems
-        .map(
-          (e) => e.id,
-        )
-        .toList();
-    final List<String> newItemsIds = newItems
-        .map(
-          (e) => e.id,
-        )
-        .toList();
-    final toDeleteIds = oldItemsIds
-        .where(
-          (oldId) => !newItemsIds.contains(oldId),
-        )
-        .toList();
-    final result = oldItems
-        .where(
-          (oldItem) => toDeleteIds.contains(oldItem.id),
-        )
-        .toList();
+    final List<String> oldItemsIds = oldItems.map((e) => e.id).toList();
+    final List<String> newItemsIds = newItems.map((e) => e.id).toList();
+    final toDeleteIds =
+        oldItemsIds.where((oldId) => !newItemsIds.contains(oldId)).toList();
+    final result =
+        oldItems.where((oldItem) => toDeleteIds.contains(oldItem.id)).toList();
     return result;
   }
 
@@ -52,10 +37,17 @@ class UpdateItems extends AsyncNotifier<void> {
     required List<Item> oldItems,
     required Transaction transaction,
   }) async {
-    await _transactionRepository.updateItems(
+    state = AsyncValue.loading();
+    final result = await _transactionRepository.updateItems(
       itemsToAdd: newItems,
       itemsToDelete: _itemsToDelete(oldItems: oldItems, newItems: newItems),
       transaction: transaction,
     );
+    switch (result) {
+      case Ok():
+        state = AsyncValue.data(null);
+      case Error():
+        state = AsyncValue.error(result.error, StackTrace.current);
+    }
   }
 }

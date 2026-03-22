@@ -25,7 +25,25 @@ class ItemsEditScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(itemsEditViewModel(oldItems));
-    final selectedMode = ref.watch(isItemSelectedMode);
+    final selectedMode = ref.watch(itemSelectedMode);
+    ref.listen(
+      updateItems,
+      (previous, next) {
+        next.when(
+          data: (data) {
+            if (context.mounted) {
+              context.pop();
+            }
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('an error happened')),
+            );
+          },
+          loading: () {},
+        );
+      },
+    );
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: selectedMode ? false : true,
@@ -118,9 +136,6 @@ class ItemsEditScreen extends ConsumerWidget {
                             newItems: items,
                             oldItems: oldItems,
                           );
-                      if (context.mounted) {
-                        context.pop();
-                      }
                     },
                     child: Text("Save"),
                   ),
@@ -130,13 +145,6 @@ class ItemsEditScreen extends ConsumerWidget {
           ],
         ),
       ),
-      // floatingActionButton: Padding(
-      //   padding: const EdgeInsets.only(bottom: 58.0),
-      //   child: FloatingActionButton(
-      //     onPressed: () {},
-      //     child: Icon(Icons.add),
-      //   ),
-      // ),
     );
   }
 }

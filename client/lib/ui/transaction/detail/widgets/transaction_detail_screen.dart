@@ -1,16 +1,15 @@
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
-import 'package:client/domain/models/payment/payment.dart';
-import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/delete_button.dart';
-import 'package:client/ui/core/ui/information_card.dart';
 import 'package:client/ui/core/ui/items_table.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
+import 'package:client/ui/transaction/detail/widgets/info_card.dart';
+import 'package:client/ui/transaction/detail/widgets/payment_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,8 +28,22 @@ class TransactionDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionAsync = ref.watch(transactionProvider(transactionId));
-    final client = ref.watch(clientDetailViewModel(clientId)).value;
-    final selectedMode = ref.watch(isPaymentselectedMode);
+    final client = ref.watch(clientProvider(clientId)).value;
+    final selectedMode = ref.watch(paymentselectedMode);
+    final isLoading = ref.watch(transactionDetailViewModel).isLoading;
+    ref.listen(
+      transactionDetailViewModel,
+      (previous, next) {
+        next.when(
+          data: (data) {},
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('an error happened')));
+          },
+          loading: () {},
+        );
+      },
+    );
     return transactionAsync.when(
       data: (transaction) {
         return Scaffold(
@@ -50,8 +63,8 @@ class TransactionDetailScreen extends ConsumerWidget {
               actions: selectedMode
                   ? [
                       DeleteButton(
-                        delete: () {
-                          ref
+                        delete: () async {
+                          await ref
                               .read(transactionDetailViewModel.notifier)
                               .deletePayments(transaction: transaction);
                           ref
@@ -63,132 +76,137 @@ class TransactionDetailScreen extends ConsumerWidget {
                     ]
                   : null,
             ),
-            body: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'General Information',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    SizedBox(height: 24.0),
-                    Row(
-                      spacing: 24.0,
-                      children: [
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Total',
-                            value: '\$${transaction.totalPrice}',
+            body: isLoading
+                ? Center(
+                    child: LoaderWidget(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'General Information',
+                            style: TextStyle(fontSize: 20),
                           ),
-                        ),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Remainder',
-                            value: '\$${transaction.remainder}',
+                          SizedBox(height: 24.0),
+                          Row(
+                            spacing: 24.0,
+                            children: [
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Total',
+                                  value: '\$${transaction.totalPrice}',
+                                ),
+                              ),
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Remainder',
+                                  value: '\$${transaction.remainder}',
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 12.0),
-                    Row(
-                      spacing: 24.0,
-                      children: [
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Paid',
-                            value: '\$${transaction.totalPaid}',
+                          SizedBox(height: 12.0),
+                          Row(
+                            spacing: 24.0,
+                            children: [
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Paid',
+                                  value: '\$${transaction.totalPaid}',
+                                ),
+                              ),
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Date',
+                                  value:
+                                      '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction))}',
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Date',
-                            value:
-                                '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction))}',
+                          SizedBox(height: 12.0),
+                          Row(
+                            spacing: 24.0,
+                            children: [
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Client',
+                                  value: client?.name ?? 'Error',
+                                ),
+                              ),
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Type',
+                                  value: transaction.type,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 12.0),
-                    Row(
-                      spacing: 24.0,
-                      children: [
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Client',
-                            value: client?.name ?? 'Error',
+                          SizedBox(height: 32.0),
+                          Text(
+                            'items',
+                            style: TextStyle(fontSize: 20),
                           ),
-                        ),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Type',
-                            value: transaction.type,
+                          SizedBox(height: 24.0),
+                          GestureDetector(
+                            onTap: () {
+                              context.pushNamed(
+                                Routes.itemsEditName,
+                                pathParameters: {
+                                  'transactionId': transactionId,
+                                  'clientId': clientId,
+                                },
+                                extra: {
+                                  'transaction': transaction,
+                                  'oldItems':
+                                      transaction.items?.map((e) => e).toList() ?? []
+                                },
+                              );
+                            },
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child:
+                                    ItemsTable(items: transaction.items ?? []),
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 32.0),
-                    Text(
-                      'items',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    SizedBox(height: 24.0),
-                    GestureDetector(
-                      onTap: () {
-                        context.pushNamed(
-                          Routes.itemsEditName,
-                          pathParameters: {
-                            'transactionId': transactionId,
-                            'clientId': clientId,
-                          },
-                          extra: {
-                            'transaction': transaction,
-                            'oldItems':
-                                transaction.items?.map((e) => e).toList() ?? []
-                          },
-                        );
-                      },
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: ItemsTable(items: transaction.items ?? []),
-                        ),
+                          SizedBox(height: 32.0),
+                          Text(
+                            'Payments',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(height: 24.0),
+                          if (transaction.payments != null)
+                            ...transaction.payments!.map(
+                              (payment) {
+                                return PaymentCard(
+                                  clientId: clientId,
+                                  payment: payment,
+                                  transaction: transaction,
+                                );
+                              },
+                            ).toList(),
+                          SizedBox(height: 32.0),
+                          CustomButtonWidget(
+                            buttonText: 'Pay',
+                            onPressed: () {
+                              context.pushNamed(
+                                Routes.paymentName,
+                                queryParameters: {
+                                  'clientId': clientId,
+                                  'transactionId': transaction.id,
+                                },
+                              );
+                            },
+                          )
+                        ],
                       ),
                     ),
-                    SizedBox(height: 32.0),
-                    Text(
-                      'Payments',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    SizedBox(height: 24.0),
-                    if (transaction.payments != null)
-                      ...transaction.payments!.map(
-                        (payment) {
-                          return PaymentCard(
-                            clientId: clientId,
-                            payment: payment,
-                            transaction: transaction,
-                          );
-                        },
-                      ).toList(),
-                    SizedBox(height: 32.0),
-                    CustomButtonWidget(
-                      buttonText: 'Pay',
-                      onPressed: () {
-                        context.pushNamed(
-                          Routes.paymentName,
-                          queryParameters: {
-                            'clientId': clientId,
-                            'transactionId': transaction.id,
-                          },
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ));
+                  ));
       },
       loading: () {
         return Scaffold(
@@ -204,93 +222,6 @@ class TransactionDetailScreen extends ConsumerWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class InfoCard extends StatelessWidget {
-  const InfoCard(
-      {super.key, required String this.title, required String this.value});
-  final String title;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(0.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10.0,
-          children: [
-            Text(title),
-            Text(
-              value,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PaymentCard extends ConsumerWidget {
-  const PaymentCard({
-    super.key,
-    required Payment this.payment,
-    required Transaction this.transaction,
-    required String this.clientId,
-  });
-
-  final Payment payment;
-  final String clientId;
-  final Transaction transaction;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isSelected = ref.watch(isPaymentselected(payment));
-    final selectedMode = ref.watch(isPaymentselectedMode);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0),
-      child: GestureDetector(
-        onLongPress: () {
-          if (isSelected) {
-            ref.read(selectedPayments.notifier).removeSelectedPayment(payment);
-          } else {
-            ref.read(selectedPayments.notifier).addSelectedPayment(payment);
-          }
-        },
-        onTap: () {
-          if (selectedMode) {
-            if (isSelected) {
-              ref
-                  .read(selectedPayments.notifier)
-                  .removeSelectedPayment(payment);
-            } else {
-              ref.read(selectedPayments.notifier).addSelectedPayment(payment);
-            }
-          } else {
-            context.pushNamed(Routes.paymentEditName, pathParameters: {
-              'clientId': clientId,
-              'transactionId': transaction.id,
-            }, extra: {
-              'transaction': transaction,
-              'payment': payment
-            });
-          }
-        },
-        child: InformationCard(
-          information: {
-            'Payment Date':
-                '${DateFormat.yMMMMd().format(DateTime.fromMillisecondsSinceEpoch(payment.timeOfPayment))}',
-            'Paid': '${payment.amount}\$',
-          },
-          isSelected: isSelected,
-          selectedMode: selectedMode,
-        ),
-      ),
     );
   }
 }

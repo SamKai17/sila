@@ -1,13 +1,8 @@
-import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
-import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
-import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:client/ui/payment/edit/view_model/payment_edit_viewmodel.dart';
-import 'package:client/ui/payment/payment/view_model/payment_viewmodel.dart';
-import 'package:client/ui/transaction/detail/view_model/transaction_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -55,6 +50,20 @@ class _PaymentEditScreenState extends ConsumerState<PaymentEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      paymentEditViewModel,
+      (previous, next) {
+        next.when(
+          data: (data) {
+            if (context.mounted) {
+              context.pop();
+            }
+          },
+          error: (error, stackTrace) {},
+          loading: () {},
+        );
+      },
+    );
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -146,17 +155,6 @@ class _PaymentEditScreenState extends ConsumerState<PaymentEditScreen> {
                       payment: widget.payment,
                       newAmount: paid,
                     );
-                if (context.mounted) {
-                  context.pop();
-                }
-                // context.pushNamed(
-                //   Routes.paymentPreviewName,
-                //   queryParameters: {
-                //     'clientId': widget.clientId,
-                //     'transactionId': widget.transactionId,
-                //   },
-                //   extra: paid,
-                // );
               },
             ),
           ],

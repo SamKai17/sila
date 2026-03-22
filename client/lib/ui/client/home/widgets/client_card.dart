@@ -17,7 +17,7 @@ class ClientCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isSelected = ref.watch(isClientSelected(client));
-    final selectedMode = ref.watch(isClientSelectedMode);
+    final selectedMode = ref.watch(clientsSelectedMode);
     final selectedClientsNotifier = ref.read(selectedClients.notifier);
 
     return SizedBox(

@@ -22,44 +22,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedMode = ref.watch(isClientSelectedMode);
+    final selectedMode = ref.watch(clientsSelectedMode);
     final selectedClientsNotifier = ref.read(selectedClients.notifier);
-    // final viewModelNotifier = ref.read(homeViewModel.notifier);
-    final deleteClients = ref.watch(homeViewModel);
+    final deleteClients = ref.watch(deleteClientsViewModel);
     final clients = ref.watch(filteredClients);
     final isLoading = clients.isLoading || deleteClients.isLoading;
 
     ref.listen(
       filteredClients,
       (previous, next) {
-        // print('here');
         next.when(
-          data: (data) {
-            // print('data');
-          },
+          data: (data) {},
           error: (error, stackTrace) {
-            // print('error');
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text('an error happened')));
           },
-          loading: () {
-          },
+          loading: () {},
         );
       },
     );
 
     ref.listen(
-      homeViewModel,
+      deleteClientsViewModel,
       (previous, next) {
         next.when(
-          data: (data) {
-          },
+          data: (data) {},
           error: (error, stackTrace) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text('an error happened')));
           },
-          loading: () {
-          },
+          loading: () {},
         );
       },
     );
@@ -88,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: selectedMode
             ? [
                 DeleteButton(delete: () {
-                  ref.read(homeViewModel.notifier).deleteClients();
+                  ref.read(deleteClientsViewModel.notifier).deleteClients();
                   selectedClientsNotifier.clearSelectedClients();
                 }),
                 SizedBox(width: 32)
@@ -137,10 +129,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Text('couldn\'t fetch client'),
                 );
               },
-              loading: () {},
+              loading: () {
+                return Center(
+                  child: LoaderWidget(),
+                );
+              },
             ),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'clientCreate',
         onPressed: () {
           context.pushNamed(Routes.clientCreateName);
         },

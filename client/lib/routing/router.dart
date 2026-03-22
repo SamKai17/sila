@@ -11,7 +11,6 @@ import 'package:client/ui/item/update/widgets/item_update_screen.dart';
 import 'package:client/ui/payment/edit/widgets/payment_edit_screen.dart';
 import 'package:client/ui/payment/payment/widgets/payment_screen.dart';
 import 'package:client/ui/payment/preview/widgets/payment_preview_screen.dart';
-import 'package:client/ui/payment/receipt/widgets/payment_receipt_screen.dart';
 import 'package:client/ui/transaction/create/widgets/transaction_create_screen.dart';
 import 'package:client/ui/transaction/detail/widgets/transaction_detail_screen.dart';
 import 'package:client/ui/transaction/items_edit/widgets/items_edit_screen.dart';
