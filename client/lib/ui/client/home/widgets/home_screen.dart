@@ -1,4 +1,6 @@
 import 'package:client/routing/routes.dart';
+import 'package:client/ui/auth/login/view_model/auth_viewmodel.dart';
+import 'package:client/ui/auth/logout/widgets/logout_button.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
 import 'package:client/ui/client/home/widgets/client_card.dart';
@@ -27,6 +29,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final deleteClients = ref.watch(deleteClientsViewModel);
     final clients = ref.watch(filteredClients);
     final isLoading = clients.isLoading || deleteClients.isLoading;
+    final user = ref.watch(loginViewModel).value;
 
     ref.listen(
       filteredClients,
@@ -64,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         titleSpacing: 32.0,
         title: !selectedMode
             ? Text(
-                "Sila",
+                "Welcome ${user?.username}",
                 style: TextStyle(
                   fontSize: 28.0,
                   fontWeight: FontWeight.w500,
@@ -85,7 +88,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 }),
                 SizedBox(width: 32)
               ]
-            : null,
+            : [
+                LogoutButton(),
+                SizedBox(width: 32),
+              ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(72.0),
           child: SearchField(

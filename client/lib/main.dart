@@ -13,17 +13,17 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
       title: 'Sila',
       theme: AppTheme.darkThemeMode,
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      routerConfig: router,
+      routerConfig: ref.read(routerProvider),
       builder: (context, child) {
         return ScrollConfiguration(
           behavior: const MaterialScrollBehavior().copyWith(

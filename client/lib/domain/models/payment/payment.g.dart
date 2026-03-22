@@ -9,7 +9,7 @@ part of 'payment.dart';
 _Payment _$PaymentFromJson(Map<String, dynamic> json) => _Payment(
       id: json['id'] as String,
       amount: (json['amount'] as num).toDouble(),
-      timeOfPayment: (json['time_of_payment'] as num).toInt(),
+      timeOfPayment: (json['timeOfPayment'] as num).toInt(),
     );
 
 Map<String, dynamic> _$PaymentToJson(_Payment instance) => <String, dynamic>{

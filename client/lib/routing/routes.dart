@@ -1,4 +1,6 @@
 abstract final class Routes {
+  static const login = '/login';
+  static const loginName = 'login';
   static const home = '/';
   static const homeName = 'home';
   static const clientCreate = 'create';
