@@ -16,8 +16,8 @@ class LogoutButton extends ConsumerWidget {
         color: AppPallete.surface,
       ),
       child: IconButton(
-        onPressed: () {
-          ref.read(loginViewModel.notifier).logout();
+        onPressed: () async {
+          await ref.read(loginViewModel.notifier).logout();
         },
         icon: Icon(Icons.logout),
       ),

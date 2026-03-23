@@ -30,6 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final clients = ref.watch(filteredClients);
     final isLoading = clients.isLoading || deleteClients.isLoading;
     final user = ref.watch(loginViewModel).value;
+    print(clients);
 
     ref.listen(
       filteredClients,

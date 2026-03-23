@@ -54,13 +54,26 @@ class LoginViewModel extends AsyncNotifier<User?> {
         await _authRepository.login(username: username, password: password);
     switch (result) {
       case Ok():
+        await _authRepository.setTokens(user: result.value);
         state = AsyncValue.data(result.value);
       case Error():
         state = AsyncValue.error(result.error, StackTrace.current);
     }
   }
 
-  void logout() {
+  Future<void> logout() async {
     state = AsyncValue.data(null);
+    await _authRepository.clearTokens();
+  }
+
+  Future<void> getUser() async {
+    state = AsyncValue.loading();
+    final result = await _authRepository.getUser();
+    switch (result) {
+      case Ok():
+        state = AsyncValue.data(result.value);
+      case Error():
+        state = AsyncValue.error(result.error, StackTrace.current);
+    }
   }
 }

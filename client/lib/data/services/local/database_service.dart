@@ -445,12 +445,13 @@ class DatabaseService {
     }
   }
 
-  Future<Result<void>> addClient(
-      {required String name,
-      required String phone,
-      required String city}) async {
+  Future<Result<void>> addClient({
+    required String id,
+    required String name,
+    required String phone,
+    required String city,
+  }) async {
     try {
-      final id = Uuid().v4();
       await _database!.insert(
         _clientTable,
         {
@@ -484,11 +485,12 @@ class DatabaseService {
     }
   }
 
-  Future<Result<void>> updateClient(
-      {required String id,
-      required String name,
-      required String phone,
-      required String city}) async {
+  Future<Result<void>> updateClient({
+    required String id,
+    required String name,
+    required String phone,
+    required String city,
+  }) async {
     try {
       await _database!.update(
         _clientTable,

@@ -32,9 +32,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       (previous, next) {
         next.when(
           data: (data) {
-            if (context.mounted) {
-              context.goNamed(Routes.homeName);
-            }
+            // if (context.mounted) {
+            //   context.goNamed(Routes.homeName);
+            // }
           },
           error: (error, stackTrace) {},
           loading: () {},

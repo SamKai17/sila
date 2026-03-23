@@ -11,6 +11,7 @@ _Client _$ClientFromJson(Map<String, dynamic> json) => _Client(
       name: json['name'] as String,
       phone: json['phone'] as String,
       city: json['city'] as String,
+      synchronized: json['synchronized'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ClientToJson(_Client instance) => <String, dynamic>{
@@ -18,4 +19,5 @@ Map<String, dynamic> _$ClientToJson(_Client instance) => <String, dynamic>{
       'name': instance.name,
       'phone': instance.phone,
       'city': instance.city,
+      'synchronized': instance.synchronized,
     };

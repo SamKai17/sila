@@ -28,7 +28,6 @@ final routerProvider = Provider(
     final user = ref.watch(currentUser);
     return GoRouter(
       debugLogDiagnostics: true,
-      // initialLocation: '/login',
       refreshListenable: user,
       redirect: (context, state) {
         if (user.value.value == null) {

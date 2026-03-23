@@ -18,6 +18,7 @@ mixin _$Client {
   String get name;
   String get phone;
   String get city;
+  bool get synchronized;
 
   /// Create a copy of Client
   /// with the given fields replaced by the non-null parameter values.
@@ -37,16 +38,19 @@ mixin _$Client {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.city, city) || other.city == city));
+            (identical(other.city, city) || other.city == city) &&
+            (identical(other.synchronized, synchronized) ||
+                other.synchronized == synchronized));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, phone, city);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, phone, city, synchronized);
 
   @override
   String toString() {
-    return 'Client(id: $id, name: $name, phone: $phone, city: $city)';
+    return 'Client(id: $id, name: $name, phone: $phone, city: $city, synchronized: $synchronized)';
   }
 }
 
@@ -55,7 +59,8 @@ abstract mixin class $ClientCopyWith<$Res> {
   factory $ClientCopyWith(Client value, $Res Function(Client) _then) =
       _$ClientCopyWithImpl;
   @useResult
-  $Res call({String id, String name, String phone, String city});
+  $Res call(
+      {String id, String name, String phone, String city, bool synchronized});
 }
 
 /// @nodoc
@@ -74,6 +79,7 @@ class _$ClientCopyWithImpl<$Res> implements $ClientCopyWith<$Res> {
     Object? name = null,
     Object? phone = null,
     Object? city = null,
+    Object? synchronized = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -92,6 +98,10 @@ class _$ClientCopyWithImpl<$Res> implements $ClientCopyWith<$Res> {
           ? _self.city
           : city // ignore: cast_nullable_to_non_nullable
               as String,
+      synchronized: null == synchronized
+          ? _self.synchronized
+          : synchronized // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -189,14 +199,16 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String name, String phone, String city)?
+    TResult Function(String id, String name, String phone, String city,
+            bool synchronized)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _Client() when $default != null:
-        return $default(_that.id, _that.name, _that.phone, _that.city);
+        return $default(
+            _that.id, _that.name, _that.phone, _that.city, _that.synchronized);
       case _:
         return orElse();
     }
@@ -217,13 +229,15 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String name, String phone, String city)
+    TResult Function(String id, String name, String phone, String city,
+            bool synchronized)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Client():
-        return $default(_that.id, _that.name, _that.phone, _that.city);
+        return $default(
+            _that.id, _that.name, _that.phone, _that.city, _that.synchronized);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -243,13 +257,15 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String name, String phone, String city)?
+    TResult? Function(String id, String name, String phone, String city,
+            bool synchronized)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Client() when $default != null:
-        return $default(_that.id, _that.name, _that.phone, _that.city);
+        return $default(
+            _that.id, _that.name, _that.phone, _that.city, _that.synchronized);
       case _:
         return null;
     }
@@ -263,7 +279,8 @@ class _Client implements Client {
       {required this.id,
       required this.name,
       required this.phone,
-      required this.city});
+      required this.city,
+      this.synchronized = false});
   factory _Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
 
   @override
@@ -274,6 +291,9 @@ class _Client implements Client {
   final String phone;
   @override
   final String city;
+  @override
+  @JsonKey()
+  final bool synchronized;
 
   /// Create a copy of Client
   /// with the given fields replaced by the non-null parameter values.
@@ -298,16 +318,19 @@ class _Client implements Client {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.city, city) || other.city == city));
+            (identical(other.city, city) || other.city == city) &&
+            (identical(other.synchronized, synchronized) ||
+                other.synchronized == synchronized));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, phone, city);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, phone, city, synchronized);
 
   @override
   String toString() {
-    return 'Client(id: $id, name: $name, phone: $phone, city: $city)';
+    return 'Client(id: $id, name: $name, phone: $phone, city: $city, synchronized: $synchronized)';
   }
 }
 
@@ -317,7 +340,8 @@ abstract mixin class _$ClientCopyWith<$Res> implements $ClientCopyWith<$Res> {
       __$ClientCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, String name, String phone, String city});
+  $Res call(
+      {String id, String name, String phone, String city, bool synchronized});
 }
 
 /// @nodoc
@@ -336,6 +360,7 @@ class __$ClientCopyWithImpl<$Res> implements _$ClientCopyWith<$Res> {
     Object? name = null,
     Object? phone = null,
     Object? city = null,
+    Object? synchronized = null,
   }) {
     return _then(_Client(
       id: null == id
@@ -354,6 +379,10 @@ class __$ClientCopyWithImpl<$Res> implements _$ClientCopyWith<$Res> {
           ? _self.city
           : city // ignore: cast_nullable_to_non_nullable
               as String,
+      synchronized: null == synchronized
+          ? _self.synchronized
+          : synchronized // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
