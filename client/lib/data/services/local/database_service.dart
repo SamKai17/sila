@@ -21,6 +21,7 @@ class DatabaseService {
   static const _clientNameField = 'name';
   static const _clientPhoneField = 'phone';
   static const _clientCityField = 'city';
+  static const _clientSynchronizedField = 'synchronized';
 
   static const _transactionTable = 'transactions';
   static const _transactionIdField = 'id';
@@ -70,7 +71,9 @@ class DatabaseService {
             $_clientIdField TEXT PRIMARY KEY,
             $_clientNameField TEXT,
             $_clientPhoneField TEXT,
-            $_clientCityField TEXT)
+            $_clientCityField TEXT,
+            $_clientSynchronizedField INTEGER DEFAULT 0
+            )
         ''');
         db.execute('''CREATE TABLE $_transactionTable(
             $_transactionIdField TEXT PRIMARY KEY,
@@ -103,7 +106,7 @@ class DatabaseService {
       },
       version: 1,
       onConfigure: (db) {
-        print("configuring db...");
+        // print("configuring db...");
         db.execute('PRAGMA foreign_keys = ON');
       },
     );
@@ -461,6 +464,24 @@ class DatabaseService {
           _clientCityField: city,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> synchronizeClient({
+    required String id,
+  }) async {
+    try {
+      await _database!.update(
+        _clientTable,
+        {
+          _clientSynchronizedField: 1,
+        },
+        where: '$_clientIdField = ?',
+        whereArgs: [id],
       );
       return Result.ok(null);
     } on Exception catch (e) {

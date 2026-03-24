@@ -40,6 +40,30 @@ class AuthApiClient {
     }
   }
 
+  Future<Result<String>> refreshAccess({required String refreshToken}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.uri}/api/token/refresh/'),
+        headers: {
+          Constants.contentType: 'application/json',
+        },
+        body: jsonEncode(
+          {
+            'refresh': refreshToken,
+          },
+        ),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('an error while refreshing access token');
+      }
+      final responseMap = jsonDecode(response.body) as Map<String, dynamic>;
+      final token = responseMap['access'] as String;
+      return Result.ok(token);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
   Future<Result<User>> getUser({
     required String accessToken,
     required String refreshToken,

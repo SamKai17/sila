@@ -1,3 +1,4 @@
+import 'package:client/data/services/local/secure_storage_service.dart';
 import 'package:client/data/services/local/shared_preferences_service.dart';
 import 'package:client/data/services/remote/auth_api_client.dart';
 import 'package:client/domain/models/auth/user.dart';
@@ -9,6 +10,7 @@ final authRepository = Provider(
     return AuthRepository(
       authApiClient: ref.read(authApiClient),
       prefs: ref.read(sharedPreferencesService),
+      secureStorageService: ref.read(secureStorageService),
     );
   },
 );
@@ -17,11 +19,14 @@ class AuthRepository {
   AuthRepository({
     required AuthApiClient authApiClient,
     required SharedPreferencesService prefs,
+    required SecureStorageService secureStorageService,
   })  : _authApiClient = authApiClient,
-        _prefs = prefs;
+        _prefs = prefs,
+        _secureStorageService = secureStorageService;
 
   final AuthApiClient _authApiClient;
   final SharedPreferencesService _prefs;
+  final SecureStorageService _secureStorageService;
 
   Future<Result<User?>> login({
     required String username,
@@ -38,6 +43,10 @@ class AuthRepository {
     }
     if (user != null) {
       await _prefs.setTokens(access: user.access, refresh: user.refresh);
+      await _secureStorageService.setTokens((
+        accessToken: user.access,
+        refreshToken: user.refresh,
+      ));
     }
   }
 
@@ -59,6 +68,19 @@ class AuthRepository {
     }
     return await _authApiClient.getUser(
         accessToken: accessToken, refreshToken: refreshToken);
+  }
+
+  Future<Result<void>> refreshAccess() async {
+    if (!_prefs.isOpen) {
+      await _prefs.open();
+    }
+    final refreshToken = _prefs.getRefreshToken();
+    if (refreshToken != null) {
+      final result =
+          await _authApiClient.refreshAccess(refreshToken: refreshToken);
+      return result;
+    }
+    return Result.error(Exception('refresh token not found'));
   }
 
   Future<void> register({

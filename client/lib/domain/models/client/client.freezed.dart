@@ -18,7 +18,7 @@ mixin _$Client {
   String get name;
   String get phone;
   String get city;
-  bool get synchronized;
+  int get synchronized;
 
   /// Create a copy of Client
   /// with the given fields replaced by the non-null parameter values.
@@ -60,7 +60,7 @@ abstract mixin class $ClientCopyWith<$Res> {
       _$ClientCopyWithImpl;
   @useResult
   $Res call(
-      {String id, String name, String phone, String city, bool synchronized});
+      {String id, String name, String phone, String city, int synchronized});
 }
 
 /// @nodoc
@@ -101,7 +101,7 @@ class _$ClientCopyWithImpl<$Res> implements $ClientCopyWith<$Res> {
       synchronized: null == synchronized
           ? _self.synchronized
           : synchronized // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as int,
     ));
   }
 }
@@ -200,7 +200,7 @@ extension ClientPatterns on Client {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String id, String name, String phone, String city,
-            bool synchronized)?
+            int synchronized)?
         $default, {
     required TResult orElse(),
   }) {
@@ -229,8 +229,8 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String name, String phone, String city,
-            bool synchronized)
+    TResult Function(
+            String id, String name, String phone, String city, int synchronized)
         $default,
   ) {
     final _that = this;
@@ -258,7 +258,7 @@ extension ClientPatterns on Client {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String id, String name, String phone, String city,
-            bool synchronized)?
+            int synchronized)?
         $default,
   ) {
     final _that = this;
@@ -280,7 +280,7 @@ class _Client implements Client {
       required this.name,
       required this.phone,
       required this.city,
-      this.synchronized = false});
+      this.synchronized = 0});
   factory _Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
 
   @override
@@ -293,7 +293,7 @@ class _Client implements Client {
   final String city;
   @override
   @JsonKey()
-  final bool synchronized;
+  final int synchronized;
 
   /// Create a copy of Client
   /// with the given fields replaced by the non-null parameter values.
@@ -341,7 +341,7 @@ abstract mixin class _$ClientCopyWith<$Res> implements $ClientCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {String id, String name, String phone, String city, bool synchronized});
+      {String id, String name, String phone, String city, int synchronized});
 }
 
 /// @nodoc
@@ -382,7 +382,7 @@ class __$ClientCopyWithImpl<$Res> implements _$ClientCopyWith<$Res> {
       synchronized: null == synchronized
           ? _self.synchronized
           : synchronized // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as int,
     ));
   }
 }

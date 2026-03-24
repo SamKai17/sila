@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:client/data/services/local/database_service.dart';
 import 'package:client/data/services/local/shared_preferences_service.dart';
 import 'package:client/data/services/remote/api_client.dart';
+import 'package:client/data/services/remote/auth_api_client.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';
 import 'package:riverpod/riverpod.dart';
@@ -19,6 +20,7 @@ final clientRepository = Provider(
     return ClientRepository(
       databaseService: ref.read(databaseService),
       apiClient: ref.read(apiClient),
+      authApiClient: ref.read(authApiClient),
       prefs: ref.read(sharedPreferencesService),
     );
   },
@@ -28,12 +30,16 @@ class ClientRepository {
   ClientRepository({
     required DatabaseService databaseService,
     required ApiClient apiClient,
+    required AuthApiClient authApiClient,
     required SharedPreferencesService prefs,
   })  : _databaseService = databaseService,
         _apiClient = apiClient,
+        _authApiClient = authApiClient,
         _prefs = prefs;
+
   DatabaseService _databaseService;
   ApiClient _apiClient;
+  AuthApiClient _authApiClient;
   SharedPreferencesService _prefs;
 
   final _controller = StreamController<void>.broadcast();
@@ -49,7 +55,6 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    // await Future.delayed(Duration(seconds: 2));
     final result = await _databaseService.getClientsList();
     switch (result) {
       case Ok():
@@ -74,14 +79,23 @@ class ClientRepository {
     }
     final id = Uuid().v4();
     final result = await _databaseService.addClient(
-        id: id, name: name, phone: phone, city: city);
-    _controller.add(null);
+      id: id,
+      name: name,
+      phone: phone,
+      city: city,
+    );
+    switch (result) {
+      case Ok():
+        _controller.add(null);
+      case Error():
+        return result;
+    }
     if (!_prefs.isOpen) {
       await _prefs.open();
     }
     final accessToken = await _prefs.getAccessToken();
     if (accessToken != null) {
-      await _apiClient.addClient(
+      final res = await _apiClient.addClient(
         accessToken: accessToken,
         id: id,
         name: name,
