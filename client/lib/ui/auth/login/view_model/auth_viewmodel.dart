@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:client/data/repositories/auth/auth_repository.dart';
+import 'package:client/data/repositories/client/client_repository.dart';
 import 'package:client/domain/models/auth/user.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter/foundation.dart';
@@ -40,10 +41,17 @@ class LoginViewModel extends AsyncNotifier<User?> {
   @override
   FutureOr<User?> build() {
     _authRepository = ref.read(authRepository);
+    _clientRepository = ref.read(clientRepository);
+    _clientRepository.observeAuth().listen(
+      (event) {
+        state = AsyncValue.data(null);
+      },
+    );
     return null;
   }
 
   late AuthRepository _authRepository;
+  late ClientRepository _clientRepository;
 
   Future<void> login({
     required String username,

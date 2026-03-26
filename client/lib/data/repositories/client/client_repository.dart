@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:client/data/services/local/database_service.dart';
-import 'package:client/data/services/local/shared_preferences_service.dart';
 import 'package:client/data/services/remote/api_client.dart';
-import 'package:client/data/services/remote/auth_api_client.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';
 import 'package:riverpod/riverpod.dart';
@@ -20,8 +18,7 @@ final clientRepository = Provider(
     return ClientRepository(
       databaseService: ref.read(databaseService),
       apiClient: ref.read(apiClient),
-      authApiClient: ref.read(authApiClient),
-      prefs: ref.read(sharedPreferencesService),
+      // authApiClient: ref.read(authApiClient),
     );
   },
 );
@@ -30,19 +27,19 @@ class ClientRepository {
   ClientRepository({
     required DatabaseService databaseService,
     required ApiClient apiClient,
-    required AuthApiClient authApiClient,
-    required SharedPreferencesService prefs,
+    // required AuthApiClient authApiClient,
   })  : _databaseService = databaseService,
-        _apiClient = apiClient,
-        _authApiClient = authApiClient,
-        _prefs = prefs;
+        _apiClient = apiClient;
+  // _authApiClient = authApiClient;
 
   DatabaseService _databaseService;
   ApiClient _apiClient;
-  AuthApiClient _authApiClient;
-  SharedPreferencesService _prefs;
+  // AuthApiClient _authApiClient;
 
   final _controller = StreamController<void>.broadcast();
+  final _authController = StreamController<void>.broadcast();
+
+  Stream<void> observeAuth() => _authController.stream;
 
   Stream<List<Client>> watch() async* {
     yield await getClientsList();
@@ -78,32 +75,35 @@ class ClientRepository {
       await _databaseService.open();
     }
     final id = Uuid().v4();
-    final result = await _databaseService.addClient(
+    final localResult = await _databaseService.addClient(
       id: id,
       name: name,
       phone: phone,
       city: city,
     );
-    switch (result) {
+    switch (localResult) {
       case Ok():
         _controller.add(null);
       case Error():
-        return result;
+        return localResult;
     }
-    if (!_prefs.isOpen) {
-      await _prefs.open();
+    final remoteResult = await _apiClient.addClient(
+      id: id,
+      name: name,
+      phone: phone,
+      city: city,
+    );
+    switch (remoteResult) {
+      case Ok():
+        break;
+      case Error():
+        _authController.add(null);
+      // if (remoteResult.error is RevokeTokenException) {
+      //   return remoteResult;
+      //   // logout user
+      // }
     }
-    final accessToken = await _prefs.getAccessToken();
-    if (accessToken != null) {
-      final res = await _apiClient.addClient(
-        accessToken: accessToken,
-        id: id,
-        name: name,
-        phone: phone,
-        city: city,
-      );
-    }
-    return result;
+    return localResult;
   }
 
   Future<Result<void>> updateClient({
@@ -115,23 +115,16 @@ class ClientRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final result = await _databaseService.updateClient(
+    final localResult = await _databaseService.updateClient(
         id: id, name: name, phone: phone, city: city);
     _controller.add(null);
-    if (!_prefs.isOpen) {
-      await _prefs.open();
-    }
-    final accessToken = await _prefs.getAccessToken();
-    if (accessToken != null) {
-      await _apiClient.updateClient(
-        accessToken: accessToken,
-        id: id,
-        name: name,
-        phone: phone,
-        city: city,
-      );
-    }
-    return result;
+    final remoteResult = await _apiClient.updateClient(
+      id: id,
+      name: name,
+      phone: phone,
+      city: city,
+    );
+    return localResult;
   }
 
   Future<Result<void>> deleteClients({
@@ -142,16 +135,9 @@ class ClientRepository {
     }
     final result = await _databaseService.deleteClients(ids);
     _controller.add(null);
-    if (!_prefs.isOpen) {
-      await _prefs.open();
-    }
-    final accessToken = await _prefs.getAccessToken();
-    if (accessToken != null) {
-      await _apiClient.deleteClients(
-        accessToken: accessToken,
-        ids: ids,
-      );
-    }
+    await _apiClient.deleteClients(
+      ids: ids,
+    );
     return result;
   }
 }

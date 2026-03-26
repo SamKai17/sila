@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:client/data/repositories/client/client_repository.dart';
+import 'package:client/ui/auth/login/view_model/auth_viewmodel.dart';
 import 'package:client/utils/result.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

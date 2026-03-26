@@ -1,5 +1,4 @@
 import 'package:client/data/services/local/secure_storage_service.dart';
-import 'package:client/data/services/local/shared_preferences_service.dart';
 import 'package:client/data/services/remote/auth_api_client.dart';
 import 'package:client/domain/models/auth/user.dart';
 import 'package:client/utils/result.dart';
@@ -9,7 +8,6 @@ final authRepository = Provider(
   (ref) {
     return AuthRepository(
       authApiClient: ref.read(authApiClient),
-      prefs: ref.read(sharedPreferencesService),
       secureStorageService: ref.read(secureStorageService),
     );
   },
@@ -18,14 +16,11 @@ final authRepository = Provider(
 class AuthRepository {
   AuthRepository({
     required AuthApiClient authApiClient,
-    required SharedPreferencesService prefs,
     required SecureStorageService secureStorageService,
   })  : _authApiClient = authApiClient,
-        _prefs = prefs,
         _secureStorageService = secureStorageService;
 
   final AuthApiClient _authApiClient;
-  final SharedPreferencesService _prefs;
   final SecureStorageService _secureStorageService;
 
   Future<Result<User?>> login({
@@ -38,54 +33,34 @@ class AuthRepository {
   }
 
   Future<void> setTokens({required User? user}) async {
-    if (!_prefs.isOpen) {
-      await _prefs.open();
-    }
     if (user != null) {
-      await _prefs.setTokens(access: user.access, refresh: user.refresh);
-      await _secureStorageService.setTokens((
-        accessToken: user.access,
-        refreshToken: user.refresh,
-      ));
+      await _secureStorageService.setTokens(
+        (
+          accessToken: user.access,
+          refreshToken: user.refresh,
+        ),
+      );
     }
   }
 
   Future<void> clearTokens() async {
-    if (!_prefs.isOpen) {
-      await _prefs.open();
-    }
-    await _prefs.clearTokens();
+    await _secureStorageService.clearTokens();
   }
 
   Future<Result<User>> getUser() async {
-    if (!_prefs.isOpen) {
-      await _prefs.open();
+    final tokenPair = await _secureStorageService.getTokens();
+    if (tokenPair != null) {
+      return await _authApiClient.getUser(
+        accessToken: tokenPair.accessToken,
+        refreshToken: tokenPair.refreshToken,
+      );
     }
-    final accessToken = _prefs.getAccessToken();
-    final refreshToken = _prefs.getRefreshToken();
-    if (accessToken == null || refreshToken == null) {
-      return Result.error(Exception('lack of tokens'));
-    }
-    return await _authApiClient.getUser(
-        accessToken: accessToken, refreshToken: refreshToken);
+    return Result.error(Exception('no token found'));
   }
 
-  Future<Result<void>> refreshAccess() async {
-    if (!_prefs.isOpen) {
-      await _prefs.open();
-    }
-    final refreshToken = _prefs.getRefreshToken();
-    if (refreshToken != null) {
-      final result =
-          await _authApiClient.refreshAccess(refreshToken: refreshToken);
-      return result;
-    }
-    return Result.error(Exception('refresh token not found'));
-  }
-
-  Future<void> register({
-    required String username,
-    required String password,
-    required String confirmPassword,
-  }) async {}
+  // Future<void> register({
+  //   required String username,
+  //   required String password,
+  //   required String confirmPassword,
+  // }) async {}
 }

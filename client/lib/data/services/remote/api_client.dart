@@ -1,18 +1,13 @@
-import 'dart:convert';
 import 'package:client/data/services/local/secure_storage_service.dart';
 import 'package:client/utils/constants.dart';
 import 'package:client/utils/result.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 
 class RevokeTokenException extends DioException {
   RevokeTokenException({required super.requestOptions});
 }
-
-typedef TokenPair = ({String accessToken, String refreshToken});
 
 class AuthInterceptor extends QueuedInterceptor {
   AuthInterceptor({
@@ -20,11 +15,14 @@ class AuthInterceptor extends QueuedInterceptor {
     required Dio this.dio,
   }) {
     refreshClient = Dio();
+    retryClient = Dio();
     refreshClient.options = BaseOptions(baseUrl: dio.options.baseUrl);
+    retryClient.options = BaseOptions(baseUrl: dio.options.baseUrl);
   }
   final SecureStorageService secureStorageService;
   final Dio dio;
   late Dio refreshClient;
+  late Dio retryClient;
 
   Future<bool> get _isAccessTokenValid async {
     final tokenPair = await secureStorageService.getTokens();
@@ -42,22 +40,27 @@ class AuthInterceptor extends QueuedInterceptor {
 
   Future<TokenPair?> _refresh({required String refreshToken}) async {
     try {
-      final response = await refreshClient.post('/api/token/refresh/', data: {
-        'refresh': refreshToken,
-      });
+      final response = await refreshClient.post(
+        '/api/token/refresh/',
+        data: {
+          'refresh': refreshToken,
+        },
+      );
       final String accessToken = response.data['access'];
       return (accessToken: accessToken, refreshToken: refreshToken);
       //need to send refresh token
     } catch (_) {
       // maybe here rethrow the exception
+      // maybe there was an error other than refresh token has expired
       return null;
     }
   }
 
   @override
   void onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
-    // return handler.reject(RevokeTokenException(requestOptions: options));
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     print('on request');
     // get access token
     final TokenPair? tokenPair = await secureStorageService.getTokens();
@@ -93,17 +96,79 @@ class AuthInterceptor extends QueuedInterceptor {
     return handler.next(options);
   }
 
+  Future<Map<String, dynamic>> _authorizationHeader() async {
+    final tokenPair = await secureStorageService.getTokens();
+    return {'Authorization': 'bearer ${tokenPair!.accessToken}'};
+  }
+
+  Future<Response<T>> _retry<T>(RequestOptions requestOptions) async {
+    // retryClient.fetch(requestOptions)
+    // return retryClient.fetch(requestOptions);
+    print('retry');
+    return retryClient.request(
+      requestOptions.path,
+      cancelToken: requestOptions.cancelToken,
+      data: requestOptions.data is FormData
+          ? (requestOptions.data as FormData).clone()
+          : requestOptions.data,
+      onReceiveProgress: requestOptions.onReceiveProgress,
+      onSendProgress: requestOptions.onSendProgress,
+      queryParameters: requestOptions.queryParameters,
+      options: Options(
+        method: requestOptions.method,
+        sendTimeout: requestOptions.sendTimeout,
+        receiveTimeout: requestOptions.receiveTimeout,
+        extra: requestOptions.extra,
+        headers: {
+          ...requestOptions.headers,
+          ...await _authorizationHeader(),
+        },
+        responseType: requestOptions.responseType,
+        contentType: requestOptions.contentType,
+        validateStatus: requestOptions.validateStatus,
+        receiveDataWhenStatusError: requestOptions.receiveDataWhenStatusError,
+        followRedirects: requestOptions.followRedirects,
+        maxRedirects: requestOptions.maxRedirects,
+        requestEncoder: requestOptions.requestEncoder,
+        responseDecoder: requestOptions.responseDecoder,
+        listFormat: requestOptions.listFormat,
+        connectTimeout: requestOptions.connectTimeout,
+        persistentConnection: requestOptions.persistentConnection,
+        preserveHeaderCase: requestOptions.preserveHeaderCase,
+      ),
+    );
+  }
+
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  void onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     print('on error');
-    if (err is RevokeTokenException) {
+    if (err is RevokeTokenException || err.response == null) {
       print('rejected onError');
       return handler.reject(err);
     }
+    if (err.response!.statusCode == 401) {
+      final TokenPair? tokenPair = await secureStorageService.getTokens();
+      if (tokenPair == null) {
+        return handler
+            .reject(RevokeTokenException(requestOptions: err.requestOptions));
+      }
+      final TokenPair? newTokenPair =
+          await _refresh(refreshToken: tokenPair.refreshToken);
+      if (newTokenPair == null) {
+        print('invalid refresh token');
+        // if refresh is not valid => logout user
+        return handler.reject(
+          RevokeTokenException(requestOptions: err.requestOptions),
+        );
+      }
+      final response = await _retry(err.requestOptions);
+      return handler.resolve(response);
+      // retry
+    }
     return handler.next(err);
-    // return handler.resolve(response);
-    // final TokenPair tokens = (accessToken: '', refreshToken: '');
-    // super.onError(err, handler);
   }
 }
 
@@ -120,35 +185,37 @@ final apiClient = Provider(
 );
 
 class ApiClient {
-  final Dio _dio;
   ApiClient(this._dio);
+
+  final Dio _dio;
+
   Future<Result<void>> addClient({
-    required String accessToken,
+    // required String accessToken,
     required String id,
     required String name,
     required String phone,
     required String city,
   }) async {
     try {
-      final Response response = await _dio.post(
-        '${Constants.uri}/api/client/',
-        data: jsonEncode(
-          {
-            'id': id,
-            'name': name,
-            'phone': phone,
-            'city': city,
-          },
-        ),
+      final _ = await _dio.post(
+        '/api/client/',
+        data: {
+          'id': id,
+          'name': name,
+          'phone': phone,
+          'city': city,
+        },
       );
-      print(response.data);
-      print('here: ${response.statusCode}');
       return Result.ok(null);
+    } on RevokeTokenException catch (e) {
+      print('refresh token is out');
+      return Result.error(e);
     } on DioException catch (e) {
       if (e.response != null) {
         // server error
         print('exception: ${e.response!.statusCode}');
       } else {
+        print('my error');
         // your error
       }
       return Result.error(e);
@@ -156,59 +223,49 @@ class ApiClient {
   }
 
   Future<Result<void>> updateClient({
-    required String accessToken,
+    // required String accessToken,
     required String id,
     required String name,
     required String phone,
     required String city,
   }) async {
     try {
-      print('${Constants.uri}/api/client/${id}/');
-      final response = await http.put(
-        Uri.parse('${Constants.uri}/api/client/${id}/'),
-        headers: {
-          Constants.contentType: 'application/json',
-          Constants.authorization: 'Bearer ${accessToken}'
+      final _ = await _dio.put(
+        '/api/client/${id}/',
+        data: {
+          'name': name,
+          'phone': phone,
+          'city': city,
         },
-        body: jsonEncode(
-          {
-            'name': name,
-            'phone': phone,
-            'city': city,
-          },
-        ),
       );
-      if (response.statusCode != 200) {
-        throw Exception('error updating client');
-      }
       return Result.ok(null);
-    } on Exception catch (e) {
+    } on DioException catch (e) {
+      if (e.response != null) {
+        // server error
+        print('exception: ${e.response!.statusCode}');
+      } else {
+        print('my error');
+        // your error
+      }
       return Result.error(e);
     }
   }
 
   Future<Result<void>> deleteClients({
-    required String accessToken,
+    // required String accessToken,
     required List<String> ids,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('${Constants.uri}/api/clients/delete/'),
-        headers: {
-          Constants.contentType: 'application/json',
-          Constants.authorization: 'Bearer ${accessToken}'
+      final _ = await _dio.post(
+        '/api/clients/delete/',
+        data: {
+          'ids': ids,
         },
-        body: jsonEncode(
-          {
-            'ids': ids,
-          },
-        ),
       );
-      if (response.statusCode != 200) {
-        throw Exception('error creating client');
-      }
       return Result.ok(null);
-    } on Exception catch (e) {
+    } on DioException catch (e) {
+      if (e.response != null) {
+      } else {}
       return Result.error(e);
     }
   }

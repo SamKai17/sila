@@ -15,6 +15,9 @@ class SecureStorageService {
   }
   late FlutterSecureStorage _secureStorage;
 
+  Future<String?> get accessToken => _secureStorage.read(key: 'accessToken');
+  Future<String?> get refreshToken => _secureStorage.read(key: 'refreshToken');
+
   Future<TokenPair?> getTokens() async {
     final accessToken = await _secureStorage.read(key: 'accessToken');
     final refreshToken = await _secureStorage.read(key: 'refreshToken');
