@@ -8,7 +8,7 @@ part of 'transaction_draft.dart';
 
 _TransactionDraft _$TransactionDraftFromJson(Map<String, dynamic> json) =>
     _TransactionDraft(
-      clientId: json['clientId'] as String,
+      clientId: json['client_id'] as String,
       paid: (json['paid'] as num).toDouble(),
       items: (json['items'] as List<dynamic>)
           .map((e) => Item.fromJson(e as Map<String, dynamic>))

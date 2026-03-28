@@ -23,6 +23,7 @@ class TransactionReceiptScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print(transactionId);
     final transactionAsync = ref.watch(transactionProvider(transactionId));
     final client = ref.watch(clientProvider(clientId)).value;
     return transactionAsync.when(
@@ -143,8 +144,9 @@ class TransactionReceiptScreen extends ConsumerWidget {
       },
       error: (error, stackTrace) {
         return Scaffold(
+          appBar: AppBar(),
           body: Center(
-            child: Text('no transaction found'),
+            child: Text('noo transaction found'),
           ),
         );
       },

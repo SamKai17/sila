@@ -10,12 +10,12 @@ _TransactionLocalModel _$TransactionLocalModelFromJson(
         Map<String, dynamic> json) =>
     _TransactionLocalModel(
       id: json['id'] as String,
-      totalPrice: (json['totalPrice'] as num).toDouble(),
+      totalPrice: (json['total_price'] as num).toDouble(),
       remainder: (json['remainder'] as num).toDouble(),
-      totalPaid: (json['totalPaid'] as num).toDouble(),
+      totalPaid: (json['total_paid'] as num).toDouble(),
       type: json['type'] as String,
-      timeOfTransaction: (json['timeOfTransaction'] as num).toInt(),
-      clientId: json['clientId'] as String,
+      timeOfTransaction: (json['time_of_transaction'] as num).toInt(),
+      clientId: json['client_id'] as String,
     );
 
 Map<String, dynamic> _$TransactionLocalModelToJson(

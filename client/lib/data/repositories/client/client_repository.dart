@@ -3,6 +3,7 @@ import 'package:client/data/services/local/database_service.dart';
 import 'package:client/data/services/remote/api_client.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';
+import 'package:dio/dio.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:uuid/uuid.dart';
 
@@ -140,4 +141,5 @@ class ClientRepository {
     );
     return result;
   }
+
 }
