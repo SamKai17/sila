@@ -1,5 +1,4 @@
 import 'package:client/data/services/local/secure_storage_service.dart';
-import 'package:client/domain/models/item/item.dart';
 import 'package:client/utils/constants.dart';
 import 'package:client/utils/result.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -99,7 +98,7 @@ class AuthInterceptor extends QueuedInterceptor {
 
   Future<Map<String, dynamic>> _authorizationHeader() async {
     final tokenPair = await secureStorageService.getTokens();
-    return {'Authorization': 'Bearer ${tokenPair!.accessToken}'};
+    return {'Authorization': 'bearer ${tokenPair!.accessToken}'};
   }
 
   Future<Response<T>> _retry<T>(RequestOptions requestOptions) async {
@@ -267,75 +266,6 @@ class ApiClient {
     } on DioException catch (e) {
       if (e.response != null) {
       } else {}
-      return Result.error(e);
-    }
-  }
-
-  Future<Result<void>> addTransaction({
-    required String id,
-    required double totalPrice,
-    required double totalPaid,
-    required double remainder,
-    required int timeOfTransaction,
-    required String type,
-    required String clientId,
-    required List<Item> items,
-    required String paymentId,
-  }) async {
-    try {
-      final itemsMapList = items
-          .map(
-            (e) => {
-              'id': e.id,
-              'name': e.name,
-              'price': e.price,
-              'quantity': e.quantity
-            },
-          )
-          .toList();
-      print(type);
-      final response = await _dio.post(
-        '/transaction/create/',
-        data: {
-          'id': id,
-          'total_price': totalPrice,
-          'total_paid': totalPaid,
-          'remainder': remainder,
-          'time_of_transaction': timeOfTransaction,
-          'type': 'Buy', // need to fix the type
-          'client': clientId,
-          'items': itemsMapList,
-          'payments': [
-            {
-              'id': paymentId,
-              'amount': totalPaid,
-              'time_of_payment': timeOfTransaction,
-            }
-          ],
-        },
-      );
-      print(response.data);
-      return Result.ok(null);
-    } on DioException catch (e) {
-      print(e.message);
-      print(e.error);
-      return Result.error(e);
-    }
-  }
-
-  Future<Result<void>> deleteTransactions({
-    required List<String> transactionsIds,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/transaction/delete/',
-        data: {
-          'ids': transactionsIds,
-        },
-      );
-      print(response.data);
-      return Result.ok(null);
-    } on DioException catch (e) {
       return Result.error(e);
     }
   }

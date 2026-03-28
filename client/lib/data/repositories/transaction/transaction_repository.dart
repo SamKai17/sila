@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'package:client/data/services/local/database_service.dart';
-import 'package:client/data/services/remote/api_client.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 final transactionsProvider = StreamProvider.family<List<Transaction>, String>(
   (ref, clientId) {
@@ -26,22 +24,16 @@ final transactionProvider = StreamProvider.family<Transaction, String>(
 
 final transactionRepository = Provider(
   (ref) {
-    return TransactionRepository(
-      databaseService: ref.read(databaseService),
-      apiClient: ref.read(apiClient),
-    );
+    return TransactionRepository(databaseService: ref.read(databaseService));
   },
 );
 
 class TransactionRepository {
   TransactionRepository({
     required DatabaseService databaseService,
-    required ApiClient apiClient,
-  })  : _databaseService = databaseService,
-        _apiClient = apiClient;
+  }) : _databaseService = databaseService;
 
   final DatabaseService _databaseService;
-  final ApiClient _apiClient;
 
   final _transactionsListController = StreamController<void>.broadcast();
   final _transactionController = StreamController<void>.broadcast();
@@ -204,31 +196,15 @@ class TransactionRepository {
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
-    final timeOfTransaction = DateTime.now().millisecondsSinceEpoch;
-    final transactionId = Uuid().v4();
-    final paymentId = Uuid().v4();
     final result = await _databaseService.addTransaction(
-      transactionId: transactionId,
-      paymentId: paymentId,
       clientId: clientId,
       paid: paid,
       remainder: remainder,
       type: type,
-      timeOfTransaction: timeOfTransaction,
+      timeOfTransaction: DateTime.now().millisecondsSinceEpoch,
       totalPaid: totalPaid,
       totalPrice: totalPrice,
       items: items,
-    );
-    await _apiClient.addTransaction(
-      id: transactionId,
-      totalPrice: totalPrice,
-      totalPaid: totalPaid,
-      remainder: remainder,
-      timeOfTransaction: timeOfTransaction,
-      type: type,
-      clientId: clientId,
-      items: items,
-      paymentId: paymentId 
     );
     _transactionsListController.add(null);
     return result;
@@ -241,8 +217,7 @@ class TransactionRepository {
     }
     _transactionsListController.add(null);
     final result =
-        await _databaseService.deleteTransactions(transactionsIds: transactionsIds);
-      await _apiClient.deleteTransactions(transactionsIds: transactionsIds);
+        _databaseService.deleteTransactions(transactionsIds: transactionsIds);
     return result;
   }
 

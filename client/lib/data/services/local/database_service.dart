@@ -364,8 +364,6 @@ class DatabaseService {
   }
 
   Future<Result<String>> addTransaction({
-    required String transactionId,
-    required String paymentId,
     required double totalPrice,
     required double totalPaid,
     required double remainder,
@@ -376,6 +374,8 @@ class DatabaseService {
     required List<Item> items,
   }) async {
     try {
+      final transactionId = Uuid().v4();
+      final paymentId = Uuid().v4();
       await _database!.transaction(
         (txn) async {
           await txn.insert(
