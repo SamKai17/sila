@@ -10,7 +10,6 @@ from django.db import transaction
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def client_list(request):
-    print(request.user)
     # fetch by user
     clients = Client.objects.filter(user=request.user)
     serializer = ClientModelSerializer(clients, many=True)
@@ -33,7 +32,7 @@ def client_create(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def client_update(request, pk):
     client = get_object_or_404(Client, pk=pk, user=request.user)
@@ -43,14 +42,13 @@ def client_update(request, pk):
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def client_delete(request):
     ids_to_delete = request.data.get('ids', [])
     with transaction.atomic():
-        qs = Client.objects.filter(id__in=ids_to_delete, user=request.user).select_for_update()
+        qs = Client.objects.filter(id__in=ids_to_delete, user=request.user)
         deleted_ids = list(qs.values_list('id', flat=True))
         qs.delete()
-    print(deleted_ids)
+    # print(deleted_ids)
     return Response({"ids": deleted_ids}, status=status.HTTP_200_OK)
