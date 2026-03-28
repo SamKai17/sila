@@ -14,10 +14,10 @@ abstract class Transaction with _$Transaction {
     required String type,
     required int timeOfTransaction,
     required String clientId,
-    List<Item>? items,
-    List<Payment>? payments
-    // items
-    // payments
+    @Default([]) List<Item> items,
+    @Default([]) List<Payment> payments,
+    @Default(0) int synchronized,
+    @Default(0) int isDeleted,
   }) = _Transaction;
   factory Transaction.fromJson(Map<String, Object?> json) => _$TransactionFromJson(json);
 }

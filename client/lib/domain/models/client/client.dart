@@ -11,6 +11,7 @@ abstract class Client with _$Client {
     required String phone,
     required String city,
     @Default(0) int synchronized,
+    @Default(0) int isDeleted,
   }) = _Client;
 
   factory Client.fromJson(Map<String, Object?> json) => _$ClientFromJson(json);

@@ -22,6 +22,7 @@ class DatabaseService {
   static const _clientPhoneField = 'phone';
   static const _clientCityField = 'city';
   static const _clientSynchronizedField = 'synchronized';
+  static const _clientIsDeletedField = 'isDeleted';
 
   static const _transactionTable = 'transactions';
   static const _transactionIdField = 'id';
@@ -31,6 +32,8 @@ class DatabaseService {
   static const _transactionRemainderField = 'remainder';
   static const _transactionTimeOfTransactionField = 'time_of_transaction';
   static const _transactionClientIdField = 'client_id';
+  static const _transactionSynchronizedField = 'synchronized';
+  static const _transactionIsDeletedField = 'isDeleted';
 
   static const _itemTable = 'items';
   static const _itemIdField = 'id';
@@ -72,7 +75,8 @@ class DatabaseService {
             $_clientNameField TEXT,
             $_clientPhoneField TEXT,
             $_clientCityField TEXT,
-            $_clientSynchronizedField INTEGER DEFAULT 0
+            $_clientSynchronizedField INTEGER DEFAULT 0,
+            $_clientIsDeletedField INTEGER DEFAULT 0
             )
         ''');
         db.execute('''CREATE TABLE $_transactionTable(
@@ -83,6 +87,8 @@ class DatabaseService {
             $_transactionRemainderField REAL,
             $_transactionTimeOfTransactionField INTEGER,
             $_transactionClientIdField TEXT,
+            $_transactionSynchronizedField INTEGER DEFAULT 0,
+            $_transactionIsDeletedField INTEGER DEFAULT 0,
             FOREIGN KEY($_transactionClientIdField) REFERENCES $_clientTable($_clientIdField) ON DELETE CASCADE
             )
         ''');
@@ -364,6 +370,8 @@ class DatabaseService {
   }
 
   Future<Result<String>> addTransaction({
+    required String transactionId,
+    required String paymentId,
     required double totalPrice,
     required double totalPaid,
     required double remainder,
@@ -374,8 +382,8 @@ class DatabaseService {
     required List<Item> items,
   }) async {
     try {
-      final transactionId = Uuid().v4();
-      final paymentId = Uuid().v4();
+      // final transactionId = Uuid().v4();
+      // final paymentId = Uuid().v4();
       await _database!.transaction(
         (txn) async {
           await txn.insert(

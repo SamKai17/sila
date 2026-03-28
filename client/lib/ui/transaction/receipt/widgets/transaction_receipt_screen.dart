@@ -91,13 +91,12 @@ class TransactionReceiptScreen extends ConsumerWidget {
                                 fontSize: 20.0, fontWeight: FontWeight.w500),
                           ),
                           SizedBox(height: 12.0),
-                          if (transaction.payments != null)
-                            InformationCard(information: {
-                              'Payment Date':
-                                  '${DateTime.fromMillisecondsSinceEpoch(transaction.payments!.isNotEmpty ? transaction.payments!.last.timeOfPayment : 0)}',
-                              'Paid':
-                                  '${transaction.payments!.isNotEmpty ? transaction.payments!.last.amount : 0}\$',
-                            }),
+                          InformationCard(information: {
+                            'Payment Date':
+                                '${DateTime.fromMillisecondsSinceEpoch(transaction.payments.isNotEmpty ? transaction.payments.last.timeOfPayment : 0)}',
+                            'Paid':
+                                '${transaction.payments.isNotEmpty ? transaction.payments.last.amount : 0}\$',
+                          }),
                           SizedBox(height: 32.0),
                           Text(
                             'Transaction detail',
