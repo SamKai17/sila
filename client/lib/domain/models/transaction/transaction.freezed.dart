@@ -23,8 +23,6 @@ mixin _$Transaction {
   String get clientId;
   List<Item> get items;
   List<Payment> get payments;
-  int get synchronized;
-  int get isDeleted;
 
   /// Create a copy of Transaction
   /// with the given fields replaced by the non-null parameter values.
@@ -54,11 +52,7 @@ mixin _$Transaction {
             (identical(other.clientId, clientId) ||
                 other.clientId == clientId) &&
             const DeepCollectionEquality().equals(other.items, items) &&
-            const DeepCollectionEquality().equals(other.payments, payments) &&
-            (identical(other.synchronized, synchronized) ||
-                other.synchronized == synchronized) &&
-            (identical(other.isDeleted, isDeleted) ||
-                other.isDeleted == isDeleted));
+            const DeepCollectionEquality().equals(other.payments, payments));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -73,13 +67,11 @@ mixin _$Transaction {
       timeOfTransaction,
       clientId,
       const DeepCollectionEquality().hash(items),
-      const DeepCollectionEquality().hash(payments),
-      synchronized,
-      isDeleted);
+      const DeepCollectionEquality().hash(payments));
 
   @override
   String toString() {
-    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, items: $items, payments: $payments, synchronized: $synchronized, isDeleted: $isDeleted)';
+    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, items: $items, payments: $payments)';
   }
 }
 
@@ -98,9 +90,7 @@ abstract mixin class $TransactionCopyWith<$Res> {
       int timeOfTransaction,
       String clientId,
       List<Item> items,
-      List<Payment> payments,
-      int synchronized,
-      int isDeleted});
+      List<Payment> payments});
 }
 
 /// @nodoc
@@ -124,8 +114,6 @@ class _$TransactionCopyWithImpl<$Res> implements $TransactionCopyWith<$Res> {
     Object? clientId = null,
     Object? items = null,
     Object? payments = null,
-    Object? synchronized = null,
-    Object? isDeleted = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -164,14 +152,6 @@ class _$TransactionCopyWithImpl<$Res> implements $TransactionCopyWith<$Res> {
           ? _self.payments
           : payments // ignore: cast_nullable_to_non_nullable
               as List<Payment>,
-      synchronized: null == synchronized
-          ? _self.synchronized
-          : synchronized // ignore: cast_nullable_to_non_nullable
-              as int,
-      isDeleted: null == isDeleted
-          ? _self.isDeleted
-          : isDeleted // ignore: cast_nullable_to_non_nullable
-              as int,
     ));
   }
 }
@@ -278,9 +258,7 @@ extension TransactionPatterns on Transaction {
             int timeOfTransaction,
             String clientId,
             List<Item> items,
-            List<Payment> payments,
-            int synchronized,
-            int isDeleted)?
+            List<Payment> payments)?
         $default, {
     required TResult orElse(),
   }) {
@@ -296,9 +274,7 @@ extension TransactionPatterns on Transaction {
             _that.timeOfTransaction,
             _that.clientId,
             _that.items,
-            _that.payments,
-            _that.synchronized,
-            _that.isDeleted);
+            _that.payments);
       case _:
         return orElse();
     }
@@ -328,9 +304,7 @@ extension TransactionPatterns on Transaction {
             int timeOfTransaction,
             String clientId,
             List<Item> items,
-            List<Payment> payments,
-            int synchronized,
-            int isDeleted)
+            List<Payment> payments)
         $default,
   ) {
     final _that = this;
@@ -345,9 +319,7 @@ extension TransactionPatterns on Transaction {
             _that.timeOfTransaction,
             _that.clientId,
             _that.items,
-            _that.payments,
-            _that.synchronized,
-            _that.isDeleted);
+            _that.payments);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -376,9 +348,7 @@ extension TransactionPatterns on Transaction {
             int timeOfTransaction,
             String clientId,
             List<Item> items,
-            List<Payment> payments,
-            int synchronized,
-            int isDeleted)?
+            List<Payment> payments)?
         $default,
   ) {
     final _that = this;
@@ -393,9 +363,7 @@ extension TransactionPatterns on Transaction {
             _that.timeOfTransaction,
             _that.clientId,
             _that.items,
-            _that.payments,
-            _that.synchronized,
-            _that.isDeleted);
+            _that.payments);
       case _:
         return null;
     }
@@ -403,7 +371,8 @@ extension TransactionPatterns on Transaction {
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class _Transaction implements Transaction {
   const _Transaction(
       {required this.id,
@@ -414,9 +383,7 @@ class _Transaction implements Transaction {
       required this.timeOfTransaction,
       required this.clientId,
       final List<Item> items = const [],
-      final List<Payment> payments = const [],
-      this.synchronized = 0,
-      this.isDeleted = 0})
+      final List<Payment> payments = const []})
       : _items = items,
         _payments = payments;
   factory _Transaction.fromJson(Map<String, dynamic> json) =>
@@ -454,13 +421,6 @@ class _Transaction implements Transaction {
     return EqualUnmodifiableListView(_payments);
   }
 
-  @override
-  @JsonKey()
-  final int synchronized;
-  @override
-  @JsonKey()
-  final int isDeleted;
-
   /// Create a copy of Transaction
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -494,11 +454,7 @@ class _Transaction implements Transaction {
             (identical(other.clientId, clientId) ||
                 other.clientId == clientId) &&
             const DeepCollectionEquality().equals(other._items, _items) &&
-            const DeepCollectionEquality().equals(other._payments, _payments) &&
-            (identical(other.synchronized, synchronized) ||
-                other.synchronized == synchronized) &&
-            (identical(other.isDeleted, isDeleted) ||
-                other.isDeleted == isDeleted));
+            const DeepCollectionEquality().equals(other._payments, _payments));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -513,13 +469,11 @@ class _Transaction implements Transaction {
       timeOfTransaction,
       clientId,
       const DeepCollectionEquality().hash(_items),
-      const DeepCollectionEquality().hash(_payments),
-      synchronized,
-      isDeleted);
+      const DeepCollectionEquality().hash(_payments));
 
   @override
   String toString() {
-    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, items: $items, payments: $payments, synchronized: $synchronized, isDeleted: $isDeleted)';
+    return 'Transaction(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, items: $items, payments: $payments)';
   }
 }
 
@@ -540,9 +494,7 @@ abstract mixin class _$TransactionCopyWith<$Res>
       int timeOfTransaction,
       String clientId,
       List<Item> items,
-      List<Payment> payments,
-      int synchronized,
-      int isDeleted});
+      List<Payment> payments});
 }
 
 /// @nodoc
@@ -566,8 +518,6 @@ class __$TransactionCopyWithImpl<$Res> implements _$TransactionCopyWith<$Res> {
     Object? clientId = null,
     Object? items = null,
     Object? payments = null,
-    Object? synchronized = null,
-    Object? isDeleted = null,
   }) {
     return _then(_Transaction(
       id: null == id
@@ -606,14 +556,6 @@ class __$TransactionCopyWithImpl<$Res> implements _$TransactionCopyWith<$Res> {
           ? _self._payments
           : payments // ignore: cast_nullable_to_non_nullable
               as List<Payment>,
-      synchronized: null == synchronized
-          ? _self.synchronized
-          : synchronized // ignore: cast_nullable_to_non_nullable
-              as int,
-      isDeleted: null == isDeleted
-          ? _self.isDeleted
-          : isDeleted // ignore: cast_nullable_to_non_nullable
-              as int,
     ));
   }
 }

@@ -258,7 +258,8 @@ extension ItemPatterns on Item {
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class _Item implements Item {
   const _Item(
       {required this.id,

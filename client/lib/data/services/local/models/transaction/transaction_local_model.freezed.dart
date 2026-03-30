@@ -21,6 +21,8 @@ mixin _$TransactionLocalModel {
   String get type;
   int get timeOfTransaction;
   String get clientId;
+  int get synchronized;
+  int get isDeleted;
 
   /// Create a copy of TransactionLocalModel
   /// with the given fields replaced by the non-null parameter values.
@@ -49,17 +51,21 @@ mixin _$TransactionLocalModel {
             (identical(other.timeOfTransaction, timeOfTransaction) ||
                 other.timeOfTransaction == timeOfTransaction) &&
             (identical(other.clientId, clientId) ||
-                other.clientId == clientId));
+                other.clientId == clientId) &&
+            (identical(other.synchronized, synchronized) ||
+                other.synchronized == synchronized) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, totalPrice, remainder,
-      totalPaid, type, timeOfTransaction, clientId);
+      totalPaid, type, timeOfTransaction, clientId, synchronized, isDeleted);
 
   @override
   String toString() {
-    return 'TransactionLocalModel(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId)';
+    return 'TransactionLocalModel(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, synchronized: $synchronized, isDeleted: $isDeleted)';
   }
 }
 
@@ -76,7 +82,9 @@ abstract mixin class $TransactionLocalModelCopyWith<$Res> {
       double totalPaid,
       String type,
       int timeOfTransaction,
-      String clientId});
+      String clientId,
+      int synchronized,
+      int isDeleted});
 }
 
 /// @nodoc
@@ -99,6 +107,8 @@ class _$TransactionLocalModelCopyWithImpl<$Res>
     Object? type = null,
     Object? timeOfTransaction = null,
     Object? clientId = null,
+    Object? synchronized = null,
+    Object? isDeleted = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -129,6 +139,14 @@ class _$TransactionLocalModelCopyWithImpl<$Res>
           ? _self.clientId
           : clientId // ignore: cast_nullable_to_non_nullable
               as String,
+      synchronized: null == synchronized
+          ? _self.synchronized
+          : synchronized // ignore: cast_nullable_to_non_nullable
+              as int,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -233,7 +251,9 @@ extension TransactionLocalModelPatterns on TransactionLocalModel {
             double totalPaid,
             String type,
             int timeOfTransaction,
-            String clientId)?
+            String clientId,
+            int synchronized,
+            int isDeleted)?
         $default, {
     required TResult orElse(),
   }) {
@@ -247,7 +267,9 @@ extension TransactionLocalModelPatterns on TransactionLocalModel {
             _that.totalPaid,
             _that.type,
             _that.timeOfTransaction,
-            _that.clientId);
+            _that.clientId,
+            _that.synchronized,
+            _that.isDeleted);
       case _:
         return orElse();
     }
@@ -275,7 +297,9 @@ extension TransactionLocalModelPatterns on TransactionLocalModel {
             double totalPaid,
             String type,
             int timeOfTransaction,
-            String clientId)
+            String clientId,
+            int synchronized,
+            int isDeleted)
         $default,
   ) {
     final _that = this;
@@ -288,7 +312,9 @@ extension TransactionLocalModelPatterns on TransactionLocalModel {
             _that.totalPaid,
             _that.type,
             _that.timeOfTransaction,
-            _that.clientId);
+            _that.clientId,
+            _that.synchronized,
+            _that.isDeleted);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -315,7 +341,9 @@ extension TransactionLocalModelPatterns on TransactionLocalModel {
             double totalPaid,
             String type,
             int timeOfTransaction,
-            String clientId)?
+            String clientId,
+            int synchronized,
+            int isDeleted)?
         $default,
   ) {
     final _that = this;
@@ -328,7 +356,9 @@ extension TransactionLocalModelPatterns on TransactionLocalModel {
             _that.totalPaid,
             _that.type,
             _that.timeOfTransaction,
-            _that.clientId);
+            _that.clientId,
+            _that.synchronized,
+            _that.isDeleted);
       case _:
         return null;
     }
@@ -336,7 +366,8 @@ extension TransactionLocalModelPatterns on TransactionLocalModel {
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class _TransactionLocalModel implements TransactionLocalModel {
   const _TransactionLocalModel(
       {required this.id,
@@ -345,7 +376,9 @@ class _TransactionLocalModel implements TransactionLocalModel {
       required this.totalPaid,
       required this.type,
       required this.timeOfTransaction,
-      required this.clientId});
+      required this.clientId,
+      this.synchronized = 0,
+      this.isDeleted = 0});
   factory _TransactionLocalModel.fromJson(Map<String, dynamic> json) =>
       _$TransactionLocalModelFromJson(json);
 
@@ -363,6 +396,12 @@ class _TransactionLocalModel implements TransactionLocalModel {
   final int timeOfTransaction;
   @override
   final String clientId;
+  @override
+  @JsonKey()
+  final int synchronized;
+  @override
+  @JsonKey()
+  final int isDeleted;
 
   /// Create a copy of TransactionLocalModel
   /// with the given fields replaced by the non-null parameter values.
@@ -396,17 +435,21 @@ class _TransactionLocalModel implements TransactionLocalModel {
             (identical(other.timeOfTransaction, timeOfTransaction) ||
                 other.timeOfTransaction == timeOfTransaction) &&
             (identical(other.clientId, clientId) ||
-                other.clientId == clientId));
+                other.clientId == clientId) &&
+            (identical(other.synchronized, synchronized) ||
+                other.synchronized == synchronized) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, totalPrice, remainder,
-      totalPaid, type, timeOfTransaction, clientId);
+      totalPaid, type, timeOfTransaction, clientId, synchronized, isDeleted);
 
   @override
   String toString() {
-    return 'TransactionLocalModel(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId)';
+    return 'TransactionLocalModel(id: $id, totalPrice: $totalPrice, remainder: $remainder, totalPaid: $totalPaid, type: $type, timeOfTransaction: $timeOfTransaction, clientId: $clientId, synchronized: $synchronized, isDeleted: $isDeleted)';
   }
 }
 
@@ -425,7 +468,9 @@ abstract mixin class _$TransactionLocalModelCopyWith<$Res>
       double totalPaid,
       String type,
       int timeOfTransaction,
-      String clientId});
+      String clientId,
+      int synchronized,
+      int isDeleted});
 }
 
 /// @nodoc
@@ -448,6 +493,8 @@ class __$TransactionLocalModelCopyWithImpl<$Res>
     Object? type = null,
     Object? timeOfTransaction = null,
     Object? clientId = null,
+    Object? synchronized = null,
+    Object? isDeleted = null,
   }) {
     return _then(_TransactionLocalModel(
       id: null == id
@@ -478,6 +525,14 @@ class __$TransactionLocalModelCopyWithImpl<$Res>
           ? _self.clientId
           : clientId // ignore: cast_nullable_to_non_nullable
               as String,
+      synchronized: null == synchronized
+          ? _self.synchronized
+          : synchronized // ignore: cast_nullable_to_non_nullable
+              as int,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }

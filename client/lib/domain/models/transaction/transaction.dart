@@ -6,6 +6,7 @@ part 'transaction.g.dart';
 
 @freezed
 abstract class Transaction with _$Transaction {
+  @JsonSerializable(fieldRename: FieldRename.snake)
   const factory Transaction({
     required String id,
     required double totalPrice,
@@ -16,8 +17,9 @@ abstract class Transaction with _$Transaction {
     required String clientId,
     @Default([]) List<Item> items,
     @Default([]) List<Payment> payments,
-    @Default(0) int synchronized,
-    @Default(0) int isDeleted,
+    // @Default(0) int synchronized,
+    // @Default(0) int isDeleted,
   }) = _Transaction;
-  factory Transaction.fromJson(Map<String, Object?> json) => _$TransactionFromJson(json);
+  factory Transaction.fromJson(Map<String, Object?> json) =>
+      _$TransactionFromJson(json);
 }

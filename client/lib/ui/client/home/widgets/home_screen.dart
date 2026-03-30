@@ -2,6 +2,7 @@ import 'package:client/routing/routes.dart';
 import 'package:client/ui/auth/login/view_model/auth_viewmodel.dart';
 import 'package:client/ui/auth/logout/widgets/logout_button.dart';
 import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
+import 'package:client/ui/client/home/widgets/sync_button.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
 import 'package:client/ui/client/home/widgets/client_card.dart';
 import 'package:client/ui/core/ui/delete_button.dart';
@@ -89,6 +90,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SizedBox(width: 32)
               ]
             : [
+                SyncButton(),
+                SizedBox(width: 8),
                 LogoutButton(),
                 SizedBox(width: 32),
               ],

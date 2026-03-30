@@ -5,6 +5,7 @@ part 'item.freezed.dart';
 
 @freezed
 abstract class Item with _$Item {
+  @JsonSerializable(fieldRename: FieldRename.snake)
   const factory Item({
     required String id,
     required String name,

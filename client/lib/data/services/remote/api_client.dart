@@ -1,5 +1,6 @@
 import 'package:client/data/services/local/secure_storage_service.dart';
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/utils/constants.dart';
 import 'package:client/utils/result.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -62,7 +63,7 @@ class AuthInterceptor extends QueuedInterceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    print('on request');
+    // print('on request');
     // get access token
     final TokenPair? tokenPair = await secureStorageService.getTokens();
     if (tokenPair == null) {
@@ -73,7 +74,7 @@ class AuthInterceptor extends QueuedInterceptor {
     // check if access token is valid
     final isAccessTokenValid = await _isAccessTokenValid;
     if (isAccessTokenValid) {
-      print('valid access token');
+      // print('valid access token');
       options.headers
           .addAll({'Authorization': 'Bearer ${tokenPair.accessToken}'});
       return handler.next(options);
@@ -82,7 +83,7 @@ class AuthInterceptor extends QueuedInterceptor {
     final TokenPair? newTokenPair =
         await _refresh(refreshToken: tokenPair.refreshToken);
     if (newTokenPair == null) {
-      print('invalid refresh token');
+      // print('invalid refresh token');
       // if refresh is not valid => logout user
       return handler.reject(
         RevokeTokenException(requestOptions: options),
@@ -93,7 +94,7 @@ class AuthInterceptor extends QueuedInterceptor {
     //set new tokens
     options.headers
         .addAll({'Authorization': 'Bearer ${newTokenPair.accessToken}'});
-    print('success refreshing token');
+    // print('success refreshing token');
     return handler.next(options);
   }
 
@@ -105,7 +106,7 @@ class AuthInterceptor extends QueuedInterceptor {
   Future<Response<T>> _retry<T>(RequestOptions requestOptions) async {
     // retryClient.fetch(requestOptions)
     // return retryClient.fetch(requestOptions);
-    print('retry');
+    // print('retry');
     return retryClient.request(
       requestOptions.path,
       cancelToken: requestOptions.cancelToken,
@@ -145,9 +146,9 @@ class AuthInterceptor extends QueuedInterceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    print('on error');
+    // print('on error');
     if (err is RevokeTokenException || err.response == null) {
-      print('rejected onError');
+      // print('rejected onError');
       return handler.reject(err);
     }
     if (err.response!.statusCode == 401) {
@@ -159,7 +160,7 @@ class AuthInterceptor extends QueuedInterceptor {
       final TokenPair? newTokenPair =
           await _refresh(refreshToken: tokenPair.refreshToken);
       if (newTokenPair == null) {
-        print('invalid refresh token');
+        // print('invalid refresh token');
         // if refresh is not valid => logout user
         return handler.reject(
           RevokeTokenException(requestOptions: err.requestOptions),
@@ -224,7 +225,6 @@ class ApiClient {
   }
 
   Future<Result<void>> updateClient({
-    // required String accessToken,
     required String id,
     required String name,
     required String phone,
@@ -244,6 +244,7 @@ class ApiClient {
       if (e.response != null) {
         // server error
         print('exception: ${e.response!.statusCode}');
+        print('exception: ${e.message}');
       } else {
         print('my error');
         // your error
@@ -253,7 +254,6 @@ class ApiClient {
   }
 
   Future<Result<void>> deleteClients({
-    // required String accessToken,
     required List<String> ids,
   }) async {
     try {
@@ -270,7 +270,38 @@ class ApiClient {
       return Result.error(e);
     }
   }
-    Future<Result<void>> addTransaction({
+
+  Future<Result<void>> deleteClient({
+    required String id,
+  }) async {
+    try {
+      final _ = await _dio.delete(
+        '/api/client/delete/${id}/',
+      );
+      return Result.ok(null);
+    } on DioException catch (e) {
+      if (e.response != null) {
+      } else {}
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> deleteTransaction({
+    required String id,
+  }) async {
+    try {
+      final _ = await _dio.delete(
+        '/transaction/delete/${id}/',
+      );
+      return Result.ok(null);
+    } on DioException catch (e) {
+      if (e.response != null) {
+      } else {}
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> addTransaction({
     required String id,
     required double totalPrice,
     required double totalPaid,
@@ -279,7 +310,7 @@ class ApiClient {
     required String type,
     required String clientId,
     required List<Item> items,
-    required String paymentId,
+    required List<Payment> payments,
   }) async {
     try {
       final itemsMapList = items
@@ -292,7 +323,15 @@ class ApiClient {
             },
           )
           .toList();
-      print(type);
+      final paymentsMapList = payments
+          .map(
+            (e) => {
+              'id': e.id,
+              'amount': e.amount,
+              'time_of_payment': e.timeOfPayment,
+            },
+          )
+          .toList();
       final response = await _dio.post(
         '/transaction/create/',
         data: {
@@ -304,23 +343,21 @@ class ApiClient {
           'type': 'Buy', // need to fix the type
           'client': clientId,
           'items': itemsMapList,
-          'payments': [
-            {
-              'id': paymentId,
-              'amount': totalPaid,
-              'time_of_payment': timeOfTransaction,
-            }
-          ],
+          'payments': paymentsMapList,
         },
       );
-      print(response.data);
+      // print(response.data);
       return Result.ok(null);
     } on DioException catch (e) {
-      print(e.message);
-      print(e.error);
+      // print(e.message);
+      // print(e.error);
       return Result.error(e);
     }
   }
+
+  // Future<void> updateTransaction() async {
+  //   await _dio.post('/transaction/create/', data: {});
+  // }
 
   Future<Result<void>> deleteTransactions({
     required List<String> transactionsIds,
@@ -332,7 +369,7 @@ class ApiClient {
           'ids': transactionsIds,
         },
       );
-      print(response.data);
+      // print(response.data);
       return Result.ok(null);
     } on DioException catch (e) {
       return Result.error(e);

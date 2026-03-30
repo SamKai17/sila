@@ -27,7 +27,7 @@ class TransactionReceiptScreen extends ConsumerWidget {
     final client = ref.watch(clientProvider(clientId)).value;
     return transactionAsync.when(
       data: (transaction) {
-        print(transaction);
+        // print(transaction);
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
@@ -70,7 +70,7 @@ class TransactionReceiptScreen extends ConsumerWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child:
-                                    ItemsTable(items: transaction.items ?? []),
+                                    ItemsTable(items: transaction.items),
                               )),
                           SizedBox(height: 32.0),
                           Text(

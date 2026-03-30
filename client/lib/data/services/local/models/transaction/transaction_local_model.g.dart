@@ -16,16 +16,20 @@ _TransactionLocalModel _$TransactionLocalModelFromJson(
       type: json['type'] as String,
       timeOfTransaction: (json['time_of_transaction'] as num).toInt(),
       clientId: json['client_id'] as String,
+      synchronized: (json['synchronized'] as num?)?.toInt() ?? 0,
+      isDeleted: (json['is_deleted'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$TransactionLocalModelToJson(
         _TransactionLocalModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'totalPrice': instance.totalPrice,
+      'total_price': instance.totalPrice,
       'remainder': instance.remainder,
-      'totalPaid': instance.totalPaid,
+      'total_paid': instance.totalPaid,
       'type': instance.type,
-      'timeOfTransaction': instance.timeOfTransaction,
-      'clientId': instance.clientId,
+      'time_of_transaction': instance.timeOfTransaction,
+      'client_id': instance.clientId,
+      'synchronized': instance.synchronized,
+      'is_deleted': instance.isDeleted,
     };

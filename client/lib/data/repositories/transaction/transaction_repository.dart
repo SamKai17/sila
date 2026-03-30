@@ -218,16 +218,17 @@ class TransactionRepository {
       totalPrice: totalPrice,
       items: items,
     );
-    await _apiClient.addTransaction(
-        id: transactionId,
-        totalPrice: totalPrice,
-        totalPaid: totalPaid,
-        remainder: remainder,
-        timeOfTransaction: timeOfTransaction,
-        type: type,
-        clientId: clientId,
-        items: items,
-        paymentId: paymentId);
+    // await _apiClient.addTransaction(
+    //   id: transactionId,
+    //   totalPrice: totalPrice,
+    //   totalPaid: totalPaid,
+    //   remainder: remainder,
+    //   timeOfTransaction: timeOfTransaction,
+    //   type: type,
+    //   clientId: clientId,
+    //   items: items,
+    //   paymentId: paymentId,
+    // );
 
     _transactionsListController.add(null);
     return result;
@@ -241,7 +242,7 @@ class TransactionRepository {
     _transactionsListController.add(null);
     final result =
         _databaseService.deleteTransactions(transactionsIds: transactionsIds);
-    await _apiClient.deleteTransactions(transactionsIds: transactionsIds);
+    // await _apiClient.deleteTransactions(transactionsIds: transactionsIds);
     return result;
   }
 
@@ -256,7 +257,17 @@ class TransactionRepository {
     List<Item> items;
     switch (itemsResult) {
       case Ok():
-        items = itemsResult.value;
+        final localItem = itemsResult.value;
+        items = localItem
+            .map(
+              (item) => Item(
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+              ),
+            )
+            .toList();
       case Error():
         throw itemsResult.error;
     }

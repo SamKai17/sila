@@ -1,8 +1,8 @@
+import 'package:client/data/services/local/models/client/client_local_model.dart';
+import 'package:client/data/services/local/models/item/item_local_model.dart';
 import 'package:client/data/services/local/models/transaction/transaction_local_model.dart';
-import 'package:client/domain/models/client/client.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
-import 'package:client/ui/transaction/items_edit/view_model/items_edit_viewmodel.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart';
@@ -22,7 +22,7 @@ class DatabaseService {
   static const _clientPhoneField = 'phone';
   static const _clientCityField = 'city';
   static const _clientSynchronizedField = 'synchronized';
-  static const _clientIsDeletedField = 'isDeleted';
+  static const _clientIsDeletedField = 'is_deleted';
 
   static const _transactionTable = 'transactions';
   static const _transactionIdField = 'id';
@@ -33,7 +33,7 @@ class DatabaseService {
   static const _transactionTimeOfTransactionField = 'time_of_transaction';
   static const _transactionClientIdField = 'client_id';
   static const _transactionSynchronizedField = 'synchronized';
-  static const _transactionIsDeletedField = 'isDeleted';
+  static const _transactionIsDeletedField = 'is_deleted';
 
   static const _itemTable = 'items';
   static const _itemIdField = 'id';
@@ -41,12 +41,16 @@ class DatabaseService {
   static const _itemPriceField = 'price';
   static const _itemQuantityField = 'quantity';
   static const _itemTransactionIdField = 'transaction_id';
+  // static const _itemSynchronizedField = 'synchronized';
+  static const _itemIsDeletedField = 'is_deleted';
 
   static const _paymentTable = 'payments';
   static const _paymentIdField = 'id';
   static const _paymentAmountField = 'amount';
   static const _paymentTimeOfPaymentField = 'time_of_payment';
   static const _paymentTransactionIdField = 'transaction_id';
+  // static const _paymentSynchronizedField = 'synchronized';
+  static const _paymentIsDeletedField = 'is_deleted';
 
   Database? _database;
 
@@ -98,6 +102,7 @@ class DatabaseService {
             $_itemQuantityField INTEGER,
             $_itemPriceField REAL,
             $_itemTransactionIdField TEXT,
+            $_itemIsDeletedField INTEGER DEFAULT 0,
             FOREIGN KEY($_itemTransactionIdField) REFERENCES $_transactionTable($_transactionIdField) ON DELETE CASCADE
             )
         ''');
@@ -106,6 +111,7 @@ class DatabaseService {
             $_paymentAmountField REAL,
             $_paymentTimeOfPaymentField INTEGER,
             $_paymentTransactionIdField TEXT,
+            $_paymentIsDeletedField INTEGER DEFAULT 0,
             FOREIGN KEY($_paymentTransactionIdField) REFERENCES $_transactionTable($_transactionIdField) ON DELETE CASCADE
             )
         ''');
@@ -118,7 +124,7 @@ class DatabaseService {
     );
   }
 
-  Future<Result<List<Item>>> getItems({
+  Future<Result<List<ItemLocalModel>>> fetchItems({
     required String transactionId,
   }) async {
     try {
@@ -127,8 +133,79 @@ class DatabaseService {
         where: '$_itemTransactionIdField = ?',
         whereArgs: [transactionId],
       );
-      final items = itemsMap.map((e) => Item.fromJson(e)).toList();
+      final items = itemsMap.map((e) => ItemLocalModel.fromJson(e)).toList();
       return Result.ok(items);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<List<ItemLocalModel>>> getItems({
+    required String transactionId,
+  }) async {
+    try {
+      final List<Map<String, Object?>> itemsMap = await _database!.query(
+        _itemTable,
+        where: '$_itemTransactionIdField = ? AND $_itemIsDeletedField = ?',
+        whereArgs: [transactionId, 0],
+      );
+      final items = itemsMap.map((e) => ItemLocalModel.fromJson(e)).toList();
+      return Result.ok(items);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> updateItems({
+    required String transactionId,
+    required double total,
+    required double remainder,
+    required List<Item> itemsToAdd,
+    required List<Item> itemsToDelete,
+  }) async {
+    try {
+      await _database!.transaction(
+        (txn) async {
+          await txn.update(
+            _transactionTable,
+            {
+              _transactionTotalPriceField: total,
+              _transactionRemainderField: remainder,
+              _transactionSynchronizedField: 0,
+            },
+            where: '$_transactionIdField = ?',
+            whereArgs: [transactionId],
+          );
+          itemsToAdd.forEach(
+            (item) async {
+              await txn.insert(
+                _itemTable,
+                {
+                  _itemIdField: item.id,
+                  _itemNameField: item.name,
+                  _itemQuantityField: item.quantity,
+                  _itemPriceField: item.price,
+                  _itemTransactionIdField: transactionId,
+                },
+                conflictAlgorithm: ConflictAlgorithm.replace,
+              );
+            },
+          );
+          itemsToDelete.forEach(
+            (item) async {
+              await txn.update(
+                _itemTable,
+                {
+                  _itemIsDeletedField: 1,
+                },
+                where: '$_itemIdField = ?',
+                whereArgs: [item.id],
+              );
+            },
+          );
+        },
+      );
+      return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
     }
@@ -145,64 +222,6 @@ class DatabaseService {
       );
       final payments = paymentsMap.map((e) => Payment.fromJson(e)).toList();
       return Result.ok(payments);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-  Future<Result<TransactionLocalModel>> getTransaction({
-    required String transactionId,
-  }) async {
-    try {
-      final List<Map<String, Object?>> transactionMap = await _database!.query(
-        _transactionTable,
-        where: '$_transactionIdField = ?',
-        whereArgs: [transactionId],
-        limit: 1,
-      );
-      if (transactionMap.isNotEmpty) {
-        final TransactionLocalModel transaction =
-            TransactionLocalModel.fromJson(transactionMap.first);
-        return Result.ok(transaction);
-      } else {
-        throw Exception('transaction not found');
-      }
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-  Future<Result<List<TransactionLocalModel>>> getTransactionsList({
-    required String clientId,
-  }) async {
-    try {
-      final List<Map<String, Object?>> transactionsMap = await _database!.query(
-        _transactionTable,
-        where: '$_transactionClientIdField = ?',
-        whereArgs: [clientId],
-      );
-      final transactions = transactionsMap.map((t) {
-        return TransactionLocalModel.fromJson(t);
-      }).toList();
-      return Result.ok(transactions);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-  Future<Result<List<TransactionLocalModel>>> getItemsList({
-    required String transactionId,
-  }) async {
-    try {
-      final List<Map<String, Object?>> itemsMap = await _database!.query(
-        _itemTable,
-        where: '$_itemTransactionIdField = ?',
-        whereArgs: [transactionId],
-      );
-      final items = itemsMap.map((t) {
-        return TransactionLocalModel.fromJson(t);
-      }).toList();
-      return Result.ok(items);
     } on Exception catch (e) {
       return Result.error(e);
     }
@@ -234,6 +253,7 @@ class DatabaseService {
             {
               _transactionRemainderField: remainder,
               _transactionTotalPaidField: totalPaid,
+              _transactionSynchronizedField: 0,
             },
             where: '$_transactionIdField = ?',
             whereArgs: [transactionId],
@@ -259,7 +279,8 @@ class DatabaseService {
             _transactionTable,
             {
               _transactionTotalPaidField: totalPaid,
-              _transactionRemainderField: remainder
+              _transactionRemainderField: remainder,
+              _transactionSynchronizedField: 0,
             },
             where: '$_transactionIdField = ?',
             whereArgs: [transactionId],
@@ -286,10 +307,6 @@ class DatabaseService {
     required String paymentId,
     required double paid,
   }) async {
-    // transactionId
-    // totalPaid
-    // paymentId
-    // amount
     try {
       await _database!.transaction(
         (txn) async {
@@ -298,6 +315,7 @@ class DatabaseService {
             {
               _transactionTotalPaidField: totalPaid,
               _transactionRemainderField: remainder,
+              _transactionSynchronizedField: 0,
             },
             where: '$_transactionIdField = ?',
             whereArgs: [transactionId],
@@ -318,52 +336,44 @@ class DatabaseService {
     }
   }
 
-  Future<Result<void>> updateItems({
+  Future<Result<TransactionLocalModel>> getTransaction({
     required String transactionId,
-    required double total,
-    required double remainder,
-    required List<Item> itemsToAdd,
-    required List<Item> itemsToDelete,
   }) async {
     try {
-      await _database!.transaction(
-        (txn) async {
-          await txn.update(
-            _transactionTable,
-            {
-              _transactionTotalPriceField: total,
-              _transactionRemainderField: remainder,
-            },
-            where: '$_transactionIdField = ?',
-            whereArgs: [transactionId],
-          );
-          itemsToAdd.forEach(
-            (item) async {
-              await txn.insert(
-                _itemTable,
-                {
-                  _itemIdField: item.id,
-                  _itemNameField: item.name,
-                  _itemQuantityField: item.quantity,
-                  _itemPriceField: item.price,
-                  _itemTransactionIdField: transactionId,
-                },
-                conflictAlgorithm: ConflictAlgorithm.replace,
-              );
-            },
-          );
-          itemsToDelete.forEach(
-            (item) async {
-              await txn.delete(
-                _itemTable,
-                where: '$_itemIdField = ?',
-                whereArgs: [item.id],
-              );
-            },
-          );
-        },
+      final List<Map<String, Object?>> transactionMap = await _database!.query(
+        _transactionTable,
+        where: '$_transactionIdField = ?',
+        whereArgs: [transactionId],
+        limit: 1,
       );
-      return Result.ok(null);
+      if (transactionMap.isNotEmpty) {
+        final TransactionLocalModel transaction =
+            TransactionLocalModel.fromJson(transactionMap.first);
+        return Result.ok(transaction);
+      } else {
+        return Result.error(Exception('transaction not found'));
+      }
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<List<TransactionLocalModel>>> getTransactionsList({
+    required String clientId,
+  }) async {
+    try {
+      final List<Map<String, Object?>> transactionsMap = await _database!.query(
+        _transactionTable,
+        where:
+            '$_transactionClientIdField = ? AND $_transactionIsDeletedField = ?',
+        whereArgs: [clientId, 0],
+      );
+      final transactions = transactionsMap.map(
+        (t) {
+          return TransactionLocalModel.fromJson(t);
+        },
+      ).toList();
+      return Result.ok(transactions);
     } on Exception catch (e) {
       return Result.error(e);
     }
@@ -382,8 +392,6 @@ class DatabaseService {
     required List<Item> items,
   }) async {
     try {
-      // final transactionId = Uuid().v4();
-      // final paymentId = Uuid().v4();
       await _database!.transaction(
         (txn) async {
           await txn.insert(
@@ -430,8 +438,12 @@ class DatabaseService {
     try {
       final batch = _database!.batch();
       for (var id in transactionsIds) {
-        batch.delete(
+        batch.update(
           _transactionTable,
+          {
+            _transactionIsDeletedField: 1,
+            _transactionSynchronizedField: 0,
+          },
           where: '$_transactionIdField = ?',
           whereArgs: [id],
         );
@@ -443,13 +455,50 @@ class DatabaseService {
     }
   }
 
-  Future<Result<List<Client>>> getClientsList() async {
+  Future<Result<void>> synchronizeTransaction({
+    required String id,
+  }) async {
     try {
-      final List<Map<String, Object?>> clientsMap =
-          await _database!.query(_clientTable);
-      final List<Client> clients =
-          clientsMap.map((client) => Client.fromJson(client)).toList();
-      // print(clients);
+      await _database!.update(
+        _transactionTable,
+        {
+          _transactionSynchronizedField: 1,
+        },
+        where: '$_transactionIdField = ?',
+        whereArgs: [id],
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<List<TransactionLocalModel>>>
+      fetchUnsyncedTransactions() async {
+    try {
+      final List<Map<String, Object?>> transactionsMap = await _database!.query(
+        _transactionTable,
+        where: '$_transactionSynchronizedField = 0',
+      );
+      final List<TransactionLocalModel> transactions = transactionsMap
+          .map((transaction) => TransactionLocalModel.fromJson(transaction))
+          .toList();
+      return Result.ok(transactions);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<List<ClientLocalModel>>> getClientsList() async {
+    try {
+      final List<Map<String, Object?>> clientsMap = await _database!.query(
+        _clientTable,
+        where: '${_clientIsDeletedField} = ?',
+        whereArgs: [0],
+      );
+      final List<ClientLocalModel> clients = clientsMap
+          .map((client) => ClientLocalModel.fromJson(client))
+          .toList();
       return Result.ok(clients);
     } on Exception catch (e) {
       return Result.error(e);
@@ -479,25 +528,7 @@ class DatabaseService {
     }
   }
 
-  Future<Result<void>> synchronizeClient({
-    required String id,
-  }) async {
-    try {
-      await _database!.update(
-        _clientTable,
-        {
-          _clientSynchronizedField: 1,
-        },
-        where: '$_clientIdField = ?',
-        whereArgs: [id],
-      );
-      return Result.ok(null);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-  Future<Result<Client>> getClient(String id) async {
+  Future<Result<ClientLocalModel>> getClient(String id) async {
     try {
       final List<Map<String, Object?>> clientMaps = await _database!.query(
         _clientTable,
@@ -506,7 +537,7 @@ class DatabaseService {
         limit: 1,
       );
       if (clientMaps.isNotEmpty) {
-        return Result.ok(Client.fromJson(clientMaps.first));
+        return Result.ok(ClientLocalModel.fromJson(clientMaps.first));
       }
       return Result.error(Exception("no clients found"));
     } on Exception catch (e) {
@@ -527,6 +558,7 @@ class DatabaseService {
           _clientNameField: name,
           _clientPhoneField: phone,
           _clientCityField: city,
+          _clientSynchronizedField: 0,
         },
         where: '$_clientIdField = ?',
         whereArgs: [id],
@@ -541,14 +573,51 @@ class DatabaseService {
     try {
       final batch = _database!.batch();
       for (var id in ids) {
-        batch.delete(
+        batch.update(
           _clientTable,
+          {
+            _clientIsDeletedField: 1,
+            _clientSynchronizedField: 0,
+          },
           where: '$_clientIdField = ?',
           whereArgs: [id],
         );
       }
       await batch.commit(noResult: true);
       return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<void>> synchronizeClient({
+    required String id,
+  }) async {
+    try {
+      await _database!.update(
+        _clientTable,
+        {
+          _clientSynchronizedField: 1,
+        },
+        where: '$_clientIdField = ?',
+        whereArgs: [id],
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  Future<Result<List<ClientLocalModel>>> fetchUnsyncedClients() async {
+    try {
+      final List<Map<String, Object?>> clientsMaps = await _database!.query(
+        _clientTable,
+        where: '$_clientSynchronizedField = 0',
+      );
+      final List<ClientLocalModel> clients = clientsMaps
+          .map((client) => ClientLocalModel.fromJson(client))
+          .toList();
+      return Result.ok(clients);
     } on Exception catch (e) {
       return Result.error(e);
     }

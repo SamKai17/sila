@@ -55,7 +55,17 @@ class ClientRepository {
     final result = await _databaseService.getClientsList();
     switch (result) {
       case Ok():
-        return result.value;
+        final clientLocalList = result.value;
+        return clientLocalList.map(
+          (clientLocal) {
+            return Client(
+              id: clientLocal.id,
+              name: clientLocal.name,
+              phone: clientLocal.phone,
+              city: clientLocal.city,
+            );
+          },
+        ).toList();
       case Error():
         throw result.error;
     }
@@ -85,24 +95,24 @@ class ClientRepository {
       case Ok():
         _controller.add(null);
       case Error():
-        return localResult;
-    }
-    final remoteResult = await _apiClient.addClient(
-      id: id,
-      name: name,
-      phone: phone,
-      city: city,
-    );
-    switch (remoteResult) {
-      case Ok():
         break;
-      case Error():
-        _authController.add(null);
-      // if (remoteResult.error is RevokeTokenException) {
-      //   return remoteResult;
-      //   // logout user
-      // }
     }
+    // final remoteResult = await _apiClient.addClient(
+    //   id: id,
+    //   name: name,
+    //   phone: phone,
+    //   city: city,
+    // );
+    // switch (remoteResult) {
+    //   case Ok():
+    //     break;
+    //   case Error():
+    //     _authController.add(null);
+    //   if (remoteResult.error is RevokeTokenException) {
+    //     return remoteResult;
+    //     // logout user
+    //   }
+    // }
     return localResult;
   }
 
@@ -118,12 +128,12 @@ class ClientRepository {
     final localResult = await _databaseService.updateClient(
         id: id, name: name, phone: phone, city: city);
     _controller.add(null);
-    final remoteResult = await _apiClient.updateClient(
-      id: id,
-      name: name,
-      phone: phone,
-      city: city,
-    );
+    // final remoteResult = await _apiClient.updateClient(
+    //   id: id,
+    //   name: name,
+    //   phone: phone,
+    //   city: city,
+    // );
     return localResult;
   }
 
@@ -135,9 +145,9 @@ class ClientRepository {
     }
     final result = await _databaseService.deleteClients(ids);
     _controller.add(null);
-    await _apiClient.deleteClients(
-      ids: ids,
-    );
+    // await _apiClient.deleteClients(
+    //   ids: ids,
+    // );
     return result;
   }
 }

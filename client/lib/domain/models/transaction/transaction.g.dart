@@ -22,21 +22,17 @@ _Transaction _$TransactionFromJson(Map<String, dynamic> json) => _Transaction(
               ?.map((e) => Payment.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      synchronized: (json['synchronized'] as num?)?.toInt() ?? 0,
-      isDeleted: (json['is_deleted'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$TransactionToJson(_Transaction instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'totalPrice': instance.totalPrice,
+      'total_price': instance.totalPrice,
       'remainder': instance.remainder,
-      'totalPaid': instance.totalPaid,
+      'total_paid': instance.totalPaid,
       'type': instance.type,
-      'timeOfTransaction': instance.timeOfTransaction,
-      'clientId': instance.clientId,
+      'time_of_transaction': instance.timeOfTransaction,
+      'client_id': instance.clientId,
       'items': instance.items,
       'payments': instance.payments,
-      'synchronized': instance.synchronized,
-      'isDeleted': instance.isDeleted,
     };

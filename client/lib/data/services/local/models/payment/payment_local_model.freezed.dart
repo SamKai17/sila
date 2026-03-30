@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'payment.dart';
+part of 'payment_local_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,58 +13,65 @@ part of 'payment.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$Payment {
+mixin _$PaymentLocalModel {
   String get id;
   double get amount;
-  int get timeOfPayment;
+  int get timeOfPayment; // @Default(0) int synchronized,
+  int get isDeleted;
 
-  /// Create a copy of Payment
+  /// Create a copy of PaymentLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $PaymentCopyWith<Payment> get copyWith =>
-      _$PaymentCopyWithImpl<Payment>(this as Payment, _$identity);
+  $PaymentLocalModelCopyWith<PaymentLocalModel> get copyWith =>
+      _$PaymentLocalModelCopyWithImpl<PaymentLocalModel>(
+          this as PaymentLocalModel, _$identity);
 
-  /// Serializes this Payment to a JSON map.
+  /// Serializes this PaymentLocalModel to a JSON map.
   Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is Payment &&
+            other is PaymentLocalModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.amount, amount) || other.amount == amount) &&
             (identical(other.timeOfPayment, timeOfPayment) ||
-                other.timeOfPayment == timeOfPayment));
+                other.timeOfPayment == timeOfPayment) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, amount, timeOfPayment);
+  int get hashCode =>
+      Object.hash(runtimeType, id, amount, timeOfPayment, isDeleted);
 
   @override
   String toString() {
-    return 'Payment(id: $id, amount: $amount, timeOfPayment: $timeOfPayment)';
+    return 'PaymentLocalModel(id: $id, amount: $amount, timeOfPayment: $timeOfPayment, isDeleted: $isDeleted)';
   }
 }
 
 /// @nodoc
-abstract mixin class $PaymentCopyWith<$Res> {
-  factory $PaymentCopyWith(Payment value, $Res Function(Payment) _then) =
-      _$PaymentCopyWithImpl;
+abstract mixin class $PaymentLocalModelCopyWith<$Res> {
+  factory $PaymentLocalModelCopyWith(
+          PaymentLocalModel value, $Res Function(PaymentLocalModel) _then) =
+      _$PaymentLocalModelCopyWithImpl;
   @useResult
-  $Res call({String id, double amount, int timeOfPayment});
+  $Res call({String id, double amount, int timeOfPayment, int isDeleted});
 }
 
 /// @nodoc
-class _$PaymentCopyWithImpl<$Res> implements $PaymentCopyWith<$Res> {
-  _$PaymentCopyWithImpl(this._self, this._then);
+class _$PaymentLocalModelCopyWithImpl<$Res>
+    implements $PaymentLocalModelCopyWith<$Res> {
+  _$PaymentLocalModelCopyWithImpl(this._self, this._then);
 
-  final Payment _self;
-  final $Res Function(Payment) _then;
+  final PaymentLocalModel _self;
+  final $Res Function(PaymentLocalModel) _then;
 
-  /// Create a copy of Payment
+  /// Create a copy of PaymentLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -72,6 +79,7 @@ class _$PaymentCopyWithImpl<$Res> implements $PaymentCopyWith<$Res> {
     Object? id = null,
     Object? amount = null,
     Object? timeOfPayment = null,
+    Object? isDeleted = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -86,12 +94,16 @@ class _$PaymentCopyWithImpl<$Res> implements $PaymentCopyWith<$Res> {
           ? _self.timeOfPayment
           : timeOfPayment // ignore: cast_nullable_to_non_nullable
               as int,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [Payment].
-extension PaymentPatterns on Payment {
+/// Adds pattern-matching-related methods to [PaymentLocalModel].
+extension PaymentLocalModelPatterns on PaymentLocalModel {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -106,12 +118,12 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_Payment value)? $default, {
+    TResult Function(_PaymentLocalModel value)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Payment() when $default != null:
+      case _PaymentLocalModel() when $default != null:
         return $default(_that);
       case _:
         return orElse();
@@ -133,11 +145,11 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_Payment value) $default,
+    TResult Function(_PaymentLocalModel value) $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Payment():
+      case _PaymentLocalModel():
         return $default(_that);
       case _:
         throw StateError('Unexpected subclass');
@@ -158,11 +170,11 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_Payment value)? $default,
+    TResult? Function(_PaymentLocalModel value)? $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Payment() when $default != null:
+      case _PaymentLocalModel() when $default != null:
         return $default(_that);
       case _:
         return null;
@@ -183,13 +195,16 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, double amount, int timeOfPayment)? $default, {
+    TResult Function(
+            String id, double amount, int timeOfPayment, int isDeleted)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Payment() when $default != null:
-        return $default(_that.id, _that.amount, _that.timeOfPayment);
+      case _PaymentLocalModel() when $default != null:
+        return $default(
+            _that.id, _that.amount, _that.timeOfPayment, _that.isDeleted);
       case _:
         return orElse();
     }
@@ -210,12 +225,14 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, double amount, int timeOfPayment) $default,
+    TResult Function(String id, double amount, int timeOfPayment, int isDeleted)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Payment():
-        return $default(_that.id, _that.amount, _that.timeOfPayment);
+      case _PaymentLocalModel():
+        return $default(
+            _that.id, _that.amount, _that.timeOfPayment, _that.isDeleted);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -235,12 +252,15 @@ extension PaymentPatterns on Payment {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, double amount, int timeOfPayment)? $default,
+    TResult? Function(
+            String id, double amount, int timeOfPayment, int isDeleted)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Payment() when $default != null:
-        return $default(_that.id, _that.amount, _that.timeOfPayment);
+      case _PaymentLocalModel() when $default != null:
+        return $default(
+            _that.id, _that.amount, _that.timeOfPayment, _that.isDeleted);
       case _:
         return null;
     }
@@ -250,11 +270,14 @@ extension PaymentPatterns on Payment {
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class _Payment implements Payment {
-  const _Payment(
-      {required this.id, required this.amount, required this.timeOfPayment});
-  factory _Payment.fromJson(Map<String, dynamic> json) =>
-      _$PaymentFromJson(json);
+class _PaymentLocalModel implements PaymentLocalModel {
+  const _PaymentLocalModel(
+      {required this.id,
+      required this.amount,
+      required this.timeOfPayment,
+      this.isDeleted = 0});
+  factory _PaymentLocalModel.fromJson(Map<String, dynamic> json) =>
+      _$PaymentLocalModelFromJson(json);
 
   @override
   final String id;
@@ -262,18 +285,22 @@ class _Payment implements Payment {
   final double amount;
   @override
   final int timeOfPayment;
+// @Default(0) int synchronized,
+  @override
+  @JsonKey()
+  final int isDeleted;
 
-  /// Create a copy of Payment
+  /// Create a copy of PaymentLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$PaymentCopyWith<_Payment> get copyWith =>
-      __$PaymentCopyWithImpl<_Payment>(this, _$identity);
+  _$PaymentLocalModelCopyWith<_PaymentLocalModel> get copyWith =>
+      __$PaymentLocalModelCopyWithImpl<_PaymentLocalModel>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$PaymentToJson(
+    return _$PaymentLocalModelToJson(
       this,
     );
   }
@@ -282,40 +309,46 @@ class _Payment implements Payment {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _Payment &&
+            other is _PaymentLocalModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.amount, amount) || other.amount == amount) &&
             (identical(other.timeOfPayment, timeOfPayment) ||
-                other.timeOfPayment == timeOfPayment));
+                other.timeOfPayment == timeOfPayment) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, amount, timeOfPayment);
+  int get hashCode =>
+      Object.hash(runtimeType, id, amount, timeOfPayment, isDeleted);
 
   @override
   String toString() {
-    return 'Payment(id: $id, amount: $amount, timeOfPayment: $timeOfPayment)';
+    return 'PaymentLocalModel(id: $id, amount: $amount, timeOfPayment: $timeOfPayment, isDeleted: $isDeleted)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$PaymentCopyWith<$Res> implements $PaymentCopyWith<$Res> {
-  factory _$PaymentCopyWith(_Payment value, $Res Function(_Payment) _then) =
-      __$PaymentCopyWithImpl;
+abstract mixin class _$PaymentLocalModelCopyWith<$Res>
+    implements $PaymentLocalModelCopyWith<$Res> {
+  factory _$PaymentLocalModelCopyWith(
+          _PaymentLocalModel value, $Res Function(_PaymentLocalModel) _then) =
+      __$PaymentLocalModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, double amount, int timeOfPayment});
+  $Res call({String id, double amount, int timeOfPayment, int isDeleted});
 }
 
 /// @nodoc
-class __$PaymentCopyWithImpl<$Res> implements _$PaymentCopyWith<$Res> {
-  __$PaymentCopyWithImpl(this._self, this._then);
+class __$PaymentLocalModelCopyWithImpl<$Res>
+    implements _$PaymentLocalModelCopyWith<$Res> {
+  __$PaymentLocalModelCopyWithImpl(this._self, this._then);
 
-  final _Payment _self;
-  final $Res Function(_Payment) _then;
+  final _PaymentLocalModel _self;
+  final $Res Function(_PaymentLocalModel) _then;
 
-  /// Create a copy of Payment
+  /// Create a copy of PaymentLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -323,8 +356,9 @@ class __$PaymentCopyWithImpl<$Res> implements _$PaymentCopyWith<$Res> {
     Object? id = null,
     Object? amount = null,
     Object? timeOfPayment = null,
+    Object? isDeleted = null,
   }) {
-    return _then(_Payment(
+    return _then(_PaymentLocalModel(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -336,6 +370,10 @@ class __$PaymentCopyWithImpl<$Res> implements _$PaymentCopyWith<$Res> {
       timeOfPayment: null == timeOfPayment
           ? _self.timeOfPayment
           : timeOfPayment // ignore: cast_nullable_to_non_nullable
+              as int,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }

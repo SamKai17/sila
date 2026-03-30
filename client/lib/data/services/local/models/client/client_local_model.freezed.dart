@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'client.dart';
+part of 'client_local_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,59 +13,75 @@ part of 'client.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$Client {
+mixin _$ClientLocalModel {
   String get id;
   String get name;
   String get phone;
   String get city;
+  int get synchronized;
+  int get isDeleted;
 
-  /// Create a copy of Client
+  /// Create a copy of ClientLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $ClientCopyWith<Client> get copyWith =>
-      _$ClientCopyWithImpl<Client>(this as Client, _$identity);
+  $ClientLocalModelCopyWith<ClientLocalModel> get copyWith =>
+      _$ClientLocalModelCopyWithImpl<ClientLocalModel>(
+          this as ClientLocalModel, _$identity);
 
-  /// Serializes this Client to a JSON map.
+  /// Serializes this ClientLocalModel to a JSON map.
   Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is Client &&
+            other is ClientLocalModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.city, city) || other.city == city));
+            (identical(other.city, city) || other.city == city) &&
+            (identical(other.synchronized, synchronized) ||
+                other.synchronized == synchronized) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, phone, city);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, phone, city, synchronized, isDeleted);
 
   @override
   String toString() {
-    return 'Client(id: $id, name: $name, phone: $phone, city: $city)';
+    return 'ClientLocalModel(id: $id, name: $name, phone: $phone, city: $city, synchronized: $synchronized, isDeleted: $isDeleted)';
   }
 }
 
 /// @nodoc
-abstract mixin class $ClientCopyWith<$Res> {
-  factory $ClientCopyWith(Client value, $Res Function(Client) _then) =
-      _$ClientCopyWithImpl;
+abstract mixin class $ClientLocalModelCopyWith<$Res> {
+  factory $ClientLocalModelCopyWith(
+          ClientLocalModel value, $Res Function(ClientLocalModel) _then) =
+      _$ClientLocalModelCopyWithImpl;
   @useResult
-  $Res call({String id, String name, String phone, String city});
+  $Res call(
+      {String id,
+      String name,
+      String phone,
+      String city,
+      int synchronized,
+      int isDeleted});
 }
 
 /// @nodoc
-class _$ClientCopyWithImpl<$Res> implements $ClientCopyWith<$Res> {
-  _$ClientCopyWithImpl(this._self, this._then);
+class _$ClientLocalModelCopyWithImpl<$Res>
+    implements $ClientLocalModelCopyWith<$Res> {
+  _$ClientLocalModelCopyWithImpl(this._self, this._then);
 
-  final Client _self;
-  final $Res Function(Client) _then;
+  final ClientLocalModel _self;
+  final $Res Function(ClientLocalModel) _then;
 
-  /// Create a copy of Client
+  /// Create a copy of ClientLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -74,6 +90,8 @@ class _$ClientCopyWithImpl<$Res> implements $ClientCopyWith<$Res> {
     Object? name = null,
     Object? phone = null,
     Object? city = null,
+    Object? synchronized = null,
+    Object? isDeleted = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -92,12 +110,20 @@ class _$ClientCopyWithImpl<$Res> implements $ClientCopyWith<$Res> {
           ? _self.city
           : city // ignore: cast_nullable_to_non_nullable
               as String,
+      synchronized: null == synchronized
+          ? _self.synchronized
+          : synchronized // ignore: cast_nullable_to_non_nullable
+              as int,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [Client].
-extension ClientPatterns on Client {
+/// Adds pattern-matching-related methods to [ClientLocalModel].
+extension ClientLocalModelPatterns on ClientLocalModel {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -112,12 +138,12 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_Client value)? $default, {
+    TResult Function(_ClientLocalModel value)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Client() when $default != null:
+      case _ClientLocalModel() when $default != null:
         return $default(_that);
       case _:
         return orElse();
@@ -139,11 +165,11 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_Client value) $default,
+    TResult Function(_ClientLocalModel value) $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Client():
+      case _ClientLocalModel():
         return $default(_that);
       case _:
         throw StateError('Unexpected subclass');
@@ -164,11 +190,11 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_Client value)? $default,
+    TResult? Function(_ClientLocalModel value)? $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Client() when $default != null:
+      case _ClientLocalModel() when $default != null:
         return $default(_that);
       case _:
         return null;
@@ -189,14 +215,16 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String name, String phone, String city)?
+    TResult Function(String id, String name, String phone, String city,
+            int synchronized, int isDeleted)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _Client() when $default != null:
-        return $default(_that.id, _that.name, _that.phone, _that.city);
+      case _ClientLocalModel() when $default != null:
+        return $default(_that.id, _that.name, _that.phone, _that.city,
+            _that.synchronized, _that.isDeleted);
       case _:
         return orElse();
     }
@@ -217,13 +245,15 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String name, String phone, String city)
+    TResult Function(String id, String name, String phone, String city,
+            int synchronized, int isDeleted)
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Client():
-        return $default(_that.id, _that.name, _that.phone, _that.city);
+      case _ClientLocalModel():
+        return $default(_that.id, _that.name, _that.phone, _that.city,
+            _that.synchronized, _that.isDeleted);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -243,13 +273,15 @@ extension ClientPatterns on Client {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String name, String phone, String city)?
+    TResult? Function(String id, String name, String phone, String city,
+            int synchronized, int isDeleted)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _Client() when $default != null:
-        return $default(_that.id, _that.name, _that.phone, _that.city);
+      case _ClientLocalModel() when $default != null:
+        return $default(_that.id, _that.name, _that.phone, _that.city,
+            _that.synchronized, _that.isDeleted);
       case _:
         return null;
     }
@@ -259,13 +291,16 @@ extension ClientPatterns on Client {
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class _Client implements Client {
-  const _Client(
+class _ClientLocalModel implements ClientLocalModel {
+  const _ClientLocalModel(
       {required this.id,
       required this.name,
       required this.phone,
-      required this.city});
-  factory _Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
+      required this.city,
+      this.synchronized = 0,
+      this.isDeleted = 0});
+  factory _ClientLocalModel.fromJson(Map<String, dynamic> json) =>
+      _$ClientLocalModelFromJson(json);
 
   @override
   final String id;
@@ -275,18 +310,24 @@ class _Client implements Client {
   final String phone;
   @override
   final String city;
+  @override
+  @JsonKey()
+  final int synchronized;
+  @override
+  @JsonKey()
+  final int isDeleted;
 
-  /// Create a copy of Client
+  /// Create a copy of ClientLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$ClientCopyWith<_Client> get copyWith =>
-      __$ClientCopyWithImpl<_Client>(this, _$identity);
+  _$ClientLocalModelCopyWith<_ClientLocalModel> get copyWith =>
+      __$ClientLocalModelCopyWithImpl<_ClientLocalModel>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$ClientToJson(
+    return _$ClientLocalModelToJson(
       this,
     );
   }
@@ -295,40 +336,54 @@ class _Client implements Client {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _Client &&
+            other is _ClientLocalModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.city, city) || other.city == city));
+            (identical(other.city, city) || other.city == city) &&
+            (identical(other.synchronized, synchronized) ||
+                other.synchronized == synchronized) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, phone, city);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, phone, city, synchronized, isDeleted);
 
   @override
   String toString() {
-    return 'Client(id: $id, name: $name, phone: $phone, city: $city)';
+    return 'ClientLocalModel(id: $id, name: $name, phone: $phone, city: $city, synchronized: $synchronized, isDeleted: $isDeleted)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$ClientCopyWith<$Res> implements $ClientCopyWith<$Res> {
-  factory _$ClientCopyWith(_Client value, $Res Function(_Client) _then) =
-      __$ClientCopyWithImpl;
+abstract mixin class _$ClientLocalModelCopyWith<$Res>
+    implements $ClientLocalModelCopyWith<$Res> {
+  factory _$ClientLocalModelCopyWith(
+          _ClientLocalModel value, $Res Function(_ClientLocalModel) _then) =
+      __$ClientLocalModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, String name, String phone, String city});
+  $Res call(
+      {String id,
+      String name,
+      String phone,
+      String city,
+      int synchronized,
+      int isDeleted});
 }
 
 /// @nodoc
-class __$ClientCopyWithImpl<$Res> implements _$ClientCopyWith<$Res> {
-  __$ClientCopyWithImpl(this._self, this._then);
+class __$ClientLocalModelCopyWithImpl<$Res>
+    implements _$ClientLocalModelCopyWith<$Res> {
+  __$ClientLocalModelCopyWithImpl(this._self, this._then);
 
-  final _Client _self;
-  final $Res Function(_Client) _then;
+  final _ClientLocalModel _self;
+  final $Res Function(_ClientLocalModel) _then;
 
-  /// Create a copy of Client
+  /// Create a copy of ClientLocalModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -337,8 +392,10 @@ class __$ClientCopyWithImpl<$Res> implements _$ClientCopyWith<$Res> {
     Object? name = null,
     Object? phone = null,
     Object? city = null,
+    Object? synchronized = null,
+    Object? isDeleted = null,
   }) {
-    return _then(_Client(
+    return _then(_ClientLocalModel(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -355,6 +412,14 @@ class __$ClientCopyWithImpl<$Res> implements _$ClientCopyWith<$Res> {
           ? _self.city
           : city // ignore: cast_nullable_to_non_nullable
               as String,
+      synchronized: null == synchronized
+          ? _self.synchronized
+          : synchronized // ignore: cast_nullable_to_non_nullable
+              as int,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
