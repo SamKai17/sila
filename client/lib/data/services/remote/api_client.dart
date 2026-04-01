@@ -1,3 +1,5 @@
+import 'package:client/data/services/local/models/item/item_local_model.dart';
+import 'package:client/data/services/local/models/payment/payment_local_model.dart';
 import 'package:client/data/services/local/secure_storage_service.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
@@ -309,8 +311,8 @@ class ApiClient {
     required int timeOfTransaction,
     required String type,
     required String clientId,
-    required List<Item> items,
-    required List<Payment> payments,
+    required List<ItemLocalModel> items,
+    required List<PaymentLocalModel> payments,
   }) async {
     try {
       final itemsMapList = items
@@ -319,7 +321,8 @@ class ApiClient {
               'id': e.id,
               'name': e.name,
               'price': e.price,
-              'quantity': e.quantity
+              'quantity': e.quantity,
+              'is_deleted': e.isDeleted,
             },
           )
           .toList();
@@ -329,6 +332,7 @@ class ApiClient {
               'id': e.id,
               'amount': e.amount,
               'time_of_payment': e.timeOfPayment,
+              'is_deleted': e.isDeleted,
             },
           )
           .toList();

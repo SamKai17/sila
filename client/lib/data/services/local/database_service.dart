@@ -1,5 +1,6 @@
 import 'package:client/data/services/local/models/client/client_local_model.dart';
 import 'package:client/data/services/local/models/item/item_local_model.dart';
+import 'package:client/data/services/local/models/payment/payment_local_model.dart';
 import 'package:client/data/services/local/models/transaction/transaction_local_model.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
@@ -140,6 +141,23 @@ class DatabaseService {
     }
   }
 
+  Future<Result<List<PaymentLocalModel>>> fetchPayments({
+    required String transactionId,
+  }) async {
+    try {
+      final List<Map<String, Object?>> paymentsMap = await _database!.query(
+        _paymentTable,
+        where: '$_paymentTransactionIdField = ?',
+        whereArgs: [transactionId],
+      );
+      final payments =
+          paymentsMap.map((e) => PaymentLocalModel.fromJson(e)).toList();
+      return Result.ok(payments);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
   Future<Result<List<ItemLocalModel>>> getItems({
     required String transactionId,
   }) async {
@@ -193,6 +211,7 @@ class DatabaseService {
           );
           itemsToDelete.forEach(
             (item) async {
+              print('deleting');
               await txn.update(
                 _itemTable,
                 {
@@ -217,8 +236,9 @@ class DatabaseService {
     try {
       final List<Map<String, Object?>> paymentsMap = await _database!.query(
         _paymentTable,
-        where: '$_paymentTransactionIdField = ?',
-        whereArgs: [transactionId],
+        where:
+            '$_paymentTransactionIdField = ? AND $_paymentIsDeletedField = ?',
+        whereArgs: [transactionId, 0],
       );
       final payments = paymentsMap.map((e) => Payment.fromJson(e)).toList();
       return Result.ok(payments);
@@ -286,8 +306,11 @@ class DatabaseService {
             whereArgs: [transactionId],
           );
           for (var id in paymentsIds) {
-            await txn.delete(
+            await txn.update(
               _paymentTable,
+              {
+                _paymentIsDeletedField: 1,
+              },
               where: '$_paymentIdField = ?',
               whereArgs: [id],
             );

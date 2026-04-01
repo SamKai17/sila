@@ -1,4 +1,6 @@
 import 'package:client/data/services/local/database_service.dart';
+import 'package:client/data/services/local/models/item/item_local_model.dart';
+import 'package:client/data/services/local/models/payment/payment_local_model.dart';
 import 'package:client/data/services/remote/api_client.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/utils/result.dart';
@@ -24,7 +26,7 @@ class SyncRepository {
   late ApiClient _apiClient;
 
   Future<void> syncClients() async {
-    print('sync clients');
+    // print('sync clients');
     if (!_databaseService.isOpen) {
       await _databaseService.open();
     }
@@ -66,7 +68,7 @@ class SyncRepository {
   }
 
   Future<void> syncTransactions() async {
-    print('sync transactions');
+    // print('sync transactions');
     final unsyncedTransactionsResult =
         await _databaseService.fetchUnsyncedTransactions();
     switch (unsyncedTransactionsResult) {
@@ -90,15 +92,15 @@ class SyncRepository {
             // delete transaction
           } else {
             print('creating...');
-            final itemsResult =
-                await _databaseService.fetchItems(transactionId: transaction.id);
+            final itemsResult = await _databaseService.fetchItems(
+                transactionId: transaction.id);
             switch (itemsResult) {
               case Ok():
                 break;
               case Error():
                 continue;
             }
-            final paymentsResult = await _databaseService.getPayments(
+            final paymentsResult = await _databaseService.fetchPayments(
                 transactionId: transaction.id);
             switch (paymentsResult) {
               case Ok():
@@ -114,16 +116,7 @@ class SyncRepository {
               timeOfTransaction: transaction.timeOfTransaction,
               type: transaction.type,
               clientId: transaction.clientId,
-              items: itemsResult.value
-                  .map(
-                    (item) => Item(
-                      id: item.id,
-                      name: item.name,
-                      price: item.price,
-                      quantity: item.quantity,
-                    ),
-                  )
-                  .toList(),
+              items: itemsResult.value,
               payments: paymentsResult.value,
             );
             switch (remoteResult) {

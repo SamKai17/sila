@@ -6,6 +6,7 @@ import 'package:client/ui/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:logging/logging.dart';
 
 class SyncManager {
   SyncManager({
@@ -31,9 +32,9 @@ class SyncManager {
   late SyncRepository _syncRepository;
 
   Future<void> sync() async {
-    // print('syncing');
-    // await _syncRepository.syncClients();
-    // await _syncRepository.syncTransactions();
+    print('syncing');
+    await _syncRepository.syncClients();
+    await _syncRepository.syncTransactions();
   }
 
   Future<void> periodicSyncing() async {
@@ -58,10 +59,18 @@ void main() async {
     retry: (retryCount, error) => null,
   );
   container.read(loginViewModel.notifier).getUser();
+  Logger.root.level = Level.ALL; // defaults to Level.INFO
+  Logger.root.onRecord.listen((record) {
+    print(
+        '${record.level.name}: ${record.loggerName}: ${record.message}');
+  });
 
   SyncManager(
     syncRepository: container.read(syncRepository),
   );
+  final _log = Logger('Main');
+  _log.fine('app started that\s good');
+  _log.warning('warning');
 
   runApp(
     UncontrolledProviderScope(
