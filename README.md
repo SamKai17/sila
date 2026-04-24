@@ -5,13 +5,14 @@ A mobile-first app that helps wholesalers manage clients, track transactions, an
 ---
 
 ## 📸 Demo
-
-![Clients](./screenshots/clients.png)
-![Client](./screenshots/client.png)
-![Cart](./screenshots/cart.png)
-![Payment](./screenshots/payment.png)
-![Receipt](./screenshots/receipt.png)
-![Transaction](./screenshots/transaction.png)
+<p align="center">
+  <img src="./screenshots/clients.png" width="230"/>
+  <img src="./screenshots/client.png" width="230"/>
+  <img src="./screenshots/cart.png" width="230"/>
+  <img src="./screenshots/payment.png" width="230"/>
+  <img src="./screenshots/receipt.png" width="230"/>
+  <img src="./screenshots/transaction.png" width="230"/>
+</p>
 
 ---
 
@@ -104,7 +105,7 @@ Core features are implemented, but improvements and refinements are ongoing.
 
 ## 📬 Contact
 
-* Email: [mail](mailto:oussama.akerkaou11@gmail.com)
-* LinkedIn: [profile](https://www.linkedin.com/in/oussama-a-18a095269/)
+* Email: [Gmail](mailto:oussama.akerkaou11@gmail.com)
+* LinkedIn: [LinkedIn](https://www.linkedin.com/in/oussama-a-18a095269/)
 
 ---
