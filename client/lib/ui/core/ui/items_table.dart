@@ -1,4 +1,5 @@
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class ItemsTable extends StatelessWidget {
@@ -15,19 +16,19 @@ class ItemsTable extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Qty"),
+              child: Text(AppLocalizations.of(context)!.quantity),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Name"),
+              child: Text(AppLocalizations.of(context)!.itemName),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Price"),
+              child: Text(AppLocalizations.of(context)!.price),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Total"),
+              child: Text(AppLocalizations.of(context)!.total),
             ),
           ],
         ),
@@ -45,11 +46,11 @@ class ItemsTable extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('${item.price}\$'),
+                  child: Text('\$${item.price}'),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('${item.price * item.quantity}\$'),
+                  child: Text('\$${item.price * item.quantity}'),
                 ),
               ],
             );

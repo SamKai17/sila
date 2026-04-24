@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from .models import User
 from django.contrib.auth import authenticate
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -11,7 +11,7 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField()
     class Meta:
         model = User
-        fields = ['id', 'username', 'confirm_password', 'password']
+        fields = ['id', 'username', 'password', 'confirm_password']
         extra_kwargs = {'password': {'write_only': True}}
     
     def create(self, validated_data):

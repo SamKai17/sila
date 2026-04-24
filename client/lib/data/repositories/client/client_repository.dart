@@ -3,6 +3,8 @@ import 'package:client/data/services/local/database_service.dart';
 import 'package:client/data/services/remote/api_client.dart';
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/utils/result.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:logging/logging.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:uuid/uuid.dart';
 
@@ -17,7 +19,7 @@ final clientRepository = Provider(
   (ref) {
     return ClientRepository(
       databaseService: ref.read(databaseService),
-      apiClient: ref.read(apiClient),
+      apiClient: ref.read(apiClient(ref.read(dio))),
       // authApiClient: ref.read(authApiClient),
     );
   },
@@ -34,6 +36,7 @@ class ClientRepository {
 
   DatabaseService _databaseService;
   ApiClient _apiClient;
+  Logger _log = Logger('Client');
   // AuthApiClient _authApiClient;
 
   final _controller = StreamController<void>.broadcast();
@@ -46,6 +49,42 @@ class ClientRepository {
     await for (var _ in _controller.stream) {
       yield await getClientsList();
     }
+  }
+
+  Future<void> syncClientsToLocal() async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    final storage = FlutterSecureStorage();
+    final isFirstLogin = await storage.read(key: 'isFirstLogin');
+    if (isFirstLogin != null) {
+      return;
+    }
+    _log.fine('syncing data from remote');
+    await storage.write(key: 'isFirstLogin', value: 'False');
+    print('syncing to local');
+    final clientsListResult = await _apiClient.getClientsList();
+    switch (clientsListResult) {
+      case Ok():
+        final clientsList = clientsListResult.value;
+        print(clientsList);
+        final localResult = await _databaseService.syncClients(clientsList);
+        switch (localResult) {
+          case Ok():
+            _controller.add(null);
+            break;
+          // print('success syncing data');
+          case Error():
+            _log.warning('couldn\'t sync clients to local database');
+            break;
+        }
+      // print(clientsList);
+      // sync to database
+      case Error():
+        _log.warning('couldn\'t fetch clients from remote api');
+        break;
+    }
+    _log.fine('success syncing data from remote');
   }
 
   Future<List<Client>> getClientsList() async {

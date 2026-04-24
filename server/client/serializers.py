@@ -4,5 +4,5 @@ from .models import Client
 class ClientModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ['id', 'name', 'phone', 'city', 'user']
+        fields = ['id', 'name', 'phone', 'city', 'user', 'is_deleted']
         extra_kwargs = {'user': {'read_only': True}}

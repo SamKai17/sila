@@ -1,3 +1,4 @@
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,7 @@ class _SearchFieldState extends State<SearchField> {
           widget.reload(value);
         },
         decoration: InputDecoration(
-          hintText: "Search",
+          hintText: AppLocalizations.of(context)!.search,
           contentPadding: EdgeInsets.all(10.0),
           filled: true,
           fillColor: AppPallete.surface,

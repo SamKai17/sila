@@ -1,16 +1,14 @@
 import 'package:client/data/services/local/database_service.dart';
-import 'package:client/data/services/local/models/item/item_local_model.dart';
-import 'package:client/data/services/local/models/payment/payment_local_model.dart';
 import 'package:client/data/services/remote/api_client.dart';
-import 'package:client/domain/models/item/item.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 
 final syncRepository = Provider(
   (ref) {
     return SyncRepository(
       databaseService: ref.read(databaseService),
-      apiClient: ref.read(apiClient),
+      apiClient: ref.read(apiClient(ref.read(dio))),
     );
   },
 );
@@ -24,8 +22,9 @@ class SyncRepository {
 
   late DatabaseService _databaseService;
   late ApiClient _apiClient;
+  final _log = Logger('SyncRepository');
 
-  Future<void> syncClients() async {
+  Future<void> syncClientsToRemote() async {
     // print('sync clients');
     if (!_databaseService.isOpen) {
       await _databaseService.open();
@@ -33,17 +32,19 @@ class SyncRepository {
     final unsyncedClientsResult = await _databaseService.fetchUnsyncedClients();
     switch (unsyncedClientsResult) {
       case Ok():
+        // print(unsyncedClientsResult.value);
         final unsyncedClients = unsyncedClientsResult.value;
         for (var client in unsyncedClients) {
-          // need to differentiate between add, update, delete
           if (client.isDeleted == 1) {
-            // delete client
+            // await _databaseService.synchronizeClient(id: client.id);
+            // break;
             final remoteResult = await _apiClient.deleteClient(id: client.id);
             switch (remoteResult) {
               case Ok():
-                print('synced client ${client.id}');
+                _log.finer('client ${client.id} is synced');
                 await _databaseService.synchronizeClient(id: client.id);
               case Error():
+                _log.warning('client ${client.id} was not synced');
                 break;
             }
           } else {
@@ -55,9 +56,10 @@ class SyncRepository {
             );
             switch (remoteResult) {
               case Ok():
-                print('synced client ${client.id}');
+                _log.finer('client ${client.id} is synced');
                 await _databaseService.synchronizeClient(id: client.id);
               case Error():
+                _log.warning('client ${client.id} was not synced');
                 break;
             }
           }
@@ -67,8 +69,11 @@ class SyncRepository {
     }
   }
 
-  Future<void> syncTransactions() async {
+  Future<void> syncTransactionsToRemote() async {
     // print('sync transactions');
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
     final unsyncedTransactionsResult =
         await _databaseService.fetchUnsyncedTransactions();
     switch (unsyncedTransactionsResult) {
@@ -129,6 +134,30 @@ class SyncRepository {
             }
           }
         }
+      case Error():
+        break;
+    }
+  }
+
+  Future<void> syncClientsToLocal() async {
+    if (!_databaseService.isOpen) {
+      await _databaseService.open();
+    }
+    print('syncing to local');
+    final clientsListResult = await _apiClient.getClientsList();
+    switch (clientsListResult) {
+      case Ok():
+        final clientsList = clientsListResult.value;
+        print(clientsList);
+        final localResult = await _databaseService.syncClients(clientsList);
+        switch (localResult) {
+          case Ok():
+            print('success syncing data');
+          case Error():
+            break;
+        }
+      // print(clientsList);
+      // sync to database
       case Error():
         break;
     }

@@ -28,7 +28,7 @@ final transactionRepository = Provider(
   (ref) {
     return TransactionRepository(
       databaseService: ref.read(databaseService),
-      apiClient: ref.read(apiClient),
+      apiClient: ref.read(apiClient(ref.read(dio))),
     );
   },
 );

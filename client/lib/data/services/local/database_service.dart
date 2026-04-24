@@ -2,10 +2,12 @@ import 'package:client/data/services/local/models/client/client_local_model.dart
 import 'package:client/data/services/local/models/item/item_local_model.dart';
 import 'package:client/data/services/local/models/payment/payment_local_model.dart';
 import 'package:client/data/services/local/models/transaction/transaction_local_model.dart';
+import 'package:client/domain/models/client/client.dart';
 import 'package:client/domain/models/item/item.dart';
 import 'package:client/domain/models/payment/payment.dart';
 import 'package:client/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
@@ -56,6 +58,8 @@ class DatabaseService {
   Database? _database;
 
   bool get isOpen => _database != null;
+
+  Logger _log = Logger('Db');
 
   Future<void> open() async {
     _database = await openDatabase(
@@ -123,6 +127,36 @@ class DatabaseService {
         db.execute('PRAGMA foreign_keys = ON');
       },
     );
+  }
+
+  Future<Result<void>> syncClients(List<Client> clients) async {
+    try {
+      await _database!.transaction(
+        (txn) async {
+          for (var client in clients) {
+            int res = await txn.insert(
+              _clientTable,
+              {
+                _clientIdField: client.id,
+                _clientNameField: client.name,
+                _clientCityField: client.city,
+                _clientPhoneField: client.phone,
+                _clientSynchronizedField: 1,
+                _clientIsDeletedField: 0
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+            if (res == 0) {
+              _log.warning('item not inserted');
+            }
+          }
+        },
+      );
+      return Result.ok(null);
+    } on Exception catch (e) {
+      _log.warning('client\'s are not synced into db');
+      return Result.error(e);
+    }
   }
 
   Future<Result<List<ItemLocalModel>>> fetchItems({
@@ -194,34 +228,29 @@ class DatabaseService {
             where: '$_transactionIdField = ?',
             whereArgs: [transactionId],
           );
-          itemsToAdd.forEach(
-            (item) async {
-              await txn.insert(
-                _itemTable,
-                {
-                  _itemIdField: item.id,
-                  _itemNameField: item.name,
-                  _itemQuantityField: item.quantity,
-                  _itemPriceField: item.price,
-                  _itemTransactionIdField: transactionId,
-                },
-                conflictAlgorithm: ConflictAlgorithm.replace,
-              );
-            },
-          );
-          itemsToDelete.forEach(
-            (item) async {
-              print('deleting');
-              await txn.update(
-                _itemTable,
-                {
-                  _itemIsDeletedField: 1,
-                },
-                where: '$_itemIdField = ?',
-                whereArgs: [item.id],
-              );
-            },
-          );
+          for (var item in itemsToAdd) {
+            await txn.insert(
+              _itemTable,
+              {
+                _itemIdField: item.id,
+                _itemNameField: item.name,
+                _itemQuantityField: item.quantity,
+                _itemPriceField: item.price,
+                _itemTransactionIdField: transactionId,
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          }
+          for (var item in itemsToDelete) {
+            await txn.update(
+              _itemTable,
+              {
+                _itemIsDeletedField: 1,
+              },
+              where: '$_itemIdField = ?',
+              whereArgs: [item.id],
+            );
+          }
         },
       );
       return Result.ok(null);
@@ -430,17 +459,15 @@ class DatabaseService {
             },
             conflictAlgorithm: ConflictAlgorithm.replace,
           );
-          items.forEach(
-            (item) async {
-              await txn.insert(_itemTable, {
-                _itemIdField: item.id,
-                _itemNameField: item.name,
-                _itemQuantityField: item.quantity,
-                _itemPriceField: item.price,
-                _itemTransactionIdField: transactionId,
-              });
-            },
-          );
+          for (var item in items) {
+            await txn.insert(_itemTable, {
+              _itemIdField: item.id,
+              _itemNameField: item.name,
+              _itemQuantityField: item.quantity,
+              _itemPriceField: item.price,
+              _itemTransactionIdField: transactionId,
+            });
+          }
           await txn.insert(_paymentTable, {
             _paymentIdField: paymentId,
             _paymentAmountField: paid,

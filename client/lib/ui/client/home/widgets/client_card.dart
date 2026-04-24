@@ -1,6 +1,6 @@
 import 'package:client/domain/models/client/client.dart';
 import 'package:client/routing/routes.dart';
-import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
+import 'package:client/ui/client/home/view_model/select_clients_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,9 +16,9 @@ class ClientCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isSelected = ref.watch(isClientSelected(client));
-    final selectedMode = ref.watch(clientsSelectedMode);
-    final selectedClientsNotifier = ref.read(selectedClients.notifier);
+    final isSelected =
+        ref.read(selectClientsViewModel.notifier).isClientSelected(client);
+    final selectedMode = ref.watch(selectClientsViewModel).isNotEmpty;
 
     return SizedBox(
       width: double.infinity,
@@ -88,9 +88,9 @@ class ClientCard extends ConsumerWidget {
         ),
         onLongPress: () {
           if (isSelected) {
-            selectedClientsNotifier.removeSelectedClient(client);
+            ref.read(selectClientsViewModel.notifier).removeClient(client);
           } else {
-            selectedClientsNotifier.addSelectedClient(client);
+            ref.read(selectClientsViewModel.notifier).addClient(client);
           }
         },
         onTap: () {
@@ -101,9 +101,9 @@ class ClientCard extends ConsumerWidget {
             );
           } else {
             if (isSelected) {
-              selectedClientsNotifier.removeSelectedClient(client);
+              ref.read(selectClientsViewModel.notifier).removeClient(client);
             } else {
-              selectedClientsNotifier.addSelectedClient(client);
+              ref.read(selectClientsViewModel.notifier).addClient(client);
             }
           }
         },

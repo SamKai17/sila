@@ -1,15 +1,19 @@
+import 'package:client/routing/routes.dart';
+import 'package:client/ui/auth/login/view_model/auth_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class RegisterScreen extends ConsumerStatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -59,8 +63,16 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: 32.0),
               CustomButtonWidget(
                 buttonText: "Register",
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {}
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    // await ref.read(loginViewModel.notifier).register(
+                    //       username: usernameController.text,
+                    //       password: passwordController.text,
+                    //       confirmPassword: passwordController.text,
+                    //     );
+                    context.goNamed(Routes.loginName);
+                    // context.pop();
+                  }
                 },
               ),
             ],

@@ -53,6 +53,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           return Padding(
             padding: const EdgeInsets.all(18.0),
             child: Column(
+              spacing: 12.0,
               children: [
                 Text(
                   '\$${transaction.remainder}',
@@ -62,74 +63,83 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                     color: Colors.white38,
                   ),
                 ),
-                Spacer(),
+                // Spacer(),
                 Text(
-                  '$value\$',
+                  '\$$value',
                   style: TextStyle(fontSize: 36.0, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(
                   height: 48.0,
                 ),
-                Container(
-                  height: 550.0,
-                  child: GridView.count(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 35.0,
-                    crossAxisSpacing: 35.0,
-                    childAspectRatio: 0.25 / 0.25,
-                    physics: NeverScrollableScrollPhysics(),
-                    children: [
-                      PaymentButton(
-                        text: '9',
-                        onClick: () => updateValue('9'),
-                      ),
-                      PaymentButton(
-                        text: '8',
-                        onClick: () => updateValue('8'),
-                      ),
-                      PaymentButton(
-                        text: '7',
-                        onClick: () => updateValue('7'),
-                      ),
-                      PaymentButton(
-                        text: '6',
-                        onClick: () => updateValue('6'),
-                      ),
-                      PaymentButton(
-                        text: '5',
-                        onClick: () => updateValue('5'),
-                      ),
-                      PaymentButton(
-                        text: '4',
-                        onClick: () => updateValue('4'),
-                      ),
-                      PaymentButton(
-                        text: '3',
-                        onClick: () => updateValue('3'),
-                      ),
-                      PaymentButton(
-                        text: '2',
-                        onClick: () => updateValue('2'),
-                      ),
-                      PaymentButton(
-                        text: '1',
-                        onClick: () => updateValue('1'),
-                      ),
-                      PaymentButton(
-                        text: '.',
-                        onClick: () => updateValue('.'),
-                      ),
-                      PaymentButton(
-                        text: '0',
-                        onClick: () => updateValue('0'),
-                      ),
-                      PaymentButton(
-                        text: 'del',
-                        onClick: () => clearValue(),
-                      ),
-                    ],
-                  ),
+                Row(
+                  spacing: 12.0,
+                  children: [
+                    PaymentButton(
+                      text: '9',
+                      onClick: () => updateValue('9'),
+                    ),
+                    PaymentButton(
+                      text: '8',
+                      onClick: () => updateValue('8'),
+                    ),
+                    PaymentButton(
+                      text: '7',
+                      onClick: () => updateValue('7'),
+                    ),
+                  ],
                 ),
+                Row(
+                  spacing: 12.0,
+                  children: [
+                    PaymentButton(
+                      text: '6',
+                      onClick: () => updateValue('6'),
+                    ),
+                    PaymentButton(
+                      text: '5',
+                      onClick: () => updateValue('5'),
+                    ),
+                    PaymentButton(
+                      text: '4',
+                      onClick: () => updateValue('4'),
+                    ),
+                  ],
+                ),
+                Row(
+                  spacing: 12.0,
+                  children: [
+                    PaymentButton(
+                      text: '3',
+                      onClick: () => updateValue('3'),
+                    ),
+                    PaymentButton(
+                      text: '2',
+                      onClick: () => updateValue('2'),
+                    ),
+                    PaymentButton(
+                      text: '1',
+                      onClick: () => updateValue('1'),
+                    ),
+                  ],
+                ),
+                Row(
+                  spacing: 12.0,
+                  children: [
+                    PaymentButton(
+                      text: '.',
+                      onClick: () => updateValue('.'),
+                    ),
+                    PaymentButton(
+                      text: '0',
+                      onClick: () => updateValue('0'),
+                    ),
+                    PaymentButton(
+                      text: 'del',
+                      onClick: () => clearValue(),
+                    ),
+                  ],
+                ),
+                Spacer(),
                 CustomButtonWidget(
                   buttonText: 'Pay',
                   onPressed: () {
@@ -171,19 +181,22 @@ class PaymentButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        onClick();
-      },
-      child: Container(
-        child: Center(
-            child: Text(
-          text,
-          style: TextStyle(fontSize: 18.0),
-        )),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color: AppPallete.surface,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          onClick();
+        },
+        child: Container(
+          height: 60.0,
+          child: Center(
+              child: Text(
+            text,
+            style: TextStyle(fontSize: 18.0),
+          )),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            color: AppPallete.surface,
+          ),
         ),
       ),
     );

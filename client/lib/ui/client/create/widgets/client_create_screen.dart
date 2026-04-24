@@ -1,6 +1,8 @@
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/ui/client/create/view_model/client_create_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
+import 'package:client/ui/core/ui/custom_number_field_widget.dart';
 import 'package:client/ui/core/ui/loader_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +51,10 @@ class _ClientCreateScreenState extends ConsumerState<ClientCreateScreen> {
       },
     );
     return Scaffold(
-      appBar: AppBar(title: Text("Client Create")),
+      appBar: AppBar(
+        title: Text(
+            "${AppLocalizations.of(context)!.add} ${AppLocalizations.of(context)!.client}"),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: isLoading
@@ -60,18 +65,20 @@ class _ClientCreateScreenState extends ConsumerState<ClientCreateScreen> {
                 child: Column(
                   children: [
                     CustomFieldWidget(
-                        hintText: 'name', controller: _nameController),
+                        hintText: AppLocalizations.of(context)!.clientName,
+                        controller: _nameController),
                     SizedBox(height: 32.0),
-                    CustomFieldWidget(
-                      hintText: 'phone',
+                    CustomNumberFieldWidget(
+                      hintText: AppLocalizations.of(context)!.phone,
                       controller: _phoneController,
                     ),
                     SizedBox(height: 32.0),
                     CustomFieldWidget(
-                        hintText: 'city', controller: _cityController),
+                        hintText: AppLocalizations.of(context)!.city,
+                        controller: _cityController),
                     Spacer(),
                     CustomButtonWidget(
-                        buttonText: 'save',
+                        buttonText: AppLocalizations.of(context)!.save,
                         onPressed: () async {
                           await ref
                               .read(clientCreateViewModel.notifier)

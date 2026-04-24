@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import firebase_admin
+from firebase_admin import credentials
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -28,10 +29,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '10.0.2.2',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    '192.168.1.116'
 ]
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     'authentication',
     'client',
     'transaction',
+    'corsheaders',
 ]
+
+CORS_ALLOWED_ORIGINS = ['http://localhost:59168']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -106,19 +110,28 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'authentication.User'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication'
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'authentication.authentication.FirebaseAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 }
 
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+import os
+FIREBASE_ADMIN_CREDENTIAL = os.path.join(BASE_DIR,'sila-cbf97-firebase-adminsdk-fa64v-dfa7ab69fe.json') # you have to add path according to your file location
+
+cred = credentials.Certificate(FIREBASE_ADMIN_CREDENTIAL)
+firebase_admin.initialize_app(cred)
 
 
 # Internationalization

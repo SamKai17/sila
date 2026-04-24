@@ -1,4 +1,5 @@
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
@@ -53,14 +54,17 @@ class TransactionReceiptScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Successful Transaction',
-                            style: TextStyle(
-                                fontSize: 28.0, fontWeight: FontWeight.w500),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Successful Transaction',
+                              style: TextStyle(
+                                  fontSize: 28.0, fontWeight: FontWeight.w500),
+                            ),
                           ),
                           SizedBox(height: 32.0),
                           Text(
-                            'Items',
+                            AppLocalizations.of(context)!.items,
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.w500),
                           ),
@@ -69,47 +73,52 @@ class TransactionReceiptScreen extends ConsumerWidget {
                               margin: EdgeInsets.all(0.0),
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child:
-                                    ItemsTable(items: transaction.items),
+                                child: ItemsTable(items: transaction.items),
                               )),
                           SizedBox(height: 32.0),
                           Text(
-                            'Client',
+                            AppLocalizations.of(context)!.client,
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.w500),
                           ),
                           SizedBox(height: 12.0),
                           InformationCard(information: {
-                            'Name': client?.name ?? 'Error',
-                            'Phone': client?.phone ?? 'Error',
-                            'City': client?.city ?? 'Error',
+                            AppLocalizations.of(context)!.clientName:
+                                client?.name ?? 'Error',
+                            AppLocalizations.of(context)!.phone:
+                                client?.phone ?? 'Error',
+                            AppLocalizations.of(context)!.city:
+                                client?.city ?? 'Error',
                           }),
                           SizedBox(height: 32.0),
                           Text(
-                            'Payment detail',
+                            AppLocalizations.of(context)!.paymentDetail,
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.w500),
                           ),
                           SizedBox(height: 12.0),
                           InformationCard(information: {
-                            'Payment Date':
+                            AppLocalizations.of(context)!.paymentDate:
                                 '${DateTime.fromMillisecondsSinceEpoch(transaction.payments.isNotEmpty ? transaction.payments.last.timeOfPayment : 0)}',
-                            'Paid':
+                            AppLocalizations.of(context)!.pay:
                                 '${transaction.payments.isNotEmpty ? transaction.payments.last.amount : 0}\$',
                           }),
                           SizedBox(height: 32.0),
                           Text(
-                            'Transaction detail',
+                            AppLocalizations.of(context)!.transactionDetail,
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.w500),
                           ),
                           SizedBox(height: 12.0),
                           InformationCard(information: {
-                            'Transaction Date':
+                            AppLocalizations.of(context)!.transactionDate:
                                 '${DateTime.fromMillisecondsSinceEpoch(transaction.timeOfTransaction)}',
-                            'Total Paid': '${transaction.totalPaid}\$',
-                            'Remainder': '${transaction.remainder}\$',
-                            'Total': '${transaction.totalPrice}\$',
+                            AppLocalizations.of(context)!.totalPaid:
+                                '${transaction.totalPaid}\$',
+                            AppLocalizations.of(context)!.remainder:
+                                '${transaction.remainder}\$',
+                            AppLocalizations.of(context)!.totalPrice:
+                                '${transaction.totalPrice}\$',
                           }),
                         ],
                       ),

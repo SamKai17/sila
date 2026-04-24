@@ -1,8 +1,9 @@
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
-import 'package:client/ui/auth/login/view_model/auth_viewmodel.dart';
 import 'package:client/ui/auth/logout/widgets/logout_button.dart';
-import 'package:client/ui/client/home/view_model/home_viewmodel.dart';
-import 'package:client/ui/client/home/widgets/sync_button.dart';
+import 'package:client/ui/client/delete/view_model/delete_clients_viewmodel.dart';
+import 'package:client/ui/client/home/view_model/select_clients_viewmodel.dart';
+import 'package:client/ui/client/home/view_model/search_clients_viewmodel.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
 import 'package:client/ui/client/home/widgets/client_card.dart';
 import 'package:client/ui/core/ui/delete_button.dart';
@@ -25,15 +26,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedMode = ref.watch(clientsSelectedMode);
-    final selectedClientsNotifier = ref.read(selectedClients.notifier);
-    final deleteClients = ref.watch(deleteClientsViewModel);
-    final clients = ref.watch(filteredClients);
-    final isLoading = clients.isLoading || deleteClients.isLoading;
-    final user = ref.watch(loginViewModel).value;
+    final selectedMode = ref.watch(selectClientsViewModel).isNotEmpty;
+    final clients = ref.watch(searchedClientsProvider);
+    final isLoading =
+        clients.isLoading || ref.watch(deleteClientsViewModel).isLoading;
 
     ref.listen(
-      filteredClients,
+      searchedClientsProvider,
       (previous, next) {
         next.when(
           data: (data) {},
@@ -68,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         titleSpacing: 32.0,
         title: !selectedMode
             ? Text(
-                "Welcome ${user?.username}",
+                AppLocalizations.of(context)!.appTitle,
                 style: TextStyle(
                   fontSize: 28.0,
                   fontWeight: FontWeight.w500,
@@ -78,20 +77,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         leadingWidth: 82,
         leading: selectedMode
             ? ClearButton(
-                clear: selectedClientsNotifier.clearSelectedClients,
+                clear: ref.read(selectClientsViewModel.notifier).clear,
               )
             : null,
         actions: selectedMode
             ? [
-                DeleteButton(delete: () {
-                  ref.read(deleteClientsViewModel.notifier).deleteClients();
-                  selectedClientsNotifier.clearSelectedClients();
-                }),
+                DeleteButton(
+                  delete: () {
+                    ref.read(deleteClientsViewModel.notifier).deleteClients(
+                          clients: ref.read(selectClientsViewModel),
+                        );
+                    ref.read(selectClientsViewModel.notifier).clear();
+                  },
+                ),
                 SizedBox(width: 32)
               ]
             : [
-                SyncButton(),
-                SizedBox(width: 8),
                 LogoutButton(),
                 SizedBox(width: 32),
               ],
@@ -100,7 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: SearchField(
             reload: (String q) {
               setState(() {
-                ref.read(queryProvider.notifier).addQuery(q);
+                ref.read(searchQueryProvider.notifier).addQuery(q);
               });
             },
           ),
@@ -112,25 +113,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             )
           : clients.when(
               data: (data) {
-                return SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 32.0,
-                      right: 32,
-                      bottom: 24.0,
-                    ),
-                    child: Column(
-                      spacing: 16.0,
-                      children: data.map(
-                        (client) {
-                          return ClientCard(
-                            // key: key,
-                            client: client,
-                          );
-                        },
-                      ).toList(),
-                    ),
-                  ),
+                return ListView.separated(
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: 12.0,
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    final client = data[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 32.0, right: 32.0),
+                      child: ClientCard(
+                        key: Key(client.id),
+                        client: client,
+                      ),
+                    );
+                  },
+                  itemCount: data.length,
                 );
               },
               error: (error, stackTrace) {

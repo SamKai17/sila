@@ -1,4 +1,5 @@
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
@@ -50,7 +51,8 @@ class TransactionPreviewScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Transaction Preview'),
+        title: Text(
+            '${AppLocalizations.of(context)!.confirm} ${AppLocalizations.of(context)!.transaction}'),
       ),
       body: isLoading
           ? Center(
@@ -61,7 +63,7 @@ class TransactionPreviewScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Items'),
+                  Text(AppLocalizations.of(context)!.items),
                   SizedBox(height: 12.0),
                   Card(
                       child: Padding(
@@ -69,16 +71,18 @@ class TransactionPreviewScreen extends ConsumerWidget {
                     child: ItemsTable(items: items),
                   )),
                   SizedBox(height: 32.0),
-                  Text('Details'),
+                  Text(AppLocalizations.of(context)!.transactionDetail),
                   SizedBox(height: 12.0),
-                  InformationCard(information: {
-                    'Client': client?.name ?? 'Error',
-                    'Paid': '\$${paid}',
-                    'Total': '\$${totalPrice}'
-                  }),
+                  InformationCard(
+                    information: {
+                      AppLocalizations.of(context)!.client: client?.name ?? 'Error',
+                      AppLocalizations.of(context)!.pay: '\$${paid}',
+                      AppLocalizations.of(context)!.total: '\$${totalPrice}'
+                    },
+                  ),
                   Spacer(),
                   CustomButtonWidget(
-                    buttonText: 'Confirm',
+                    buttonText: AppLocalizations.of(context)!.confirm,
                     onPressed: () async {
                       final transactionId = await ref
                           .read(transactionPreviewViewModel.notifier)

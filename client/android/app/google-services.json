@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "246816725413",
+    "firebase_url": "https://sila-cbf97-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sila-cbf97",
+    "storage_bucket": "sila-cbf97.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246816725413:android:052215007a1101ead7704c",
+        "android_client_info": {
+          "package_name": "com.example.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtd9ea-ry-zPd3hgIc30W9ndzM52ra0Ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

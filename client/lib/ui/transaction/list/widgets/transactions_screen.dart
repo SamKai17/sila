@@ -1,5 +1,6 @@
 import 'package:client/data/repositories/transaction/transaction_repository.dart';
 import 'package:client/domain/models/transaction/transaction.dart';
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
@@ -28,7 +29,7 @@ class TransactionsScreen extends ConsumerWidget {
         automaticallyImplyLeading: selectedMode ? false : true,
         toolbarHeight: 72,
         surfaceTintColor: AppPallete.background,
-        title: !selectedMode ? Text("Transaction") : null,
+        title: !selectedMode ? Text(AppLocalizations.of(context)!.transactions) : null,
         leadingWidth: 82,
         leading: selectedMode
             ? ClearButton(

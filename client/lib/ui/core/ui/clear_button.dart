@@ -2,15 +2,14 @@ import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 class ClearButton extends StatelessWidget {
-  const ClearButton(
-      {super.key, required this.clear});
+  const ClearButton({super.key, required this.clear});
 
   final Function clear;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 32.0),
+      padding: const EdgeInsetsDirectional.only(start: 32.0),
       child: UnconstrainedBox(
         child: Container(
           height: 50.0,

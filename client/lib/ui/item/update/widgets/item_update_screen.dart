@@ -1,7 +1,9 @@
 import 'package:client/domain/models/item/item.dart';
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
 import 'package:client/ui/core/ui/custom_field_widget.dart';
+import 'package:client/ui/core/ui/custom_number_field_widget.dart';
 import 'package:client/ui/transaction/create/view_model/transaction_create_viewmodel.dart';
 import 'package:client/ui/transaction/items_edit/view_model/items_edit_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +49,7 @@ class _ItemUpdateScreenState extends ConsumerState<ItemUpdateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update'),
+        title: Text(AppLocalizations.of(context)!.update),
       ),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
@@ -56,21 +58,21 @@ class _ItemUpdateScreenState extends ConsumerState<ItemUpdateScreen> {
             spacing: 18.0,
             children: [
               CustomFieldWidget(
-                hintText: 'name',
+                hintText: AppLocalizations.of(context)!.itemName,
                 controller: _nameController,
               ),
               Row(
                 spacing: 18.0,
                 children: [
                   Expanded(
-                    child: CustomFieldWidget(
-                      hintText: 'price',
+                    child: CustomNumberFieldWidget(
+                      hintText: AppLocalizations.of(context)!.price,
                       controller: _priceController,
                     ),
                   ),
                   Expanded(
-                    child: CustomFieldWidget(
-                      hintText: 'quantity',
+                    child: CustomNumberFieldWidget(
+                      hintText: AppLocalizations.of(context)!.quantity,
                       controller: _quantityController,
                     ),
                   ),
@@ -78,7 +80,7 @@ class _ItemUpdateScreenState extends ConsumerState<ItemUpdateScreen> {
               ),
               Spacer(),
               CustomButtonWidget(
-                buttonText: 'Save',
+                buttonText: AppLocalizations.of(context)!.save,
                 onPressed: () {
                   // ref.read(transactionCreateViewModel(widget.clientId).notifier).updateItem(
                   //       id: widget.item.id,

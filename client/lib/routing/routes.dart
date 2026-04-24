@@ -1,6 +1,14 @@
 abstract final class Routes {
-  static const login = '/login';
+  static const welcome = '/welcome';
+  static const welcomeName = 'welcome';
+  static const phoneAuthentication = '/phone';
+  static const phoneAuthenticationName = 'phone';
+  static const codeVerification = 'code';
+  static const codeVerificationName = 'code';
+  static const login = 'login';
   static const loginName = 'login';
+  static const register = '/register';
+  static const registerName = 'register';
   static const home = '/';
   static const homeName = 'home';
   static const clientCreate = 'create';

@@ -1,3 +1,4 @@
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/custom_button_widget.dart';
@@ -52,6 +53,7 @@ class _TransactionPaymentScreenState
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Column(
+          spacing: 12.0,
           children: [
             Text(
               '\$${totalPrice}',
@@ -68,68 +70,77 @@ class _TransactionPaymentScreenState
             SizedBox(
               height: 48.0,
             ),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 3,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0,
-                children: [
-                  PaymentButton(
-                    text: '9',
-                    onClick: () => updateValue('9'),
-                  ),
-                  PaymentButton(
-                    text: '8',
-                    onClick: () => updateValue('8'),
-                  ),
-                  PaymentButton(
-                    text: '7',
-                    onClick: () => updateValue('7'),
-                  ),
-                  PaymentButton(
-                    text: '6',
-                    onClick: () => updateValue('6'),
-                  ),
-                  PaymentButton(
-                    text: '5',
-                    onClick: () => updateValue('5'),
-                  ),
-                  PaymentButton(
-                    text: '4',
-                    onClick: () => updateValue('4'),
-                  ),
-                  PaymentButton(
-                    text: '3',
-                    onClick: () => updateValue('3'),
-                  ),
-                  PaymentButton(
-                    text: '2',
-                    onClick: () => updateValue('2'),
-                  ),
-                  PaymentButton(
-                    text: '1',
-                    onClick: () => updateValue('1'),
-                  ),
-                  PaymentButton(
-                    text: '.',
-                    onClick: () => updateValue('.'),
-                  ),
-                  PaymentButton(
-                    text: '0',
-                    onClick: () => updateValue('0'),
-                  ),
-                  PaymentButton(
-                    text: 'del',
-                    onClick: () => clearValue(),
-                  ),
-                ],
-              ),
+            Row(
+              spacing: 12.0,
+              children: [
+                PaymentButton(
+                  text: '9',
+                  onClick: () => updateValue('9'),
+                ),
+                PaymentButton(
+                  text: '8',
+                  onClick: () => updateValue('8'),
+                ),
+                PaymentButton(
+                  text: '7',
+                  onClick: () => updateValue('7'),
+                ),
+              ],
             ),
-            SizedBox(
-              height: 12,
+            Row(
+              spacing: 12.0,
+              children: [
+                PaymentButton(
+                  text: '6',
+                  onClick: () => updateValue('6'),
+                ),
+                PaymentButton(
+                  text: '5',
+                  onClick: () => updateValue('5'),
+                ),
+                PaymentButton(
+                  text: '4',
+                  onClick: () => updateValue('4'),
+                ),
+              ],
             ),
+            Row(
+              spacing: 12.0,
+              children: [
+                PaymentButton(
+                  text: '3',
+                  onClick: () => updateValue('3'),
+                ),
+                PaymentButton(
+                  text: '2',
+                  onClick: () => updateValue('2'),
+                ),
+                PaymentButton(
+                  text: '1',
+                  onClick: () => updateValue('1'),
+                ),
+              ],
+            ),
+            Row(
+              spacing: 12.0,
+              children: [
+                PaymentButton(
+                  text: '.',
+                  onClick: () => updateValue('.'),
+                ),
+                PaymentButton(
+                  text: '0',
+                  onClick: () => updateValue('0'),
+                ),
+                PaymentButton(
+                  text: 'del',
+                  onClick: () => clearValue(),
+                ),
+              ],
+            ),
+            Spacer(),
             CustomButtonWidget(
-              buttonText: 'Pay',
+              buttonText: AppLocalizations.of(context)!.pay,
               onPressed: () {
                 double paid = double.parse(value.isEmpty ? '0' : value);
                 context.pushNamed(
@@ -162,19 +173,22 @@ class PaymentButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        onClick();
-      },
-      child: Container(
-        child: Center(
-            child: Text(
-          text,
-          style: TextStyle(fontSize: 18.0),
-        )),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color: AppPallete.surface,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          onClick();
+        },
+        child: Container(
+          height: 110.0,
+          child: Center(
+              child: Text(
+            text,
+            style: TextStyle(fontSize: 18.0),
+          )),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            color: AppPallete.surface,
+          ),
         ),
       ),
     );

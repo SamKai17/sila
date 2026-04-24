@@ -1,3 +1,4 @@
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/client/detail/view_model/client_detail_viewmodel.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
@@ -20,7 +21,7 @@ class ClientDetailScreen extends ConsumerWidget {
       data: (client) {
         return Scaffold(
           appBar: AppBar(
-            title: Text("client"),
+            title: Text(AppLocalizations.of(context)!.client),
             actions: [
               IconButton(
                 onPressed: () {
@@ -94,10 +95,10 @@ class ClientDetailScreen extends ConsumerWidget {
                             context.pushNamed(
                               Routes.transactionCreateName,
                               pathParameters: {'clientId': client.id},
-                              queryParameters: {'type': 'buy'},
+                              queryParameters: {'type': 'Buy'},
                             );
                           },
-                          child: Text('Buy'),
+                          child: Text(AppLocalizations.of(context)!.buy),
                         ),
                       ),
                       SizedBox(width: 16),
@@ -107,10 +108,10 @@ class ClientDetailScreen extends ConsumerWidget {
                             context.pushNamed(
                               Routes.transactionCreateName,
                               pathParameters: {'clientId': client.id},
-                              queryParameters: {'type': 'sell'},
+                              queryParameters: {'type': 'Sell'},
                             );
                           },
-                          child: Text('Sell'),
+                          child: Text(AppLocalizations.of(context)!.sell),
                         ),
                       ),
                     ],

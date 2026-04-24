@@ -4,6 +4,7 @@ import 'package:client/domain/models/transaction/transaction.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/auth/login/view_model/auth_viewmodel.dart';
 import 'package:client/ui/auth/login/widgets/login_screen.dart';
+import 'package:client/ui/auth/welcome/widgets/welcome_screen.dart';
 import 'package:client/ui/client/create/widgets/client_create_screen.dart';
 import 'package:client/ui/client/detail/widgets/client_detail_screen.dart';
 import 'package:client/ui/client/home/widgets/home_screen.dart';
@@ -20,31 +21,52 @@ import 'package:client/ui/transaction/list/widgets/transactions_screen.dart';
 import 'package:client/ui/transaction/payment/widgets/transaction_payment_screen.dart';
 import 'package:client/ui/transaction/preview/widgets/transaction_preview_screen.dart';
 import 'package:client/ui/transaction/receipt/widgets/transaction_receipt_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider(
   (ref) {
-    final user = ref.watch(currentUser);
+    // final user = ref.watch(currentUser);
     return GoRouter(
-      debugLogDiagnostics: true,
-      refreshListenable: user,
+      // debugLogDiagnostics: true,
+      refreshListenable:
+          GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
       redirect: (context, state) {
-        if (user.value.value == null) {
-          return Routes.login;
+        // print('redirecting');
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null &&
+            state.matchedLocation != '/welcome/login' &&
+            state.matchedLocation != '/welcome') {
+          print(state.matchedLocation);
+          // print('login matched');
+          return Routes.welcome;
         }
-        if (state.matchedLocation == Routes.login) {
+        if (user != null &&
+            (state.matchedLocation == '/welcome/login' ||
+                state.matchedLocation == '/welcome')) {
+          // print('home matched');
           return Routes.home;
         }
+        // print('null matched');
         return null;
       },
       routes: [
         GoRoute(
-          name: Routes.loginName,
-          path: Routes.login,
+          name: Routes.welcomeName,
+          path: Routes.welcome,
           builder: (context, state) {
-            return LoginScreen();
+            return WelcomeScreen();
           },
+          routes: [
+            GoRoute(
+              name: Routes.loginName,
+              path: Routes.login,
+              builder: (context, state) {
+                return LoginScreen();
+              },
+            ),
+          ],
         ),
         GoRoute(
           name: Routes.homeName,

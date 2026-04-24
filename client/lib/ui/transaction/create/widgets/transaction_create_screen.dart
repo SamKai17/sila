@@ -1,3 +1,4 @@
+import 'package:client/l10n/app_localizations.dart';
 import 'package:client/routing/routes.dart';
 import 'package:client/ui/core/theme/app_pallete.dart';
 import 'package:client/ui/core/ui/clear_button.dart';
@@ -28,7 +29,9 @@ class TransactionCreateScreen extends ConsumerWidget {
         automaticallyImplyLeading: selectedMode ? false : true,
         toolbarHeight: 72,
         surfaceTintColor: AppPallete.background,
-        title: !selectedMode ? Text("Transaction") : null,
+        title: !selectedMode
+            ? Text(AppLocalizations.of(context)!.transaction)
+            : null,
         leadingWidth: 82,
         leading: selectedMode
             ? ClearButton(
@@ -68,10 +71,10 @@ class TransactionCreateScreen extends ConsumerWidget {
                   spacing: 12.0,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Summary"),
+                    Text(AppLocalizations.of(context)!.summary),
                     Row(
                       children: [
-                        Text("Total Price"),
+                        Text(AppLocalizations.of(context)!.totalPrice),
                         Spacer(),
                         Text('${totalPrice}\$'),
                       ],
@@ -95,7 +98,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                         extra: ref.read(itemsCart(clientId).notifier).addItem,
                       );
                     },
-                    child: Text("+ add item"),
+                    child: Text(AppLocalizations.of(context)!.addItem),
                   ),
                 ),
                 SizedBox(
@@ -114,7 +117,7 @@ class TransactionCreateScreen extends ConsumerWidget {
                         },
                       );
                     },
-                    child: Text("pay"),
+                    child: Text(AppLocalizations.of(context)!.pay),
                   ),
                 ),
               ],
